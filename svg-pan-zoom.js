@@ -1,7 +1,7 @@
 svgPanZoom = function(){
 
 /** 
- *  SVGPan library 1.2.2
+ *  SVGPan library 1.3.0
  * ======================
  *
  * Given an unique existing element with id "viewport" (or when missing, the 
@@ -20,6 +20,9 @@ svgPanZoom = function(){
  *  - Zooming (while panning) on Safari has still some issues
  *
  * Releases:
+ *
+ * 1.3.0, Mon Nov 18 2013, Anders Riutta
+ *	- Added programmatic control for zoom/pan enabled/disabled
  *
  * 1.2.2, Tue Aug 30 17:21:56 CEST 2011, Andrea Leofreddi
  *	- Fixed viewBox on root tag (#7)
