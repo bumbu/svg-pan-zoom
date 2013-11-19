@@ -1,367 +1,494 @@
 svgPanZoom = function(){
 
-/** 
- *  SVGPan library 1.3.0
- * ======================
- *
- * Given an unique existing element with id "viewport" (or when missing, the 
- * first g-element), including the the library into any SVG adds the following 
- * capabilities:
- *
- *  - Mouse panning
- *  - Mouse zooming (using the wheel)
- *  - Object dragging
- *
- * You can configure the behaviour of the pan/zoom/drag with the variables
- * listed in the CONFIGURATION section of this file.
- *
- * Known issues:
- *
- *  - Zooming (while panning) on Safari has still some issues
- *
- * Releases:
- *
- * 1.3.0, Mon Nov 18 2013, Anders Riutta
- *	- Added programmatic control for zoom/pan enabled/disabled
- *
- * 1.2.2, Tue Aug 30 17:21:56 CEST 2011, Andrea Leofreddi
- *	- Fixed viewBox on root tag (#7)
- *	- Improved zoom speed (#2)
- *
- * 1.2.1, Mon Jul  4 00:33:18 CEST 2011, Andrea Leofreddi
- *	- Fixed a regression with mouse wheel (now working on Firefox 5)
- *	- Working with viewBox attribute (#4)
- *	- Added "use strict;" and fixed resulting warnings (#5)
- *	- Added configuration variables, dragging is disabled by default (#3)
- *
- * 1.2, Sat Mar 20 08:42:50 GMT 2010, Zeng Xiaohui
- *	Fixed a bug with browser mouse handler interaction
- *
- * 1.1, Wed Feb  3 17:39:33 GMT 2010, Zeng Xiaohui
- *	Updated the zoom code to support the mouse wheel on Safari/Chrome
- *
- * 1.0, Andrea Leofreddi
- *	First release
- *
- * This code is licensed under the following BSD license:
- *
- * Copyright 2009-2010 Andrea Leofreddi <a.leofreddi@itcharm.com>. All rights reserved.
- * 
- * Redistribution and use in source and binary forms, with or without modification, are
- * permitted provided that the following conditions are met:
- * 
- *    1. Redistributions of source code must retain the above copyright notice, this list of
- *       conditions and the following disclaimer.
- * 
- *    2. Redistributions in binary form must reproduce the above copyright notice, this list
- *       of conditions and the following disclaimer in the documentation and/or other materials
- *       provided with the distribution.
- * 
- * THIS SOFTWARE IS PROVIDED BY Andrea Leofreddi ``AS IS'' AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL Andrea Leofreddi OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
- * The views and conclusions contained in the software and documentation are those of the
- * authors and should not be interpreted as representing official policies, either expressed
- * or implied, of Andrea Leofreddi.
- */
+  /** 
+   *  svg-pan-zoom (was SVGPan) library 1.3.0
+   * ======================
+   *
+   * Given an unique existing element with id "viewport" (or when missing, the 
+   * first g-element), including the the library into any SVG adds the following 
+   * capabilities:
+   *
+   *  - Mouse and programmatic panning
+   *  - Mouse (using the wheel) and programmatic zooming
+   *  - Object dragging
+   *
+   * You can configure the behaviour of the pan/zoom/drag with the variables
+   * listed in the CONFIGURATION section of this file.
+   *
+   * Known issues:
+   *
+   *  - Zooming (while panning) on Safari has still some issues
+   *
+   * Releases:
+   *
+   * 1.3.1, Mon Nov 19 2013, Anders Riutta
+   *	- Added programmatic control for pan and zoom 
+   *	- Changed certain terms to make them more intuitive
+   *
+   * 1.3.0, Mon Nov 18 2013, Anders Riutta
+   *	- Added programmatic control for zoom/pan enabled/disabled
+   *
+   * 1.2.2, Tue Aug 30 17:21:56 CEST 2011, Andrea Leofreddi
+   *	- Fixed viewBox on root tag (#7)
+   *	- Improved zoom speed (#2)
+   *
+   * 1.2.1, Mon Jul  4 00:33:18 CEST 2011, Andrea Leofreddi
+   *	- Fixed a regression with mouse wheel (now working on Firefox 5)
+   *	- Working with viewBox attribute (#4)
+   *	- Added "use strict;" and fixed resulting warnings (#5)
+   *	- Added configuration variables, dragging is disabled by default (#3)
+   *
+   * 1.2, Sat Mar 20 08:42:50 GMT 2010, Zeng Xiaohui
+   *	Fixed a bug with browser mouse handler interaction
+   *
+   * 1.1, Wed Feb  3 17:39:33 GMT 2010, Zeng Xiaohui
+   *	Updated the zoom code to support the mouse wheel on Safari/Chrome
+   *
+   * 1.0, Andrea Leofreddi
+   *	First release
+   *
+   * This code is licensed under the following BSD license:
+   *
+   * Copyright 2009-2010 Andrea Leofreddi <a.leofreddi@itcharm.com>. All rights reserved.
+   * 
+   * Redistribution and use in source and binary forms, with or without modification, are
+   * permitted provided that the following conditions are met:
+   * 
+   *    1. Redistributions of source code must retain the above copyright notice, this list of
+   *       conditions and the following disclaimer.
+   * 
+   *    2. Redistributions in binary form must reproduce the above copyright notice, this list
+   *       of conditions and the following disclaimer in the documentation and/or other materials
+   *       provided with the distribution.
+   * 
+   * THIS SOFTWARE IS PROVIDED BY Andrea Leofreddi ``AS IS'' AND ANY EXPRESS OR IMPLIED
+   * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+   * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL Andrea Leofreddi OR
+   * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+   * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+   * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+   * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+   * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+   * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+   * 
+  * The views and conclusions contained in the software and documentation are those of the
+    * authors and should not be interpreted as representing official policies, either expressed
+    * or implied, of Andrea Leofreddi.
+    */
 
-"use strict";
+  "use strict";
 
-var root, state = 'none', svgRoot = null, stateTarget, stateOrigin, stateTf;
+  var root, state = 'none', viewport = null, viewportCTM, stateTarget, stateOrigin, stateTf, svgDoc;
 
-/// CONFIGURATION 
-/// ====>
+  /// CONFIGURATION 
+  /// ====>
 
-var enablePan = 1; // 1 or 0: enable or disable panning (default enabled)
-var enableZoom = 1; // 1 or 0: enable or disable zooming (default enabled)
-var enableDrag = 0; // 1 or 0: enable or disable dragging (default disabled)
-var zoomScale = 0.2; // Zoom sensitivity
+  var panEnabled = true; // true or false: enable or disable panning (default enabled)
+  var zoomEnabled = true; // true or false: enable or disable zooming (default enabled)
+  var dragEnabled = false; // true or false: enable or disable dragging (default disabled)
+  var zoomScaleSensitivity = 0.2; // Zoom sensitivity
 
-/// <====
-/// END OF CONFIGURATION 
+  /// <====
+  /// END OF CONFIGURATION 
 
-/**
- * Enable svgPanZoom 
- */
+  /**
+   * Enable svgPanZoom 
+   */
 
-function init(args) {
-  root = document.documentElement.getElementsByTagName("svg")[0];
-  if (!!args) {
-    if (!!args.root) {
-      root = document.querySelector(args.root);
+  function init(args) {
+    root = document.documentElement.getElementsByTagName("svg")[0];
+    if (!!args) {
+      if (!!args.root) {
+        root = document.querySelector(args.root);
+      }
+      if (args.hasOwnProperty('panEnabled')) {
+        panEnabled = args.panEnabled;
+      }
+      if (args.hasOwnProperty('zoomEnabled')) {
+        zoomEnabled = args.zoomEnabled;
+      }
+      if (args.hasOwnProperty('dragEnabled')) {
+        dragEnabled = args.dragEnabled;
+      }
+      if (args.hasOwnProperty('zoomScaleSensitivity')) {
+        zoomScaleSensitivity = args.zoomScaleSensitivity;
+      }
     }
-    if (args.hasOwnProperty('enablePan')) {
-      enablePan = args.enablePan;
+    setupHandlers(root);
+  }
+
+  /**
+   * Change settings 
+   */
+
+  function setZoomScaleSensitivity(newZoomScaleSensitivity) {
+    zoomScaleSensitivity = newZoomScaleSensitivity;
+  }
+
+  function enablePan() {
+    panEnabled = true;
+  }
+
+  function disablePan() {
+    panEnabled = false;
+  }
+
+  function enableZoom() {
+    zoomEnabled = true;
+  }
+
+  function disableZoom() {
+    zoomEnabled = false;
+  }
+
+  function enableDrag() {
+    dragEnabled = true;
+  }
+
+  function disableDrag() {
+    dragEnabled = false;
+  }
+
+  /**
+   * Register handlers
+   */
+
+  function setupHandlers(root){
+    setAttributes(root, {
+      "onmouseup" : "svgPanZoom.handleMouseUp(evt)",
+      "onmousedown" : "svgPanZoom.handleMouseDown(evt)",
+      "onmousemove" : "svgPanZoom.handleMouseMove(evt)",
+      //"onmouseout" : "svgPanZoom.handleMouseUp(evt)", // Decomment this to stop the pan functionality when dragging out of the SVG element
+    });
+
+    if(navigator.userAgent.toLowerCase().indexOf('webkit') >= 0)
+      window.addEventListener('mousewheel', handleMouseWheel, false); // Chrome/Safari
+    else
+      window.addEventListener('DOMMouseScroll', handleMouseWheel, false); // Others
+  }
+
+  /**
+   * Retrieves the root element for SVG manipulation. The element is then cached into the viewport global variable.
+   */
+
+  function getViewport(root) {
+    if(!viewport) {
+      var r = root.getElementById("viewport") ? root.getElementById("viewport") : root.documentElement, t = r;
+
+      while(t != root) {
+        if(t.getAttribute("viewBox")) {
+          setCTM(r, t.getCTM());
+
+          t.removeAttribute("viewBox");
+        }
+
+        t = t.parentNode;
+      }
+
+      window.viewport = viewport = r;
     }
-    if (args.hasOwnProperty('enableZoom')) {
-      enableZoom = args.enableZoom;
+
+    viewportCTM = viewport.getCTM();
+    return viewport;
+  }
+
+  /**
+   * Instance an SVGPoint object with given event coordinates.
+   */
+
+  function getEventPoint(evt) {
+    var p = root.createSVGPoint();
+
+    p.x = evt.clientX;
+    p.y = evt.clientY;
+
+    return p;
+  }
+
+  /**
+   * Sets the current transform matrix of an element.
+   */
+
+  function setCTM(element, matrix) {
+    var s = "matrix(" + matrix.a + "," + matrix.b + "," + matrix.c + "," + matrix.d + "," + matrix.e + "," + matrix.f + ")";
+    element.setAttribute("transform", s);
+  }
+
+  /**
+   * Dumps a matrix to a string (useful for debug).
+   */
+
+  function dumpMatrix(matrix) {
+    var s = "[ " + matrix.a + ", " + matrix.c + ", " + matrix.e + "\n  " + matrix.b + ", " + matrix.d + ", " + matrix.f + "\n  0, 0, 1 ]";
+    return s;
+  }
+
+  /**
+   * Sets attributes of an element.
+   */
+  function setAttributes(element, attributes){
+    for (var i in attributes)
+      element.setAttributeNS(null, i, attributes[i]);
+  }
+
+  function getSvgDoc(target) {
+    if (!target) {
+      svgDoc = document.querySelector('svg');
     }
-    if (args.hasOwnProperty('enableDrag')) {
-      enableDrag = args.enableDrag;
+    else {
+      svgDoc = document.querySelector(target);
     }
-    if (args.hasOwnProperty('zoomScale')) {
-      zoomScale = args.zoomScale;
+    if (!svgDoc) {
+      return new Error('No SVG found in this document.');
+    }
+    else {
+      return svgDoc;
     }
   }
-  setupHandlers(root);
-}
 
-/**
- * Change settings 
- */
+  function pan(target, direction) {
+    if (!target || !direction) {
+      return;
+    }
+    var tx, ty;
+    var panIncrement = 0.1;
+    var directionToXYMapping = {
+      'top':{
+        'x': 0,
+        'y': -1
+      },
+      't':{
+        'x': 0,
+        'y': -1
+      },
+      'up':{
+        'x': 0,
+        'y': -1
+      },
+      'right':{
+        'x': 1,
+        'y': 0
+      },
+      'r':{
+        'x': 1,
+        'y': 0
+      },
+      'bottom':{
+        'x': 0,
+        'y': 1
+      },
+      'b':{
+        'x': 0,
+        'y': 1
+      },
+      'down':{
+        'x': 0,
+        'y': 1
+      },
+      'left':{
+        'x': -1,
+        'y': 0
+      },
+      'l':{
+        'x': -1,
+        'y': 0
+      }
+    };
+
+    svgDoc = getSvgDoc(target);
+    viewport = getViewport(svgDoc);
+
+    var directionXY = directionToXYMapping[direction];
+
+    if (!directionXY) {
+      return Error('Direction specified was not understood.');
+    }
+
+    tx = svgDoc.getBBox().width * panIncrement * directionXY.x;
+    ty = svgDoc.getBBox().height * panIncrement * directionXY.y;
+    viewportCTM.e += tx;
+    viewportCTM.f += ty;
+    setCTM(viewport, viewportCTM);
+  }
+
+  function zoomIn(target) {
+
+    // TODO zoom origin isn't center of screen
+
+    svgDoc = getSvgDoc(target);
+    viewport = getViewport(svgDoc);
+    viewportCTM.a = viewportCTM.d = (1 + zoomScaleSensitivity) * viewportCTM.a;
+    setCTM(viewport, viewportCTM);
+  }
+
+  function zoomOut(target) {
+
+    // TODO zoom origin isn't center of screen
+
+    svgDoc = getSvgDoc(target);
+    viewport = getViewport(svgDoc);
+    viewportCTM.a = viewportCTM.d = (1 - zoomScaleSensitivity) * viewportCTM.a;
+    setCTM(viewport, viewportCTM);
+  }
+
+  function zoom(args) {
+    if (!args.target || !args.scale) {
+      return;
+    }
+    svgDoc = getSvgDoc(args.target);
+    viewport = getViewport(args.svgDoc);
+    viewportCTM.a = viewportCTM.d = args.scale;
+    setCTM(viewport, viewportCTM);
+  }
+
+  /**
+   * Handle mouse wheel event.
+   */
+
+  function handleMouseWheel(evt) {
+    if(!zoomEnabled) {
+      return;
+    }
 
-function togglePan() {
-  enablePan = !enablePan;
-}
+    if(evt.preventDefault) {
+      evt.preventDefault();
+    }
+    else {
+      evt.returnValue = false;
+    }
 
-function toggleZoom() {
-  enableZoom = !enableZoom;
-}
+    var svgDoc = evt.target.ownerDocument;
 
-function toggleDrag() {
-  enableDrag = !enableDrag;
-}
+    var delta;
 
-function setZoomScale(newZoomScale) {
-  zoomScale = newZoomScale;
-}
+    if(evt.wheelDelta)
+      delta = evt.wheelDelta / 360; // Chrome/Safari
+    else
+      delta = evt.detail / -9; // Mozilla
 
-function setPan(bln) {
-  enablePan = bln;
-}
+    var z = Math.pow(1 + zoomScaleSensitivity, delta);
 
-function setZoom(bln) {
-  enableZoom = bln;
-}
+    var g = getViewport(svgDoc);
 
-function setDrag(bln) {
-  enableDrag = bln;
-}
+    var p = getEventPoint(evt);
 
-/**
- * Register handlers
- */
+    p = p.matrixTransform(g.getCTM().inverse());
 
-function setupHandlers(root){
-	setAttributes(root, {
-		"onmouseup" : "svgPanZoom.handleMouseUp(evt)",
-		"onmousedown" : "svgPanZoom.handleMouseDown(evt)",
-		"onmousemove" : "svgPanZoom.handleMouseMove(evt)",
-		//"onmouseout" : "svgPanZoom.handleMouseUp(evt)", // Decomment this to stop the pan functionality when dragging out of the SVG element
-	});
+    // Compute new scale matrix in current mouse position
+    var k = root.createSVGMatrix().translate(p.x, p.y).scale(z).translate(-p.x, -p.y);
 
-	if(navigator.userAgent.toLowerCase().indexOf('webkit') >= 0)
-		window.addEventListener('mousewheel', handleMouseWheel, false); // Chrome/Safari
-	else
-		window.addEventListener('DOMMouseScroll', handleMouseWheel, false); // Others
-}
+    setCTM(g, g.getCTM().multiply(k));
 
-/**
- * Retrieves the root element for SVG manipulation. The element is then cached into the svgRoot global variable.
- */
+    if(typeof(stateTf) == "undefined")
+      stateTf = g.getCTM().inverse();
 
-function getRoot(root) {
-	if(!svgRoot) {
-		var r = root.getElementById("viewport") ? root.getElementById("viewport") : root.documentElement, t = r;
+    stateTf = stateTf.multiply(k.inverse());
+  }
 
-		while(t != root) {
-			if(t.getAttribute("viewBox")) {
-				setCTM(r, t.getCTM());
+  /**
+   * Handle mouse move event.
+   */
 
-				t.removeAttribute("viewBox");
-			}
+  function handleMouseMove(evt) {
+    if(evt.preventDefault) {
+      evt.preventDefault();
+    }
+    else {
+      evt.returnValue = false;
+    }
 
-			t = t.parentNode;
-		}
+    var svgDoc = evt.target.ownerDocument;
 
-		window.svgRoot = svgRoot = r;
-	}
+    var g = getViewport(svgDoc);
 
-	return svgRoot;
-}
+    if(state == 'pan' && panEnabled) {
+      // Pan mode
+      var p = getEventPoint(evt).matrixTransform(stateTf);
 
-/**
- * Instance an SVGPoint object with given event coordinates.
- */
+      setCTM(g, stateTf.inverse().translate(p.x - stateOrigin.x, p.y - stateOrigin.y));
+    } else if(state == 'drag' && dragEnabled) {
+      // Drag mode
+      var p = getEventPoint(evt).matrixTransform(g.getCTM().inverse());
 
-function getEventPoint(evt) {
-	var p = root.createSVGPoint();
+      setCTM(stateTarget, root.createSVGMatrix().translate(p.x - stateOrigin.x, p.y - stateOrigin.y).multiply(g.getCTM().inverse()).multiply(stateTarget.getCTM()));
 
-	p.x = evt.clientX;
-	p.y = evt.clientY;
+      stateOrigin = p;
+    }
+  }
 
-	return p;
-}
+  /**
+   * Handle click event.
+   */
 
-/**
- * Sets the current transform matrix of an element.
- */
+  function handleMouseDown(evt) {
+    if(evt.preventDefault) {
+      evt.preventDefault();
+    }
+    else {
+      evt.returnValue = false;
+    }
 
-function setCTM(element, matrix) {
-	var s = "matrix(" + matrix.a + "," + matrix.b + "," + matrix.c + "," + matrix.d + "," + matrix.e + "," + matrix.f + ")";
+    var svgDoc = evt.target.ownerDocument;
 
-	element.setAttribute("transform", s);
-}
+    var g = getViewport(svgDoc);
 
-/**
- * Dumps a matrix to a string (useful for debug).
- */
+    if(
+      evt.target.tagName == "svg" 
+        || !dragEnabled // Pan anyway when drag is disabled and the user clicked on an element 
+    ) {
+      // Pan mode
+      state = 'pan';
 
-function dumpMatrix(matrix) {
-	var s = "[ " + matrix.a + ", " + matrix.c + ", " + matrix.e + "\n  " + matrix.b + ", " + matrix.d + ", " + matrix.f + "\n  0, 0, 1 ]";
+      stateTf = g.getCTM().inverse();
 
-	return s;
-}
+      stateOrigin = getEventPoint(evt).matrixTransform(stateTf);
+    } else {
+      // Drag mode
+      state = 'drag';
 
-/**
- * Sets attributes of an element.
- */
-function setAttributes(element, attributes){
-	for (var i in attributes)
-		element.setAttributeNS(null, i, attributes[i]);
-}
+      stateTarget = evt.target;
 
-/**
- * Handle mouse wheel event.
- */
+      stateTf = g.getCTM().inverse();
 
-function handleMouseWheel(evt) {
-	if(!enableZoom)
-		return;
+      stateOrigin = getEventPoint(evt).matrixTransform(stateTf);
+    }
+  }
 
-	if(evt.preventDefault)
-		evt.preventDefault();
+  /**
+   * Handle mouse button release event.
+   */
 
-	evt.returnValue = false;
+  function handleMouseUp(evt) {
+    if(evt.preventDefault) {
+      evt.preventDefault();
+    }
+    else {
+      evt.returnValue = false;
+    }
 
-	var svgDoc = evt.target.ownerDocument;
+    var svgDoc = evt.target.ownerDocument;
 
-	var delta;
+    if(state == 'pan' || state == 'drag') {
+      // Quit pan mode
+      state = '';
+    }
+  }
 
-	if(evt.wheelDelta)
-		delta = evt.wheelDelta / 360; // Chrome/Safari
-	else
-		delta = evt.detail / -9; // Mozilla
-
-	var z = Math.pow(1 + zoomScale, delta);
-
-	var g = getRoot(svgDoc);
-	
-	var p = getEventPoint(evt);
-
-	p = p.matrixTransform(g.getCTM().inverse());
-
-	// Compute new scale matrix in current mouse position
-	var k = root.createSVGMatrix().translate(p.x, p.y).scale(z).translate(-p.x, -p.y);
-
-        setCTM(g, g.getCTM().multiply(k));
-
-	if(typeof(stateTf) == "undefined")
-		stateTf = g.getCTM().inverse();
-
-	stateTf = stateTf.multiply(k.inverse());
-}
-
-/**
- * Handle mouse move event.
- */
-
-function handleMouseMove(evt) {
-	if(evt.preventDefault)
-		evt.preventDefault();
-
-	evt.returnValue = false;
-
-	var svgDoc = evt.target.ownerDocument;
-
-	var g = getRoot(svgDoc);
-
-	if(state == 'pan' && enablePan) {
-		// Pan mode
-		var p = getEventPoint(evt).matrixTransform(stateTf);
-
-		setCTM(g, stateTf.inverse().translate(p.x - stateOrigin.x, p.y - stateOrigin.y));
-	} else if(state == 'drag' && enableDrag) {
-		// Drag mode
-		var p = getEventPoint(evt).matrixTransform(g.getCTM().inverse());
-
-		setCTM(stateTarget, root.createSVGMatrix().translate(p.x - stateOrigin.x, p.y - stateOrigin.y).multiply(g.getCTM().inverse()).multiply(stateTarget.getCTM()));
-
-		stateOrigin = p;
-	}
-}
-
-/**
- * Handle click event.
- */
-
-function handleMouseDown(evt) {
-	if(evt.preventDefault)
-		evt.preventDefault();
-
-	evt.returnValue = false;
-
-	var svgDoc = evt.target.ownerDocument;
-
-	var g = getRoot(svgDoc);
-
-	if(
-		evt.target.tagName == "svg" 
-		|| !enableDrag // Pan anyway when drag is disabled and the user clicked on an element 
-	) {
-		// Pan mode
-		state = 'pan';
-
-		stateTf = g.getCTM().inverse();
-
-		stateOrigin = getEventPoint(evt).matrixTransform(stateTf);
-	} else {
-		// Drag mode
-		state = 'drag';
-
-		stateTarget = evt.target;
-
-		stateTf = g.getCTM().inverse();
-
-		stateOrigin = getEventPoint(evt).matrixTransform(stateTf);
-	}
-}
-
-/**
- * Handle mouse button release event.
- */
-
-function handleMouseUp(evt) {
-	if(evt.preventDefault)
-		evt.preventDefault();
-
-	evt.returnValue = false;
-
-	var svgDoc = evt.target.ownerDocument;
-
-	if(state == 'pan' || state == 'drag') {
-		// Quit pan mode
-		state = '';
-	}
-}
   return{
-   init:init,
-   handleMouseUp:handleMouseUp,
-   handleMouseDown:handleMouseDown,
-   handleMouseMove:handleMouseMove,
-   togglePan:togglePan,
-   toggleZoom:toggleZoom,
-   toggleDrag:toggleDrag,
-   setPan:setPan,
-   setZoom:setZoom,
-   setDrag:setDrag,
-   setZoomScale:setZoomScale
+    init:init,
+    handleMouseUp:handleMouseUp,
+    handleMouseDown:handleMouseDown,
+    handleMouseMove:handleMouseMove,
+    pan:pan,
+    zoom:zoom,
+    zoomIn:zoomIn,
+    zoomOut:zoomOut,
+    setZoomScaleSensitivity:setZoomScaleSensitivity,
+    enablePan:enablePan,
+    disablePan:disablePan,
+    enableZoom:enableZoom,
+    disableZoom:disableZoom,
+    enableDrag:enableDrag,
+    disableDrag:disableDrag
   };
 }();
