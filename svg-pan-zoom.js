@@ -1,23 +1,30 @@
 svgPanZoom = function(){
 
   /** 
-   *  svg-pan-zoom (was SVGPan) library 1.3.2
-   * ========================================
+   *  svg-pan-zoom (based on SVGPan) library 1.3.2
+   * =============================================
    *
-   * svg-pan-zoom adds the following capabilities
-   * to an SVG in an HTML page:
+   * The SVGPan library was intended for use inside
+   * an SVG by manually adding an xlink:href script tag.
    *
-   *  - Mouse and programmatic panning
-   *  - Mouse (using the wheel) and programmatic zooming
-   *  - Object dragging
+   * The svg-pan-zoom library builds on the SVGPan library,
+   * adding the ability to control panning and zooming of
+   * any SVG included in an HTML document, without needing 
+   * to manually add a script element to the SVG.
+   *
+   * svg-pan-zoom features the following capabilities:
+   *  - Panning based on mouse events and via JavaScript
+   *  - Zooming based on mouse events (using the wheel) and via JavaScript
+   *  - Object dragging based on mouse events
    *
    *  Note that the SVG should have a top-level 'g' element
    *  with the id 'viewport' to enable zooming for the entire SVG. 
    *  If the specified SVG does not have this element, it will
    *  use the first 'g' element.
    *
-   * You can configure the behaviour of the pan/zoom/drag with the variables
-   * listed in the CONFIGURATION section of this file.
+   * You can configure the default behaviour of the pan/zoom/drag
+   * with the variables listed in the CONFIGURATION section of this file,
+   * or with the "enable/disable" methods.
    *
    * Known issues:
    *
@@ -357,8 +364,8 @@ svgPanZoom = function(){
   }
 
   function pan(selector, direction) {
-    if (!selector || !direction) {
-      return;
+    if (!direction) {
+      throw new Error('No direction specified for direction of panning. Please enter a string value of up, right, down or left.');
     }
     var tx, ty;
     var panIncrement = 0.1;
@@ -372,6 +379,10 @@ svgPanZoom = function(){
         'y': -1
       },
       'up':{
+        'x': 0,
+        'y': -1
+      },
+      'u':{
         'x': 0,
         'y': -1
       },
@@ -395,6 +406,10 @@ svgPanZoom = function(){
         'x': 0,
         'y': 1
       },
+      'd':{
+        'x': 0,
+        'y': 1
+      },
       'left':{
         'x': -1,
         'y': 0
@@ -405,20 +420,22 @@ svgPanZoom = function(){
       }
     };
 
-    svg = getSvg(selector);
-    var viewport = getViewport(svg);
-
     var directionXY = directionToXYMapping[direction];
 
     if (!directionXY) {
-      return Error('Direction specified was not understood.');
+      throw new Error('Direction specified was not understood. Please enter a string value of up, right, down or left.');
     }
 
-    tx = svg.getBBox().width * panIncrement * directionXY.x;
-    ty = svg.getBBox().height * panIncrement * directionXY.y;
-    viewportCTM.e += tx;
-    viewportCTM.f += ty;
-    setCTM(viewport, viewportCTM);
+    getSvg(selector, function(err, svg) {
+      var viewport = getViewport(svg);
+
+
+      tx = svg.getBBox().width * panIncrement * directionXY.x;
+      ty = svg.getBBox().height * panIncrement * directionXY.y;
+      viewportCTM.e += tx;
+      viewportCTM.f += ty;
+      setCTM(viewport, viewportCTM);
+    });
   }
 
   function resetZoom(selector) {
@@ -442,30 +459,33 @@ svgPanZoom = function(){
 
     // TODO zoom origin isn't center of screen
 
-    svg = getSvg(selector);
-    var viewport = getViewport(svg);
-    viewportCTM.a = viewportCTM.d = (1 + zoomScaleSensitivity) * viewportCTM.a;
-    setCTM(viewport, viewportCTM);
+    getSvg(selector, function(err, svg) {
+      var viewport = getViewport(svg);
+      viewportCTM.a = viewportCTM.d = (1 + zoomScaleSensitivity) * viewportCTM.a;
+      setCTM(viewport, viewportCTM);
+    });
   }
 
   function zoomOut(selector) {
 
     // TODO zoom origin isn't center of screen
 
-    svg = getSvg(selector);
-    var viewport = getViewport(svg);
-    viewportCTM.a = viewportCTM.d = (1 - zoomScaleSensitivity) * viewportCTM.a;
-    setCTM(viewport, viewportCTM);
+    getSvg(selector, function(err, svg) {
+      var viewport = getViewport(svg);
+      viewportCTM.a = viewportCTM.d = (1 - zoomScaleSensitivity) * viewportCTM.a;
+      setCTM(viewport, viewportCTM);
+    });
   }
 
   function zoom(args) {
-    if (!args.selector || !args.scale) {
-      return;
+    if (!args.scale) {
+      throw new Error('No scale specified for zoom. Please enter a number.');
     }
-    svg = getSvg(args.selector);
-    var viewport = getViewport(svg);
-    viewportCTM.a = viewportCTM.d = args.scale;
-    setCTM(viewport, viewportCTM);
+    getSvg(selector, function(err, svg) {
+      var viewport = getViewport(svg);
+      viewportCTM.a = viewportCTM.d = args.scale;
+      setCTM(viewport, viewportCTM);
+    });
   }
 
   /**
