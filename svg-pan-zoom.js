@@ -32,7 +32,7 @@ svgPanZoom = function(){
 
   'use strict';
 
-  var svg, state = 'none', viewportCTM, stateTarget, stateOrigin, stateTf;
+  var state = 'none', viewportCTM, stateTarget, stateOrigin, stateTf;
 
   /// CONFIGURATION 
   /// ====>
@@ -51,7 +51,7 @@ svgPanZoom = function(){
 
   function init(args) {
     args = args || {};
-    svg = getSvg(args.selector, function(err, result) {
+    getSvg(args.selector, function(err, svg) {
       if (args.hasOwnProperty('panEnabled')) {
         panEnabled = args.panEnabled;
       }
@@ -64,8 +64,10 @@ svgPanZoom = function(){
       if (args.hasOwnProperty('zoomScaleSensitivity')) {
         zoomScaleSensitivity = args.zoomScaleSensitivity;
       }
-      setupHandlers(result);
-      svg.ownerDocument.defaultView.svgPanZoom = svgPanZoom;
+      setupHandlers(svg);
+      if (!!svg.ownerDocument.documentElement.tagName.toLowerCase() !== 'svg') {
+        svg.ownerDocument.defaultView.svgPanZoom = svgPanZoom;
+      }
     });
   }
 
@@ -117,12 +119,11 @@ svgPanZoom = function(){
     svg.setAttributeNS('xmlns', 'xlink', 'http://www.w3.org/1999/xlink')
     svg.setAttributeNS('xmlns', 'ev', 'http://www.w3.org/2001/xml-events')
 
-    var svgWindow = svg.ownerDocument.defaultView;
     if(navigator.userAgent.toLowerCase().indexOf('webkit') >= 0) {
-      svgWindow.addEventListener('mousewheel', handleMouseWheel, false); // Chrome/Safari
+      svg.addEventListener('mousewheel', handleMouseWheel, false); // Chrome/Safari
     }
     else {
-      svgWindow.addEventListener('DOMMouseScroll', handleMouseWheel, false); // Others
+      svg.addEventListener('DOMMouseScroll', handleMouseWheel, false); // Others
     }
   }
 
@@ -132,17 +133,16 @@ svgPanZoom = function(){
 
   function getViewport(svg) {
     var initialViewportCTM, svgViewBox;
-    var svgWindow = svg.ownerDocument.defaultView;
-    if (!svgWindow.viewport) {
-      svgWindow.viewport = svg.getElementById('viewport');
-      if (!svgWindow.viewport) {
+    if (!svg.__viewportElement) {
+      svg.__viewportElement = svg.getElementById('viewport');
+      if (!svg.__viewportElement) {
 
         // If no g container with id 'viewport' exists, as last resort, use first g element.
 
-        svgWindow.viewport = svg.getElementsByTagName('g')[0]
+        svg.__viewportElement = svg.getElementsByTagName('g')[0]
       }
 
-      if (!svgWindow.viewport) {
+      if (!svg.__viewportElement) {
 
         // TODO could automatically move all elements from SVG into a newly created viewport g element.
 
@@ -151,13 +151,13 @@ svgPanZoom = function(){
 
       svgViewBox = svg.getAttribute('viewBox');
       if (svgViewBox) {
-        svgWindow.viewport.setAttribute('viewBox', svgViewBox);
+        svg.__viewportElement.setAttribute('viewBox', svgViewBox);
         svg.removeAttribute('viewBox');
       }
     }
 
-    viewportCTM = svgWindow.viewport.getCTM();
-    return svgWindow.viewport;
+    viewportCTM = svg.__viewportElement.getCTM();
+    return svg.__viewportElement;
   }
 
   /**
@@ -165,7 +165,8 @@ svgPanZoom = function(){
    */
 
   function getEventPoint(evt) {
-    svg = evt.target.ownerDocument.documentElement;
+    var svg = (evt.target.tagName === 'svg' || evt.target.tagName === 'SVG') ? evt.target : evt.target.ownerSVGElement || evt.target.correspondingElement.ownerSVGElement;
+
     var p = svg.createSVGPoint();
 
     p.x = evt.clientX;
@@ -203,7 +204,7 @@ svgPanZoom = function(){
   function findFirstSvg(callback) {
     var i, candidateSvg, foundSvg;
     var candidateSvg = document.querySelector('svg');
-    if (candidateSvg) {
+    if (!!candidateSvg) {
       foundSvg = candidateSvg;
       callback(foundSvg);
     }
@@ -212,7 +213,7 @@ svgPanZoom = function(){
     i = 0;
     do {
       i += 1;
-      candidateSvg = getSvg('object:nth-of-type(' + i + ')', function(err, candidateSvg) {
+      getSvg('object:nth-of-type(' + i + ')', function(err, candidateSvg) {
         if (!!candidateSvg) {
           foundSvg = candidateSvg;
           callback(foundSvg);
@@ -224,7 +225,7 @@ svgPanZoom = function(){
     i = 0;
     do {
       i += 1;
-      candidateSvg = getSvg('embed:nth-of-type(' + i + ')', function(err, candidateSvg) {
+      getSvg('embed:nth-of-type(' + i + ')', function(err, candidateSvg) {
         if (!!candidateSvg) {
           foundSvg = candidateSvg;
           callback(foundSvg);
@@ -236,21 +237,21 @@ svgPanZoom = function(){
   }
 
   function getSvg(selector, callback) {
-    var target, err;
+    var target, err, svg;
     if (!selector) {
       console.warn('No selector specified for getSvg(). Using first svg element found.');
-      target = findFirstSvg(function(result) {
-        if (!result) {
+      target = findFirstSvg(function(svg) {
+        if (!svg) {
           err = new Error('No SVG found in this document.');
         }
         if (!!callback) {
-          callback(err, result);
+          callback(err, svg);
         }
         else {
           if (!svg) {
             throw err;
           }
-          return result;
+          return svg;
         }
       });
     }
@@ -279,19 +280,18 @@ svgPanZoom = function(){
           }
         }
       }
+      if (!svg) {
+        err = new Error('No SVG found in this document.');
+      }
+
+      if (!!callback) {
+        callback(err, svg);
+      }
       else {
         if (!svg) {
-          err = new Error('No SVG found in this document.');
+          throw err;
         }
-        if (!!callback) {
-          callback(err, svg);
-        }
-        else {
-          if (!svg) {
-            throw err;
-          }
-          return svg;
-        }
+        return svg;
       }
     }
   }
@@ -361,8 +361,6 @@ svgPanZoom = function(){
 
     getSvg(selector, function(err, svg) {
       var viewport = getViewport(svg);
-
-
       tx = svg.getBBox().width * panIncrement * directionXY.x;
       ty = svg.getBBox().height * panIncrement * directionXY.y;
       viewportCTM.e += tx;
@@ -437,7 +435,7 @@ svgPanZoom = function(){
       evt.returnValue = false;
     }
 
-    var svg = evt.target.ownerDocument.documentElement;
+    var svg = (evt.target.tagName === 'svg' || evt.target.tagName === 'SVG') ? evt.target : evt.target.ownerSVGElement || evt.target.correspondingElement.ownerSVGElement;
 
     var delta;
 
@@ -477,8 +475,8 @@ svgPanZoom = function(){
       evt.returnValue = false;
     }
 
-    var svg = evt.target.ownerDocument.documentElement;
-
+    var svg = (evt.target.tagName === 'svg' || evt.target.tagName === 'SVG') ? evt.target : evt.target.ownerSVGElement || evt.target.correspondingElement.ownerSVGElement;
+    
     var g = getViewport(svg);
 
     if(state == 'pan' && panEnabled) {
@@ -508,7 +506,7 @@ svgPanZoom = function(){
       evt.returnValue = false;
     }
 
-    var svg = evt.target.ownerDocument.documentElement;
+    var svg = (evt.target.tagName === 'svg' || evt.target.tagName === 'SVG') ? evt.target : evt.target.ownerSVGElement || evt.target.correspondingElement.ownerSVGElement;
 
     var g = getViewport(svg);
 
@@ -546,7 +544,7 @@ svgPanZoom = function(){
       evt.returnValue = false;
     }
 
-    var svg = evt.target.ownerDocument.documentElement;
+    var svg = (evt.target.tagName === 'svg' || evt.target.tagName === 'SVG') ? evt.target : evt.target.ownerSVGElement || evt.target.correspondingElement.ownerSVGElement;
 
     if(state == 'pan' || state == 'drag') {
       // Quit pan mode
