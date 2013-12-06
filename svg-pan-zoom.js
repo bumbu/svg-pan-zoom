@@ -1,16 +1,20 @@
 svgPanZoom = function(){
 
   /** 
-   *  svg-pan-zoom (was SVGPan) library 1.3.0
-   * ======================
+   *  svg-pan-zoom (was SVGPan) library 1.3.2
+   * ========================================
    *
-   * Given an unique existing element with id "viewport" (or when missing, the 
-   * first g-element), including the the library into any SVG adds the following 
-   * capabilities:
+   * svg-pan-zoom adds the following capabilities
+   * to an SVG in an HTML page:
    *
    *  - Mouse and programmatic panning
    *  - Mouse (using the wheel) and programmatic zooming
    *  - Object dragging
+   *
+   *  Note that the SVG should have a top-level 'g' element
+   *  with the id 'viewport' to enable zooming for the entire SVG. 
+   *  If the specified SVG does not have this element, it will
+   *  use the first 'g' element.
    *
    * You can configure the behaviour of the pan/zoom/drag with the variables
    * listed in the CONFIGURATION section of this file.
@@ -21,6 +25,11 @@ svgPanZoom = function(){
    *
    * Releases:
    *
+   * 1.3.2, Thu Dec 5 2013, Anders Riutta
+   *  - Addressed issue of overwriting existing viewport transform
+   *  - Added capability to handle SVG documents in object elements.
+   *
+   *
    * 1.3.1, Mon Nov 19 2013, Anders Riutta
    *	- Added programmatic control for pan and zoom 
    *	- Changed certain terms to make them more intuitive
@@ -29,13 +38,13 @@ svgPanZoom = function(){
    *	- Added programmatic control for zoom/pan enabled/disabled
    *
    * 1.2.2, Tue Aug 30 17:21:56 CEST 2011, Andrea Leofreddi
-   *	- Fixed viewBox on root tag (#7)
+   *	- Fixed viewBox on svg tag (#7)
    *	- Improved zoom speed (#2)
    *
    * 1.2.1, Mon Jul  4 00:33:18 CEST 2011, Andrea Leofreddi
    *	- Fixed a regression with mouse wheel (now working on Firefox 5)
    *	- Working with viewBox attribute (#4)
-   *	- Added "use strict;" and fixed resulting warnings (#5)
+   *	- Added 'use strict;' and fixed resulting warnings (#5)
    *	- Added configuration variables, dragging is disabled by default (#3)
    *
    * 1.2, Sat Mar 20 08:42:50 GMT 2010, Zeng Xiaohui
@@ -76,9 +85,9 @@ svgPanZoom = function(){
     * or implied, of Andrea Leofreddi.
     */
 
-  "use strict";
+  'use strict';
 
-  var root, state = 'none', viewport = null, viewportCTM, stateTarget, stateOrigin, stateTf, svgDoc;
+  var svg, state = 'none', viewportCTM, stateTarget, stateOrigin, stateTf, svg;
 
   /// CONFIGURATION 
   /// ====>
@@ -96,11 +105,8 @@ svgPanZoom = function(){
    */
 
   function init(args) {
-    root = document.documentElement.getElementsByTagName("svg")[0];
-    if (!!args) {
-      if (!!args.root) {
-        root = document.querySelector(args.root);
-      }
+    args = args || {};
+    svg = getSvg(args.selector, function(err, result) {
       if (args.hasOwnProperty('panEnabled')) {
         panEnabled = args.panEnabled;
       }
@@ -113,8 +119,9 @@ svgPanZoom = function(){
       if (args.hasOwnProperty('zoomScaleSensitivity')) {
         zoomScaleSensitivity = args.zoomScaleSensitivity;
       }
-    }
-    setupHandlers(root);
+      setupHandlers(result);
+      svg.ownerDocument.defaultView.svgPanZoom = svgPanZoom;
+    });
   }
 
   /**
@@ -153,43 +160,64 @@ svgPanZoom = function(){
    * Register handlers
    */
 
-  function setupHandlers(root){
-    setAttributes(root, {
-      "onmouseup" : "svgPanZoom.handleMouseUp(evt)",
-      "onmousedown" : "svgPanZoom.handleMouseDown(evt)",
-      "onmousemove" : "svgPanZoom.handleMouseMove(evt)",
-      //"onmouseout" : "svgPanZoom.handleMouseUp(evt)", // Decomment this to stop the pan functionality when dragging out of the SVG element
+  function setupHandlers(svg){
+    setAttributes(svg, {
+      'onmouseup': 'svgPanZoom.handleMouseUp(evt)',
+      'onmousedown': 'svgPanZoom.handleMouseDown(evt)',
+      'onmousemove': 'svgPanZoom.handleMouseMove(evt)'
+      //'onmouseout' : 'svgPanZoom.handleMouseUp(evt)', // Decomment this to stop the pan functionality when dragging out of the SVG element
     });
 
-    if(navigator.userAgent.toLowerCase().indexOf('webkit') >= 0)
-      window.addEventListener('mousewheel', handleMouseWheel, false); // Chrome/Safari
-    else
-      window.addEventListener('DOMMouseScroll', handleMouseWheel, false); // Others
+    svg.setAttribute('xmlns', 'http://www.w3.org/1999/xlink')
+    svg.setAttributeNS('xmlns', 'xlink', 'http://www.w3.org/1999/xlink')
+    svg.setAttributeNS('xmlns', 'ev', 'http://www.w3.org/2001/xml-events')
+
+    var svgWindow = svg.ownerDocument.defaultView;
+    if(navigator.userAgent.toLowerCase().indexOf('webkit') >= 0) {
+      svgWindow.addEventListener('mousewheel', handleMouseWheel, false); // Chrome/Safari
+    }
+    else {
+      svgWindow.addEventListener('DOMMouseScroll', handleMouseWheel, false); // Others
+    }
   }
 
   /**
-   * Retrieves the root element for SVG manipulation. The element is then cached into the viewport global variable.
+   * Retrieves the svg element for SVG manipulation. The element is then cached into the viewport global variable.
    */
 
-  function getViewport(root) {
-    if(!viewport) {
-      var r = root.getElementById("viewport") ? root.getElementById("viewport") : root.documentElement, t = r;
+  function getViewport(svg) {
+    var initialViewportCTM, svgViewBox;
+    var svgWindow = svg.ownerDocument.defaultView;
+    if (!svgWindow.viewport) {
+      svgWindow.viewport = svg.getElementById('viewport');
+      if (!svgWindow.viewport) {
 
-      while(t != root) {
-        if(t.getAttribute("viewBox")) {
-          setCTM(r, t.getCTM());
+        // If no g container with id 'viewport' exists, as last resort, use first g element.
 
-          t.removeAttribute("viewBox");
-        }
-
-        t = t.parentNode;
+        svgWindow.viewport = svg.getElementsByTagName('g')[0]
       }
 
-      window.viewport = viewport = r;
+      if (!svgWindow.viewport) {
+
+        // TODO could automatically move all elements from SVG into a newly created viewport g element.
+
+        throw new Error('No g element containers in SVG document to use for viewport.');
+      }
+
+      /*
+         initialViewportCTM = svgWindow.viewport.getCTM();
+         setCTM(svgWindow.viewport, svg.getCTM());
+      //*/
+
+      svgViewBox = svg.getAttribute('viewBox');
+      if (svgViewBox) {
+        svgWindow.viewport.setAttribute('viewBox', svgViewBox);
+        svg.removeAttribute('viewBox');
+      }
     }
 
-    viewportCTM = viewport.getCTM();
-    return viewport;
+    viewportCTM = svgWindow.viewport.getCTM();
+    return svgWindow.viewport;
   }
 
   /**
@@ -197,7 +225,8 @@ svgPanZoom = function(){
    */
 
   function getEventPoint(evt) {
-    var p = root.createSVGPoint();
+    svg = evt.target.ownerDocument.documentElement;
+    var p = svg.createSVGPoint();
 
     p.x = evt.clientX;
     p.y = evt.clientY;
@@ -210,8 +239,8 @@ svgPanZoom = function(){
    */
 
   function setCTM(element, matrix) {
-    var s = "matrix(" + matrix.a + "," + matrix.b + "," + matrix.c + "," + matrix.d + "," + matrix.e + "," + matrix.f + ")";
-    element.setAttribute("transform", s);
+    var s = 'matrix(' + matrix.a + ',' + matrix.b + ',' + matrix.c + ',' + matrix.d + ',' + matrix.e + ',' + matrix.f + ')';
+    element.setAttribute('transform', s);
   }
 
   /**
@@ -219,7 +248,7 @@ svgPanZoom = function(){
    */
 
   function dumpMatrix(matrix) {
-    var s = "[ " + matrix.a + ", " + matrix.c + ", " + matrix.e + "\n  " + matrix.b + ", " + matrix.d + ", " + matrix.f + "\n  0, 0, 1 ]";
+    var s = '[ ' + matrix.a + ', ' + matrix.c + ', ' + matrix.e + '\n  ' + matrix.b + ', ' + matrix.d + ', ' + matrix.f + '\n  0, 0, 1 ]';
     return s;
   }
 
@@ -231,23 +260,104 @@ svgPanZoom = function(){
       element.setAttributeNS(null, i, attributes[i]);
   }
 
-  function getSvgDoc(target) {
-    if (!target) {
-      svgDoc = document.querySelector('svg');
+  function findFirstSvg(callback) {
+    var i, candidateSvg, foundSvg;
+    var candidateSvg = document.querySelector('svg');
+    if (candidateSvg) {
+      foundSvg = candidateSvg;
+      callback(foundSvg);
+    }
+
+    var candidateObjectElements = document.querySelectorAll('object');
+    i = 0;
+    do {
+      i += 1;
+      candidateSvg = getSvg('object:nth-of-type(' + i + ')', function(err, candidateSvg) {
+        if (!!candidateSvg) {
+          foundSvg = candidateSvg;
+          callback(foundSvg);
+        }
+      });
+    } while (i < candidateObjectElements.length);
+
+    var candidateEmbedElements = document.querySelectorAll('embed');
+    i = 0;
+    do {
+      i += 1;
+      candidateSvg = getSvg('embed:nth-of-type(' + i + ')', function(err, candidateSvg) {
+        if (!!candidateSvg) {
+          foundSvg = candidateSvg;
+          callback(foundSvg);
+        }
+      });
+    } while (i < candidateEmbedElements.length);
+
+    // TODO add a timeout
+  }
+
+  function getSvg(selector, callback) {
+    var target, err;
+    if (!selector) {
+      console.warn('No selector specified for getSvg(). Using first svg element found.');
+      target = findFirstSvg(function(result) {
+        if (!result) {
+          err = new Error('No SVG found in this document.');
+        }
+        if (!!callback) {
+          callback(err, result);
+        }
+        else {
+          if (!svg) {
+            throw err;
+          }
+          return result;
+        }
+      });
     }
     else {
-      svgDoc = document.querySelector(target);
-    }
-    if (!svgDoc) {
-      return new Error('No SVG found in this document.');
-    }
-    else {
-      return svgDoc;
+      target = document.querySelector(selector);
+      if (!!target) {
+        if (target.tagName.toLowerCase() === 'svg') {
+          svg = target;
+        }
+        else {
+          if (target.tagName.toLowerCase() === 'object') {
+            svg = target.contentDocument.documentElement;
+          }
+          else {
+            if (target.tagName.toLowerCase() === 'embed') {
+              svg = target.getSVGDocument().documentElement;
+            }
+            else {
+              if (target.tagName.toLowerCase() === 'img') {
+                throw new Error('Cannot script an SVG in an "img" element. Please use an "object" element or an in-line SVG.');
+              }
+              else {
+                throw new Error('Cannot get SVG.');
+              }
+            }
+          }
+        }
+      }
+      else {
+        if (!svg) {
+          err = new Error('No SVG found in this document.');
+        }
+        if (!!callback) {
+          callback(err, svg);
+        }
+        else {
+          if (!svg) {
+            throw err;
+          }
+          return svg;
+        }
+      }
     }
   }
 
-  function pan(target, direction) {
-    if (!target || !direction) {
+  function pan(selector, direction) {
+    if (!selector || !direction) {
       return;
     }
     var tx, ty;
@@ -295,8 +405,8 @@ svgPanZoom = function(){
       }
     };
 
-    svgDoc = getSvgDoc(target);
-    viewport = getViewport(svgDoc);
+    svg = getSvg(selector);
+    var viewport = getViewport(svg);
 
     var directionXY = directionToXYMapping[direction];
 
@@ -304,39 +414,56 @@ svgPanZoom = function(){
       return Error('Direction specified was not understood.');
     }
 
-    tx = svgDoc.getBBox().width * panIncrement * directionXY.x;
-    ty = svgDoc.getBBox().height * panIncrement * directionXY.y;
+    tx = svg.getBBox().width * panIncrement * directionXY.x;
+    ty = svg.getBBox().height * panIncrement * directionXY.y;
     viewportCTM.e += tx;
     viewportCTM.f += ty;
     setCTM(viewport, viewportCTM);
   }
 
-  function zoomIn(target) {
+  function resetZoom(selector) {
+    var oldCTM, newCTM;
+    getSvg(selector, function(err, svg) {
+      var viewport = getViewport(svg);
+
+      var bBox = svg.getBBox();
+      var boundingClientRect = svg.getBoundingClientRect();
+      oldCTM = newCTM = viewportCTM;
+      var newScale = Math.min(boundingClientRect.width/bBox.width, boundingClientRect.height/bBox.height);
+      newCTM.a = newScale * oldCTM.a; //x-scale
+      newCTM.d = newScale * oldCTM.d; //y-scale
+      newCTM.e = oldCTM.e * newScale - (boundingClientRect.width - bBox.width * newScale)/2 - bBox.x * newScale; //x-transform
+      newCTM.f = oldCTM.f * newScale - (boundingClientRect.height - bBox.height * newScale)/2 - bBox.y * newScale; //y-transform
+      setCTM(viewport, newCTM);
+    });
+  }
+
+  function zoomIn(selector) {
 
     // TODO zoom origin isn't center of screen
 
-    svgDoc = getSvgDoc(target);
-    viewport = getViewport(svgDoc);
+    svg = getSvg(selector);
+    var viewport = getViewport(svg);
     viewportCTM.a = viewportCTM.d = (1 + zoomScaleSensitivity) * viewportCTM.a;
     setCTM(viewport, viewportCTM);
   }
 
-  function zoomOut(target) {
+  function zoomOut(selector) {
 
     // TODO zoom origin isn't center of screen
 
-    svgDoc = getSvgDoc(target);
-    viewport = getViewport(svgDoc);
+    svg = getSvg(selector);
+    var viewport = getViewport(svg);
     viewportCTM.a = viewportCTM.d = (1 - zoomScaleSensitivity) * viewportCTM.a;
     setCTM(viewport, viewportCTM);
   }
 
   function zoom(args) {
-    if (!args.target || !args.scale) {
+    if (!args.selector || !args.scale) {
       return;
     }
-    svgDoc = getSvgDoc(args.target);
-    viewport = getViewport(args.svgDoc);
+    svg = getSvg(args.selector);
+    var viewport = getViewport(svg);
     viewportCTM.a = viewportCTM.d = args.scale;
     setCTM(viewport, viewportCTM);
   }
@@ -357,7 +484,7 @@ svgPanZoom = function(){
       evt.returnValue = false;
     }
 
-    var svgDoc = evt.target.ownerDocument;
+    var svg = evt.target.ownerDocument.documentElement;
 
     var delta;
 
@@ -368,18 +495,18 @@ svgPanZoom = function(){
 
     var z = Math.pow(1 + zoomScaleSensitivity, delta);
 
-    var g = getViewport(svgDoc);
+    var g = getViewport(svg);
 
     var p = getEventPoint(evt);
 
     p = p.matrixTransform(g.getCTM().inverse());
 
     // Compute new scale matrix in current mouse position
-    var k = root.createSVGMatrix().translate(p.x, p.y).scale(z).translate(-p.x, -p.y);
+    var k = svg.createSVGMatrix().translate(p.x, p.y).scale(z).translate(-p.x, -p.y);
 
     setCTM(g, g.getCTM().multiply(k));
 
-    if(typeof(stateTf) == "undefined")
+    if(typeof(stateTf) == 'undefined')
       stateTf = g.getCTM().inverse();
 
     stateTf = stateTf.multiply(k.inverse());
@@ -397,9 +524,9 @@ svgPanZoom = function(){
       evt.returnValue = false;
     }
 
-    var svgDoc = evt.target.ownerDocument;
+    var svg = evt.target.ownerDocument.documentElement;
 
-    var g = getViewport(svgDoc);
+    var g = getViewport(svg);
 
     if(state == 'pan' && panEnabled) {
       // Pan mode
@@ -410,7 +537,7 @@ svgPanZoom = function(){
       // Drag mode
       var p = getEventPoint(evt).matrixTransform(g.getCTM().inverse());
 
-      setCTM(stateTarget, root.createSVGMatrix().translate(p.x - stateOrigin.x, p.y - stateOrigin.y).multiply(g.getCTM().inverse()).multiply(stateTarget.getCTM()));
+      setCTM(stateTarget, svg.createSVGMatrix().translate(p.x - stateOrigin.x, p.y - stateOrigin.y).multiply(g.getCTM().inverse()).multiply(stateTarget.getCTM()));
 
       stateOrigin = p;
     }
@@ -428,12 +555,12 @@ svgPanZoom = function(){
       evt.returnValue = false;
     }
 
-    var svgDoc = evt.target.ownerDocument;
+    var svg = evt.target.ownerDocument.documentElement;
 
-    var g = getViewport(svgDoc);
+    var g = getViewport(svg);
 
     if(
-      evt.target.tagName == "svg" 
+      evt.target.tagName == 'svg' 
         || !dragEnabled // Pan anyway when drag is disabled and the user clicked on an element 
     ) {
       // Pan mode
@@ -466,7 +593,7 @@ svgPanZoom = function(){
       evt.returnValue = false;
     }
 
-    var svgDoc = evt.target.ownerDocument;
+    var svg = evt.target.ownerDocument.documentElement;
 
     if(state == 'pan' || state == 'drag') {
       // Quit pan mode
@@ -480,6 +607,7 @@ svgPanZoom = function(){
     handleMouseDown:handleMouseDown,
     handleMouseMove:handleMouseMove,
     pan:pan,
+    resetZoom:resetZoom,
     zoom:zoom,
     zoomIn:zoomIn,
     zoomOut:zoomOut,
