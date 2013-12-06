@@ -1,5 +1,5 @@
-svg-pan-zoom (based on SVGPan) library 1.3.2
-=============================================
+svg-pan-zoom library 1.3.2
+==========================
 
 JavaScript for panning and zooming an SVG image from the mouse and programmatically.
 
