@@ -1,68 +1,6 @@
 svgPanZoom = function(){
 
   /** 
-   *  svg-pan-zoom (based on SVGPan) library 1.3.2
-   * =============================================
-   *
-   * The SVGPan library was intended for use inside
-   * an SVG by manually adding an xlink:href script tag.
-   *
-   * The svg-pan-zoom library builds on the SVGPan library,
-   * adding the ability to control panning and zooming of
-   * any SVG included in an HTML document, without needing 
-   * to manually add a script element to the SVG.
-   *
-   * svg-pan-zoom features the following capabilities:
-   *  - Panning based on mouse events and via JavaScript
-   *  - Zooming based on mouse events (using the wheel) and via JavaScript
-   *  - Object dragging based on mouse events
-   *
-   *  Note that the SVG should have a top-level 'g' element
-   *  with the id 'viewport' to enable zooming for the entire SVG. 
-   *  If the specified SVG does not have this element, it will
-   *  use the first 'g' element.
-   *
-   * You can configure the default behaviour of the pan/zoom/drag
-   * with the variables listed in the CONFIGURATION section of this file,
-   * or with the "enable/disable" methods.
-   *
-   * Known issues:
-   *
-   *  - Zooming (while panning) on Safari has still some issues
-   *
-   * Releases:
-   *
-   * 1.3.2, Thu Dec 5 2013, Anders Riutta
-   *  - Addressed issue of overwriting existing viewport transform
-   *  - Added capability to handle SVG documents in object elements.
-   *
-   *
-   * 1.3.1, Mon Nov 19 2013, Anders Riutta
-   *	- Added programmatic control for pan and zoom 
-   *	- Changed certain terms to make them more intuitive
-   *
-   * 1.3.0, Mon Nov 18 2013, Anders Riutta
-   *	- Added programmatic control for zoom/pan enabled/disabled
-   *
-   * 1.2.2, Tue Aug 30 17:21:56 CEST 2011, Andrea Leofreddi
-   *	- Fixed viewBox on svg tag (#7)
-   *	- Improved zoom speed (#2)
-   *
-   * 1.2.1, Mon Jul  4 00:33:18 CEST 2011, Andrea Leofreddi
-   *	- Fixed a regression with mouse wheel (now working on Firefox 5)
-   *	- Working with viewBox attribute (#4)
-   *	- Added 'use strict;' and fixed resulting warnings (#5)
-   *	- Added configuration variables, dragging is disabled by default (#3)
-   *
-   * 1.2, Sat Mar 20 08:42:50 GMT 2010, Zeng Xiaohui
-   *	Fixed a bug with browser mouse handler interaction
-   *
-   * 1.1, Wed Feb  3 17:39:33 GMT 2010, Zeng Xiaohui
-   *	Updated the zoom code to support the mouse wheel on Safari/Chrome
-   *
-   * 1.0, Andrea Leofreddi
-   *	First release
-   *
    * This code is licensed under the following BSD license:
    *
    * Copyright 2009-2010 Andrea Leofreddi <a.leofreddi@itcharm.com>. All rights reserved.
@@ -94,7 +32,7 @@ svgPanZoom = function(){
 
   'use strict';
 
-  var svg, state = 'none', viewportCTM, stateTarget, stateOrigin, stateTf, svg;
+  var svg, state = 'none', viewportCTM, stateTarget, stateOrigin, stateTf;
 
   /// CONFIGURATION 
   /// ====>
@@ -210,11 +148,6 @@ svgPanZoom = function(){
 
         throw new Error('No g element containers in SVG document to use for viewport.');
       }
-
-      /*
-         initialViewportCTM = svgWindow.viewport.getCTM();
-         setCTM(svgWindow.viewport, svg.getCTM());
-      //*/
 
       svgViewBox = svg.getAttribute('viewBox');
       if (svgViewBox) {
@@ -438,20 +371,14 @@ svgPanZoom = function(){
     });
   }
 
-  function resetZoom(selector) {
-    var oldCTM, newCTM;
-    getSvg(selector, function(err, svg) {
+  function zoom(args) {
+    if (!args.scale) {
+      throw new Error('No scale specified for zoom. Please enter a number.');
+    }
+    getSvg(args.selector, function(err, svg) {
       var viewport = getViewport(svg);
-
-      var bBox = svg.getBBox();
-      var boundingClientRect = svg.getBoundingClientRect();
-      oldCTM = newCTM = viewportCTM;
-      var newScale = Math.min(boundingClientRect.width/bBox.width, boundingClientRect.height/bBox.height);
-      newCTM.a = newScale * oldCTM.a; //x-scale
-      newCTM.d = newScale * oldCTM.d; //y-scale
-      newCTM.e = oldCTM.e * newScale - (boundingClientRect.width - bBox.width * newScale)/2 - bBox.x * newScale; //x-transform
-      newCTM.f = oldCTM.f * newScale - (boundingClientRect.height - bBox.height * newScale)/2 - bBox.y * newScale; //y-transform
-      setCTM(viewport, newCTM);
+      viewportCTM.a = viewportCTM.d = args.scale;
+      setCTM(viewport, viewportCTM);
     });
   }
 
@@ -477,14 +404,20 @@ svgPanZoom = function(){
     });
   }
 
-  function zoom(args) {
-    if (!args.scale) {
-      throw new Error('No scale specified for zoom. Please enter a number.');
-    }
+  function resetZoom(selector) {
+    var oldCTM, newCTM;
     getSvg(selector, function(err, svg) {
       var viewport = getViewport(svg);
-      viewportCTM.a = viewportCTM.d = args.scale;
-      setCTM(viewport, viewportCTM);
+
+      var bBox = svg.getBBox();
+      var boundingClientRect = svg.getBoundingClientRect();
+      oldCTM = newCTM = viewportCTM;
+      var newScale = Math.min(boundingClientRect.width/bBox.width, boundingClientRect.height/bBox.height);
+      newCTM.a = newScale * oldCTM.a; //x-scale
+      newCTM.d = newScale * oldCTM.d; //y-scale
+      newCTM.e = oldCTM.e * newScale - (boundingClientRect.width - bBox.width * newScale)/2 - bBox.x * newScale; //x-transform
+      newCTM.f = oldCTM.f * newScale - (boundingClientRect.height - bBox.height * newScale)/2 - bBox.y * newScale; //y-transform
+      setCTM(viewport, newCTM);
     });
   }
 
@@ -627,10 +560,10 @@ svgPanZoom = function(){
     handleMouseDown:handleMouseDown,
     handleMouseMove:handleMouseMove,
     pan:pan,
-    resetZoom:resetZoom,
     zoom:zoom,
     zoomIn:zoomIn,
     zoomOut:zoomOut,
+    resetZoom:resetZoom,
     setZoomScaleSensitivity:setZoomScaleSensitivity,
     enablePan:enablePan,
     disablePan:disablePan,
