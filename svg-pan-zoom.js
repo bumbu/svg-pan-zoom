@@ -418,7 +418,7 @@ svgPanZoom = function(){
 
     getSvg(selector, function(err, svg) {
       var viewport = getViewport(svg);
-      viewportCTM.a = viewportCTM.d = (1 - zoomScaleSensitivity) * viewportCTM.a;
+      viewportCTM.a = viewportCTM.d = (1/(1 + zoomScaleSensitivity)) * viewportCTM.a;
       setCTM(viewport, viewportCTM);
       if (onZoom) { onZoom(viewportCTM.a); }
     });
