@@ -41,6 +41,8 @@ svgPanZoom = function(){
   var zoomEnabled = true; // true or false: enable or disable zooming (default enabled)
   var dragEnabled = false; // true or false: enable or disable dragging (default disabled)
   var zoomScaleSensitivity = 0.2; // Zoom sensitivity
+  var minZoom = 0.5; 
+	var maxZoom = 10; 
 
   /// <====
   /// END OF CONFIGURATION 
@@ -387,6 +389,7 @@ svgPanZoom = function(){
     getSvg(selector, function(err, svg) {
       var viewport = getViewport(svg);
       viewportCTM.a = viewportCTM.d = (1 + zoomScaleSensitivity) * viewportCTM.a;
+      if ( viewportCTM.a > maxZoom ) { viewportCTM.a = viewportCTM.d = maxZoom ; }
       setCTM(viewport, viewportCTM);
     });
   }
@@ -398,6 +401,7 @@ svgPanZoom = function(){
     getSvg(selector, function(err, svg) {
       var viewport = getViewport(svg);
       viewportCTM.a = viewportCTM.d = (1 - zoomScaleSensitivity) * viewportCTM.a;
+      if ( viewportCTM.a < minZoom ) { viewportCTM.a = viewportCTM.d = minZoom ; }
       setCTM(viewport, viewportCTM);
     });
   }
@@ -453,9 +457,13 @@ svgPanZoom = function(){
     p = p.matrixTransform(g.getCTM().inverse());
 
     // Compute new scale matrix in current mouse position
+  	var wasZoomed = g.getCTM();
     var k = svg.createSVGMatrix().translate(p.x, p.y).scale(z).translate(-p.x, -p.y);
-
-    setCTM(g, g.getCTM().multiply(k));
+	  var setZoom = g.getCTM().multiply(k);
+	
+  	if ( setZoom.a < minZoom ) { setZoom.a = setZoom.d = wasZoomed.a }
+  	if ( setZoom.a > maxZoom ) { setZoom.a = setZoom.d = wasZoomed.a } 	
+  	if ( setZoom.a != wasZoomed.a ) { setCTM(g, setZoom) } 
 
     if(typeof(stateTf) == 'undefined')
       stateTf = g.getCTM().inverse();
