@@ -66,6 +66,12 @@ svgPanZoom = function(){
       if (args.hasOwnProperty('zoomScaleSensitivity')) {
         zoomScaleSensitivity = args.zoomScaleSensitivity;
       }
+      if (args.hasOwnProperty('minZoom')) {
+        minZoom = args.minZoom;
+      }
+      if (args.hasOwnProperty('maxZoom')) {
+        maxZoom = args.maxZoom;
+      }
       setupHandlers(svg);
       if (!!svg.ownerDocument.documentElement.tagName.toLowerCase() !== 'svg') {
         svg.ownerDocument.defaultView.svgPanZoom = svgPanZoom;
