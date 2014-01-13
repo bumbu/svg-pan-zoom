@@ -41,8 +41,8 @@ svgPanZoom = function(){
   var zoomEnabled = true; // true or false: enable or disable zooming (default enabled)
   var dragEnabled = false; // true or false: enable or disable dragging (default disabled)
   var zoomScaleSensitivity = 0.2; // Zoom sensitivity
-  var minZoom = 0.5; 
-	var maxZoom = 10; 
+  var minZoom = 0.5; // minimum zoom
+  var maxZoom = 10; // maximum zoom
 
   /// <====
   /// END OF CONFIGURATION 
