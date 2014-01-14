@@ -86,6 +86,7 @@ Releases before Github
   * Addressed issue of overwriting existing viewport transform
   * Added capability to handle SVG documents in object elements.
 
+
  1.3.1), Mon Nov 19 2013, Anders Riutta
 	* Added programmatic control for pan and zoom 
 	* Changed certain terms to make them more intuitive
