@@ -82,18 +82,15 @@ Known issues
 Releases before Github
 ----------------------
 
- 1.3.2, Thu Dec 5 2013, Anders Riutta
-
+ 1.3.2), Thu Dec 5 2013, Anders Riutta
   * Addressed issue of overwriting existing viewport transform
   * Added capability to handle SVG documents in object elements
  
- 1.3.1, Mon Nov 19 2013, Anders Riutta
-
+ 1.3.1), Mon Nov 19 2013, Anders Riutta
   * Added programmatic control for pan and zoom 
   * Changed certain terms to make them more intuitive
 
- 1.3.0, Mon Nov 18 2013, Anders Riutta
-
+ 1.3.0), Mon Nov 18 2013, Anders Riutta
   * Added programmatic control for zoom/pan enabled/disabled
 
  1.2.2, Tue Aug 30 17:21:56 CEST 2011, Andrea Leofreddi
