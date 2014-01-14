@@ -1,14 +1,14 @@
-svg-pan-zoom library 1.3.2
+svg-pan-zoom library 1.3.3
 ==========================
 
 JavaScript for panning and zooming an SVG image from the mouse and programmatically.
 
- The SVGPan library was intended for use inside
+ The [SVGPan](https://code.google.com/p/svgpan/) library is intended for use inside
  an SVG by manually adding an xlink:href script tag.
 
- The svg-pan-zoom library builds on the SVGPan library,
- adding the ability to control panning and zooming of
- any SVG included in an HTML document, without needing 
+ The svg-pan-zoom library builds on the SVGPan library, but it is intended for use also with SVG images that
+ are included in an HTML page, whether as in-line images with HTML object or embed elements. It adds the ability to control panning and zooming of
+ these SVG images included in an HTML document, without needing 
  to manually add a script element to the SVG.
 
  svg-pan-zoom features the following capabilities:
