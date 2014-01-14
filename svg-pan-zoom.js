@@ -41,6 +41,7 @@ svgPanZoom = function(){
   var zoomEnabled = true; // true or false: enable or disable zooming (default enabled)
   var dragEnabled = false; // true or false: enable or disable dragging (default disabled)
   var zoomScaleSensitivity = 0.2; // Zoom sensitivity
+  var onZoom = null; // Zoom callback
 
   /// <====
   /// END OF CONFIGURATION 
@@ -63,6 +64,9 @@ svgPanZoom = function(){
       }
       if (args.hasOwnProperty('zoomScaleSensitivity')) {
         zoomScaleSensitivity = args.zoomScaleSensitivity;
+      }
+      if (args.hasOwnProperty('onZoom')) {
+        onZoom = args.onZoom;
       }
       setupHandlers(svg);
       if (!!svg.ownerDocument.documentElement.tagName.toLowerCase() !== 'svg') {
@@ -161,6 +165,19 @@ svgPanZoom = function(){
   }
 
   /**
+   * Get an SVGPoint of the mouse co-ordinates of the event, relative to the SVG element.
+   */
+
+  function getRelativeMousePoint(evt) {
+    var svg = (evt.target.tagName === 'svg' || evt.target.tagName === 'SVG') ? evt.target : evt.target.ownerSVGElement || evt.target.correspondingElement.ownerSVGElement;
+    var point = svg.createSVGPoint();
+    point.x = evt.clientX
+    point.y = evt.clientY;
+    point = point.matrixTransform(svg.getScreenCTM().inverse());
+    return point;
+  };
+
+  /**
    * Instance an SVGPoint object with given event coordinates.
    */
 
@@ -239,7 +256,9 @@ svgPanZoom = function(){
   function getSvg(selector, callback) {
     var target, err, svg;
     if (!selector) {
-      console.warn('No selector specified for getSvg(). Using first svg element found.');
+      if(typeof console !== "undefined") {
+        console.warn('No selector specified for getSvg(). Using first svg element found.');
+      }
       target = findFirstSvg(function(svg) {
         if (!svg) {
           err = new Error('No SVG found in this document.');
@@ -377,6 +396,7 @@ svgPanZoom = function(){
       var viewport = getViewport(svg);
       viewportCTM.a = viewportCTM.d = args.scale;
       setCTM(viewport, viewportCTM);
+      if (onZoom) { onZoom(viewportCTM.a); }
     });
   }
 
@@ -388,6 +408,7 @@ svgPanZoom = function(){
       var viewport = getViewport(svg);
       viewportCTM.a = viewportCTM.d = (1 + zoomScaleSensitivity) * viewportCTM.a;
       setCTM(viewport, viewportCTM);
+      if (onZoom) { onZoom(viewportCTM.a); }
     });
   }
 
@@ -397,8 +418,9 @@ svgPanZoom = function(){
 
     getSvg(selector, function(err, svg) {
       var viewport = getViewport(svg);
-      viewportCTM.a = viewportCTM.d = (1 - zoomScaleSensitivity) * viewportCTM.a;
+      viewportCTM.a = viewportCTM.d = (1/(1 + zoomScaleSensitivity)) * viewportCTM.a;
       setCTM(viewport, viewportCTM);
+      if (onZoom) { onZoom(viewportCTM.a); }
     });
   }
 
@@ -416,6 +438,7 @@ svgPanZoom = function(){
       newCTM.e = oldCTM.e * newScale - (boundingClientRect.width - bBox.width * newScale)/2 - bBox.x * newScale; //x-transform
       newCTM.f = oldCTM.f * newScale - (boundingClientRect.height - bBox.height * newScale)/2 - bBox.y * newScale; //y-transform
       setCTM(viewport, newCTM);
+      if (onZoom) { onZoom(newCTM.a); }
     });
   }
 
@@ -448,8 +471,7 @@ svgPanZoom = function(){
 
     var g = getViewport(svg);
 
-    var p = getEventPoint(evt);
-
+    var p = getRelativeMousePoint(evt);
     p = p.matrixTransform(g.getCTM().inverse());
 
     // Compute new scale matrix in current mouse position
@@ -461,6 +483,7 @@ svgPanZoom = function(){
       stateTf = g.getCTM().inverse();
 
     stateTf = stateTf.multiply(k.inverse());
+    if (onZoom) { onZoom(g.getCTM().a); }
   }
 
   /**
