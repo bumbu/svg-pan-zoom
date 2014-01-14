@@ -35,6 +35,8 @@ svgPanZoom.init({
   'zoomEnabled': true, // optional. values must be true or false. default is true.
   'dragEnabled': false, // optional. values must be true or false. default is false.
   'zoomScaleSensitivity': 0.2, // optional. values must be scalar. default is 0.2.
+  'minZoom': 0.5, // optional. values must be scalar. default is 0.5.
+  'maxZoom': 10, // optional. values must be scalar. default is 10.
   'onZoom': function(scale) { ... }  // optional. Callback function when zoom changes.
 });
 ```
