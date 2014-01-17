@@ -549,14 +549,12 @@ svgPanZoom = function(){
     var svg = (evt.target.tagName === 'svg' || evt.target.tagName === 'SVG') ? evt.target : evt.target.ownerSVGElement || evt.target
 .correspondingElement.ownerSVGElement;
 
-    var delta = viewportCTM.a;;
-
     var zoomFactor = 4; // 4x zoom!
     if(evt.shiftKey){
         zoomFactor = -1.66; // zoom out when shift key pressed
     }
 
-    var z = Math.pow(1 + zoomScaleSensitivity * zoomFactor, delta);
+    var z = 1 + zoomScaleSensitivity * zoomFactor;
 
     var g = getViewport(svg);
 
