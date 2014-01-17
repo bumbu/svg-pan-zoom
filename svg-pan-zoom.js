@@ -533,11 +533,58 @@ svgPanZoom = function(){
     }
   }
 
+/**
+   * Handle double click event. 
+   * See handleMouseDown() for alternate detection method.
+   */
+
+  function handleDblClick(evt) {
+    if(evt.preventDefault) {
+      evt.preventDefault();
+    }
+    else {
+      evt.returnValue = false;
+    }
+
+    var svg = (evt.target.tagName === 'svg' || evt.target.tagName === 'SVG') ? evt.target : evt.target.ownerSVGElement || evt.target
+.correspondingElement.ownerSVGElement;
+
+    var delta = viewportCTM.a;;
+
+    var zoomFactor = 4; // 4x zoom!
+    if(evt.shiftKey){
+        zoomFactor = -1.66; // zoom out when shift key pressed
+    }
+
+    var z = Math.pow(1 + zoomScaleSensitivity * zoomFactor, delta);
+
+    var g = getViewport(svg);
+
+    var p = getEventPoint(evt);
+
+    p = p.matrixTransform(g.getCTM().inverse());
+
+    // Compute new scale matrix in current mouse position                                                         
+    var k = svg.createSVGMatrix().translate(p.x, p.y).scale(z).translate(-p.x, -p.y);
+
+    setCTM(g, g.getCTM().multiply(k));
+
+    if(typeof(stateTf) == 'undefined')
+      stateTf = g.getCTM().inverse();
+
+    stateTf = stateTf.multiply(k.inverse());
+  }
+  
   /**
    * Handle click event.
    */
 
   function handleMouseDown(evt) {
+    // Double click detection; more consistent than ondblclick                                                    
+    if(evt.detail==2){
+        handleDblClick(evt);
+    }
+    
     if(evt.preventDefault) {
       evt.preventDefault();
     }
@@ -596,6 +643,7 @@ svgPanZoom = function(){
     handleMouseUp:handleMouseUp,
     handleMouseDown:handleMouseDown,
     handleMouseMove:handleMouseMove,
+    handleDblClick:handleDblClick,
     pan:pan,
     zoom:zoom,
     zoomIn:zoomIn,
