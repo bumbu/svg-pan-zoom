@@ -123,8 +123,8 @@ svgPanZoom = function(){
     setAttributes(svg, {
       'onmouseup': 'svgPanZoom.handleMouseUp(evt)',
       'onmousedown': 'svgPanZoom.handleMouseDown(evt)',
-      'onmousemove': 'svgPanZoom.handleMouseMove(evt)'
-      //'onmouseout' : 'svgPanZoom.handleMouseUp(evt)', // Decomment this to stop the pan functionality when dragging out of the SVG element
+      'onmousemove': 'svgPanZoom.handleMouseMove(evt)',
+      'onmouseleave' : 'svgPanZoom.handleMouseUp(evt)', // Decomment this to stop the pan functionality when dragging out of the SVG element; Note that 'onmouseleave' works over parent svg and all children.
     });
 
     svg.setAttribute('xmlns', 'http://www.w3.org/1999/xlink')
