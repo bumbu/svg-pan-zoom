@@ -123,8 +123,8 @@ svgPanZoom = function(){
     setAttributes(svg, {
       'onmouseup': 'svgPanZoom.handleMouseUp(evt)',
       'onmousedown': 'svgPanZoom.handleMouseDown(evt)',
-      'onmousemove': 'svgPanZoom.handleMouseMove(evt)'
-      //'onmouseout' : 'svgPanZoom.handleMouseUp(evt)', // Decomment this to stop the pan functionality when dragging out of the SVG element
+      'onmousemove': 'svgPanZoom.handleMouseMove(evt)',
+      'onmouseleave' : 'svgPanZoom.handleMouseUp(evt)', // Decomment this to stop the pan functionality when dragging out of the SVG element; Note that 'onmouseleave' works over parent svg and all children.
     });
 
     svg.setAttribute('xmlns', 'http://www.w3.org/1999/xlink')
@@ -533,11 +533,61 @@ svgPanZoom = function(){
     }
   }
 
+/**
+   * Handle double click event. 
+   * See handleMouseDown() for alternate detection method.
+   */
+
+  function handleDblClick(evt) {
+    if(evt.preventDefault) {
+      evt.preventDefault();
+    }
+    else {
+      evt.returnValue = false;
+    }
+
+    var svg = (evt.target.tagName === 'svg' || evt.target.tagName === 'SVG') ? evt.target : evt.target.ownerSVGElement || evt.target
+.correspondingElement.ownerSVGElement;
+
+    var zoomFactor = 4; // 4x zoom!
+    if(evt.shiftKey){
+        zoomFactor = -1.66; // zoom out when shift key pressed
+    }
+
+    var z = 1 + zoomScaleSensitivity * zoomFactor;
+
+    var g = getViewport(svg);
+
+    var p = getEventPoint(evt);
+
+    p = p.matrixTransform(g.getCTM().inverse());
+
+    // Compute new scale matrix in current mouse position                                                         
+    var k = svg.createSVGMatrix().translate(p.x, p.y).scale(z).translate(-p.x, -p.y);
+  	var wasZoom = g.getCTM();
+  	var setZoom = g.getCTM().multiply(k);
+  	
+  	if ( setZoom.a < minZoom ) { setZoom.a = setZoom.d = wasZoom.a }
+  	if ( setZoom.a > maxZoom ) { setZoom.a = setZoom.d = wasZoom.a } 	
+  	if ( setZoom.a != wasZoom.a ) { setCTM(g, setZoom) } 
+
+    if(typeof(stateTf) == 'undefined')
+      stateTf = g.getCTM().inverse();
+
+    stateTf = stateTf.multiply(k.inverse());
+    if (onZoom) { onZoom(g.getCTM().a); }
+  }
+  
   /**
    * Handle click event.
    */
 
   function handleMouseDown(evt) {
+    // Double click detection; more consistent than ondblclick                                                    
+    if(evt.detail==2){
+        handleDblClick(evt);
+    }
+    
     if(evt.preventDefault) {
       evt.preventDefault();
     }
@@ -596,6 +646,7 @@ svgPanZoom = function(){
     handleMouseUp:handleMouseUp,
     handleMouseDown:handleMouseDown,
     handleMouseMove:handleMouseMove,
+    handleDblClick:handleDblClick,
     pan:pan,
     zoom:zoom,
     zoomIn:zoomIn,
