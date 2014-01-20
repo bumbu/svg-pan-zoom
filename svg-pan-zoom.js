@@ -564,13 +564,18 @@ svgPanZoom = function(){
 
     // Compute new scale matrix in current mouse position                                                         
     var k = svg.createSVGMatrix().translate(p.x, p.y).scale(z).translate(-p.x, -p.y);
-
-    setCTM(g, g.getCTM().multiply(k));
+  	var wasZoom = g.getCTM();
+  	var setZoom = g.getCTM().multiply(k);
+  	
+  	if ( setZoom.a < minZoom ) { setZoom.a = setZoom.d = wasZoom.a }
+  	if ( setZoom.a > maxZoom ) { setZoom.a = setZoom.d = wasZoom.a } 	
+  	if ( setZoom.a != wasZoom.a ) { setCTM(g, setZoom) } 
 
     if(typeof(stateTf) == 'undefined')
       stateTf = g.getCTM().inverse();
 
     stateTf = stateTf.multiply(k.inverse());
+    if (onZoom) { onZoom(g.getCTM().a); }
   }
   
   /**
