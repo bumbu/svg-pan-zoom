@@ -50,9 +50,9 @@ If any arguments are specified, they must have the following value types:
 * 'panEnabled' must be true or false. Default is true.
 * 'zoomEnabled' must be true or false. Default is true.
 * 'dragEnabled' must be true or false. Default is false.
-* 'zoomScaleSensitivity' must be scalar. Default is 0.2.
-* 'minZoom' must be scalar. Default is 0.5.
-* 'maxZoom' must be scalar. Default is 10.
+* 'zoomScaleSensitivity' must be a scalar. Default is 0.2.
+* 'minZoom' must be a scalar. Default is 0.5.
+* 'maxZoom' must be a scalar. Default is 10.
 * 'onZoom' must be a callback function to be called when zoom changes.
 
 
@@ -62,7 +62,7 @@ To programmatically pan, call the pan method with a direction of 'up', 'right', 
 svgPanZoom.pan([selector], direction); // selector is optional.
 ```
 
-To programmatically zoom, you can use the zoom method to specify a specific scale value:
+To programmatically zoom, you can use the zoom method to specify your desired scale value:
 
 ```js
 svgPanZoom.zoom({
