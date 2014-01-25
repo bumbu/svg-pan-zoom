@@ -46,7 +46,7 @@ svgPanZoom.init({
 ```
 
 If any arguments are specified, they must have the following value types:
-* 'selector' must be a [CSS selector]((http://www.w3.org/TR/CSS2/selector.html)). If left blank, svg-pan-zoom will look for the first SVG document in your HTML document.
+* 'selector' must be a [CSS selector](http://www.w3.org/TR/CSS2/selector.html). If left blank, svg-pan-zoom will look for the first SVG document in your HTML document.
 * 'panEnabled' must be true or false. Default is true.
 * 'zoomEnabled' must be true or false. Default is true.
 * 'dragEnabled' must be true or false. Default is false.
