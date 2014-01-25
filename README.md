@@ -77,6 +77,7 @@ svgPanZoom.disableDrag();
 Known issues
 ------------
 
+  * Programmatical Zoom does not zoom on center
   * Zooming (while panning) on Safari has still some issues
 
 Releases before Github
