@@ -6,7 +6,7 @@ JavaScript library that enables panning and zooming of an SVG image in an HTML d
 Capabilities:
   * Pan with mouse events or custom JavaScript hooks
   * Zoom with mouse events (wheel or double-click) or custom JavaScript hooks
-  * Element dragging with mouse events (custom JavaScript hooks not provied, but if you need them, check out [D3.js](http://d3js.org/))
+  * Element dragging with mouse events (custom JavaScript hooks not provided, but if you need them, check out [D3.js](http://d3js.org/))
 
 Demo
 ----
@@ -95,11 +95,6 @@ svgPanZoom.disableDrag();
 ```
 
 You can configure the default enabled/disabled state of pan/zoom/drag with the variables listed in the CONFIGURATION section of the file.
-
-Known issues
-------------
-
-  * Zooming (while panning) on Safari has still some issues
 
 Related Work
 ------------
