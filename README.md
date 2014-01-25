@@ -1,24 +1,29 @@
 svg-pan-zoom library
 ==========================
 
-JavaScript library that enables panning and zooming an SVG image in an HTML document, whether as in-line images or with HTML 'object' or 'embed' elements. It responds to mouse events and also offers hooks for custom, programmatic control of pan and zoom behavior.
+JavaScript library that enables panning and zooming of an SVG image in an HTML document, including SVGs in HTML 'object' or 'embed' elements and in-line SVGs. The library responds to mouse events and additionally offers hooks for custom, programmatic control of pan and zoom behavior.
 
 Capabilities:
-  * Panning based on mouse events and on custom JavaScript hooks
-  * Zooming based on mouse events (wheel or double-click) and on custom JavaScript hooks
-  * Element dragging based on mouse events
+  * Pan with mouse events or custom JavaScript hooks
+  * Zoom with mouse events (wheel or double-click) or custom JavaScript hooks
+  * Element dragging with mouse events (custom JavaScript hooks not provied, but if you need them, check out [D3.js](http://d3js.org/))
 
 Demo
 ----
- See a [github pages demo](http://ariutta.github.io/svg-pan-zoom/).
+ Pan and zoom the SVG tiger on [github pages](http://ariutta.github.io/svg-pan-zoom/).
 
 How To Use
 ----------
 
-The target SVG should have a top-level 'g' element with the id 'viewport' to enable zooming for the entire SVG. 
-If the target SVG does not have this element, the library will use the first 'g' element.
+1) Ensure the target SVG has a top-level 'g' element with the id 'viewport' to enable zooming for the entire SVG:
 
-To use this library, reference the svg-pan-zoom.js file from your HTML document and call the init method:
+```xml
+<g id="viewport"></g>
+```
+
+If the target SVG does not have this element, the library will use the first 'g' element found.
+
+2) Reference the svg-pan-zoom.js file from your HTML document and call the init method:
 
 ```js
 svgPanZoom.init();
