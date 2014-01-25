@@ -1,7 +1,7 @@
 svg-pan-zoom library
 ==========================
 
-JavaScript library that enables panning and zooming of an SVG in an HTML document, including SVGs in HTML 'object' or 'embed' elements and in-line SVGs. The library responds to mouse events and additionally offers hooks for custom, programmatic control of pan and zoom behavior.
+JavaScript library that enables panning and zooming of an SVG in an HTML document, including SVGs in HTML 'object' or 'embed' elements and in-line SVGs. The library responds to mouse events and offers hooks for custom, programmatic control of pan and zoom behavior.
 
 Capabilities:
   * Pan with mouse events or custom JavaScript hooks
