@@ -23,7 +23,7 @@ How To Use
 
 If the target SVG does not have this element, the library will use the first 'g' element found.
 
-2) Reference the svg-pan-zoom.js file from your HTML document and call the init method:
+2) Reference the [svg-pan-zoom.js file](http://ariutta.github.io/svg-pan-zoom/svg-pan-zoom.js) from your HTML document and call the init method:
 
 ```js
 svgPanZoom.init();
