@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <!--
+    <link rel="stylesheet" href="style.css">
+    -->
+    <script src="../svg-pan-zoom.js"></script>
+  </head>
+
+  <body>
+    <h1>Demo for svg-pan-zoom: SVG in HTML 'img' element</h1>
+    <img src="tiger.svg" />
+
+    <script>
+      // Don't use window.onLoad like this in production, because it can only listen to one function.
+      window.onload = function() {
+        svgPanZoom.init({
+          //'selector': 'svg',
+          'zoomEnabled': true 
+        });
+      };
+    </script>
+
+  </body>
+
+</html>
