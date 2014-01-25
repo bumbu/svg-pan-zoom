@@ -56,7 +56,7 @@ If any arguments are specified, they must have the following value types:
 * 'onZoom' must be a callback function to be called when zoom changes.
 
 
-To programmatically pan, call the pan method with a direction of 'up', 'right', 'left' or 'down'.
+To programmatically pan, call the pan method with a direction of 'up', 'down', 'right' or 'left'.
 
 ```js
 svgPanZoom.pan([selector], direction); // selector is optional.
