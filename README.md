@@ -1,23 +1,12 @@
 svg-pan-zoom library
 ==========================
 
-JavaScript library for panning and zooming an SVG image from the mouse and programmatically.
+JavaScript library that enables panning and zooming an SVG image in an HTML document, whether as in-line images or with HTML 'object' or 'embed' elements. It responds to mouse events and also offers hooks for custom, programmatic control of pan and zoom behavior.
 
- This library is based on the [SVGPan](https://code.google.com/p/svgpan/) library, which was intended for use inside
- an SVG by manually adding an xlink:href script tag. The svg-pan-zoom library is intended for use with SVG images that
- are included in an HTML document, whether as in-line images or with HTML "object" or "embed" elements. It adds the ability to control panning and zooming of
- these SVG images from the HTML document, without needing 
- to manually add a script element to the SVG.
-
- svg-pan-zoom features the following capabilities:
-  * Panning based on mouse events and via JavaScript
-  * Zooming based on mouse events (using the wheel) and via JavaScript
-  * Object dragging based on mouse events
-
-Note that the SVG should have a top-level 'g' element
-with the id 'viewport' to enable zooming for the entire SVG. 
-If the specified SVG does not have this element, it will
-use the first 'g' element.
+Capabilities:
+  * Panning based on mouse events and on custom JavaScript hooks
+  * Zooming based on mouse events (wheel or double-click) and on custom JavaScript hooks
+  * Element dragging based on mouse events
 
 Demo
 ----
@@ -26,37 +15,66 @@ Demo
 How To Use
 ----------
 
-To use, reference the svg-pan-zoom.js file in your page and call the init method, optionally with arguments:
+The target SVG should have a top-level 'g' element with the id 'viewport' to enable zooming for the entire SVG. 
+If the target SVG does not have this element, the library will use the first 'g' element.
+
+To use this library, reference the svg-pan-zoom.js file from your HTML document and call the init method:
+
+```js
+svgPanZoom.init();
+```
+
+If you want to override the defaults, you can optionally specify one or more arguments:
+
 
 ```js
 svgPanZoom.init({
-  'selector': '#my-svg', // optional selector. If left blank, svg-pan-zoom will look for the first SVG document in your HTML document.
-  'panEnabled': true, // optional. values must be true or false. default is true.
-  'zoomEnabled': true, // optional. values must be true or false. default is true.
-  'dragEnabled': false, // optional. values must be true or false. default is false.
-  'zoomScaleSensitivity': 0.2, // optional. values must be scalar. default is 0.2.
-  'minZoom': 0.5, // optional. values must be scalar. default is 0.5.
-  'maxZoom': 10, // optional. values must be scalar. default is 10.
-  'onZoom': function(scale) { ... }  // optional. Callback function when zoom changes.
+  'selector': '#my-svg',
+  'panEnabled': true, 
+  'zoomEnabled': true,
+  'dragEnabled': false,
+  'zoomScaleSensitivity': 0.2,
+  'minZoom': 0.5,
+  'maxZoom': 10,
+  'onZoom': function(scale) { ... }  // Callback function when zoom changes.
 });
 ```
 
-To programmatically control pan and zoom:
+If any arguments are specified, they must have the following value types:
+* 'selector' must be a [CSS selector]((http://www.w3.org/TR/CSS2/selector.html)). If left blank, svg-pan-zoom will look for the first SVG document in your HTML document.
+* 'panEnabled' must be true or false. Default is true.
+* 'zoomEnabled' must be true or false. Default is true.
+* 'dragEnabled' must be true or false. Default is false.
+* 'zoomScaleSensitivity' must be scalar. Default is 0.2.
+* 'minZoom' must be scalar. Default is 0.5.
+* 'maxZoom' must be scalar. Default is 10.
+* 'onZoom' must be a callback function to be called when zoom changes.
+
+
+To programmatically pan, call the pan method with a direction of 'up', 'right', 'left' or 'down'.
 
 ```js
-svgPanZoom.pan([selector], direction); // selector is optional. direction must be one of up, right, left or down.
+svgPanZoom.pan([selector], direction); // selector is optional.
+```
 
+To programmatically zoom, you can use the zoom method to specify a specific scale value:
+
+```js
 svgPanZoom.zoom({
-  'selector': '#my-svg', // optional selector. If left blank, svg-pan-zoom will look for the first SVG document in your HTML document.
+  'selector': '#my-svg', // selector is optional
   'scale': 2 // required. values must be scalar.
 });
 
-svgPanZoom.zoomIn([selector]); // selector is optional. control zoom increment with "setZoomScaleSensitivity" method.
+Or you can use the zoomIn or zoomOut methods:
 
-svgPanZoom.zoomOut([selector]); // selector is optional. control zoom increment with "setZoomScaleSensitivity" method.
+svgPanZoom.zoomIn([selector]); // selector is optional
+
+svgPanZoom.zoomOut([selector]); // selector is optional
 
 svgPanZoom.resetZoom([selector]); // selector is optional.
 ```
+
+If you want faster or slower zooming, you can override the default zoom increment with the setZoomScaleSensitivity method.
 
 To programmatically enable/disable pan, zoom or drag:
 
@@ -71,51 +89,47 @@ svgPanZoom.enableDrag();
 svgPanZoom.disableDrag();
 ```
 
- You can configure the default enabled/disabled state of pan/zoom/drag
- with the variables listed in the CONFIGURATION section of the file.
+You can configure the default enabled/disabled state of pan/zoom/drag with the variables listed in the CONFIGURATION section of the file.
 
 Known issues
 ------------
 
   * Zooming (while panning) on Safari has still some issues
 
-Releases before Github
-----------------------
+Related Work
+------------
+This library is based on the [SVGPan](https://code.google.com/p/svgpan/) library. SVGPan is intended for use with the [SVG 'script' element](http://www.w3.org/TR/SVG/script.html), whereas svg-pan-zoom is intended for use with the [HTML 'script' element](http://www.w3.org/TR/html401/interact/scripts.html).
 
- 1.3.2), Thu Dec 5 2013, Anders Riutta
-  * Addressed issue of overwriting existing viewport transform
-  * Added capability to handle SVG documents in object elements
+
+  * 1.3.2), Thu Dec 5 2013, Anders Riutta
+    * Addressed issue of overwriting existing viewport transform
+    * Added capability to handle SVG documents in object elements
  
- 1.3.1), Mon Nov 19 2013, Anders Riutta
-  * Added programmatic control for pan and zoom 
-  * Changed certain terms to make them more intuitive
+  * 1.3.1), Mon Nov 19 2013, Anders Riutta
+    * Added programmatic control for pan and zoom 
+    * Changed certain terms to make them more intuitive
 
- 1.3.0), Mon Nov 18 2013, Anders Riutta
-  * Added programmatic control for zoom/pan enabled/disabled
+  * 1.3.0), Mon Nov 18 2013, Anders Riutta
+    * Added programmatic control for zoom/pan enabled/disabled
 
- 1.2.2, Tue Aug 30 17:21:56 CEST 2011, Andrea Leofreddi
+  * 1.2.2) Tue Aug 30 17:21:56 CEST 2011, Andrea Leofreddi
+    * Fixed viewBox on svg tag (#7)
+    * Improved zoom speed (#2)
 
-  * Fixed viewBox on svg tag (#7)
-  * Improved zoom speed (#2)
+  * 1.2.1) Mon Jul  4 00:33:18 CEST 2011, Andrea Leofreddi
+    * Fixed a regression with mouse wheel (now working on Firefox 5)
+    * Working with viewBox attribute (#4)
+    * Added 'use strict;' and fixed resulting warnings (#5)
+    * Added configuration variables, dragging is disabled by default (#3)
 
- 1.2.1, Mon Jul  4 00:33:18 CEST 2011, Andrea Leofreddi
+  * 1.2) Sat Mar 20 08:42:50 GMT 2010, Zeng Xiaohui
+    * Fixed a bug with browser mouse handler interaction
 
-  * Fixed a regression with mouse wheel (now working on Firefox 5)
-  * Working with viewBox attribute (#4)
-  * Added 'use strict;' and fixed resulting warnings (#5)
-  * Added configuration variables, dragging is disabled by default (#3)
+  * 1.1) Wed Feb  3 17:39:33 GMT 2010, Zeng Xiaohui
+    * Updated the zoom code to support the mouse wheel on Safari/Chrome
 
- 1.2, Sat Mar 20 08:42:50 GMT 2010, Zeng Xiaohui
-
-  * Fixed a bug with browser mouse handler interaction
-
- 1.1, Wed Feb  3 17:39:33 GMT 2010, Zeng Xiaohui
-
-  * Updated the zoom code to support the mouse wheel on Safari/Chrome
-
- 1.0, Andrea Leofreddi
-
-  * First release
+  * 1.0) Andrea Leofreddi
+    * First release
 
 License
 -------
