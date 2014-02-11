@@ -100,9 +100,9 @@ You can configure the default enabled/disabled state of pan/zoom/drag with the v
 
 Known issues
 ------------
-  * Mouse zoom does not work at all with IE, and pan does not work correctly
-  * Programmatical Zoom does not zoom on center
-  * Zooming (while panning) on Safari has still some issues
+  * Mouse zoom does not work at all with IE, and pan does not work correctly. See [Issue #21](https://github.com/ariutta/svg-pan-zoom/issues/21).
+  * Programmatical Zoom does not zoom on center. See [Issue #4](https://github.com/ariutta/svg-pan-zoom/issues/4).
+  * Zooming (while panning) on Safari has still some issues. See [Issue #15](https://github.com/ariutta/svg-pan-zoom/issues/15).
 
 Related Work
 ------------
