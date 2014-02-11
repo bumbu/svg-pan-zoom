@@ -98,10 +98,15 @@ svgPanZoom.disableDrag();
 
 You can configure the default enabled/disabled state of pan/zoom/drag with the variables listed in the CONFIGURATION section of the file.
 
+Known issues
+------------
+  * Mouse zoom does not work at all with IE, and pan does not work correctly
+  * Programmatical Zoom does not zoom on center
+  * Zooming (while panning) on Safari has still some issues
+
 Related Work
 ------------
 This library is based on the [SVGPan](https://code.google.com/p/svgpan/) library. SVGPan is intended for use with the [SVG 'script' element](http://www.w3.org/TR/SVG/script.html), whereas svg-pan-zoom is intended for use with the [HTML 'script' element](http://www.w3.org/TR/html401/interact/scripts.html).
-
 
   * 1.3.2), Thu Dec 5 2013, Anders Riutta
     * Addressed issue of overwriting existing viewport transform
