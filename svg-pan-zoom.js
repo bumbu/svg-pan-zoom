@@ -1,4 +1,4 @@
-svgPanZoom = function(){
+window.svgPanZoom = (function(){
 
   /** 
    * This code is licensed under the following BSD license:
@@ -660,4 +660,4 @@ svgPanZoom = function(){
     enableDrag:enableDrag,
     disableDrag:disableDrag
   };
-}();
+})();
