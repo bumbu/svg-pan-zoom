@@ -1,35 +1,5 @@
 window.svgPanZoom = (function(){
 
-  /**
-   * This code is licensed under the following BSD license:
-   *
-   * Copyright 2009-2010 Andrea Leofreddi <a.leofreddi@itcharm.com>. All rights reserved.
-   *
-   * Redistribution and use in source and binary forms, with or without modification, are
-   * permitted provided that the following conditions are met:
-   *
-   *    1. Redistributions of source code must retain the above copyright notice, this list of
-   *       conditions and the following disclaimer.
-   *
-   *    2. Redistributions in binary form must reproduce the above copyright notice, this list
-   *       of conditions and the following disclaimer in the documentation and/or other materials
-   *       provided with the distribution.
-   *
-   * THIS SOFTWARE IS PROVIDED BY Andrea Leofreddi ``AS IS'' AND ANY EXPRESS OR IMPLIED
-   * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-   * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL Andrea Leofreddi OR
-   * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-   * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-   * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
-   * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-   * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-   * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-   *
-  * The views and conclusions contained in the software and documentation are those of the
-    * authors and should not be interpreted as representing official policies, either expressed
-    * or implied, of Andrea Leofreddi.
-    */
-
   'use strict';
 
   var state = 'none', viewportCTM, stateTarget, stateOrigin, stateTf;
@@ -51,7 +21,6 @@ window.svgPanZoom = (function(){
   /**
    * Enable svgPanZoom
    */
-
   function init(args) {
     args = args || {};
     getSvg(args.selector, function(err, svg) {
@@ -86,7 +55,6 @@ window.svgPanZoom = (function(){
   /**
    * Change settings
    */
-
   function setZoomScaleSensitivity(newZoomScaleSensitivity) {
     zoomScaleSensitivity = newZoomScaleSensitivity;
   }
@@ -118,7 +86,6 @@ window.svgPanZoom = (function(){
   /**
    * Register handlers
    */
-
   function setupHandlers(svg){
     setAttributes(svg, {
       'onmouseup': 'svgPanZoom.handleMouseUp(evt)',
@@ -127,9 +94,9 @@ window.svgPanZoom = (function(){
       'onmouseleave' : 'svgPanZoom.handleMouseUp(evt)', // Decomment this to stop the pan functionality when dragging out of the SVG element; Note that 'onmouseleave' works over parent svg and all children.
     });
 
-    svg.setAttribute('xmlns', 'http://www.w3.org/1999/xlink')
-    svg.setAttributeNS('xmlns', 'xlink', 'http://www.w3.org/1999/xlink')
-    svg.setAttributeNS('xmlns', 'ev', 'http://www.w3.org/2001/xml-events')
+    svg.setAttribute('xmlns', 'http://www.w3.org/1999/xlink');
+    svg.setAttributeNS('xmlns', 'xlink', 'http://www.w3.org/1999/xlink');
+    svg.setAttributeNS('xmlns', 'ev', 'http://www.w3.org/2001/xml-events');
 
     if(navigator.userAgent.toLowerCase().indexOf('webkit') >= 0) {
       svg.addEventListener('mousewheel', handleMouseWheel, false); // Chrome/Safari
@@ -142,7 +109,6 @@ window.svgPanZoom = (function(){
   /**
    * Retrieves the svg element for SVG manipulation. The element is then cached into the viewport global variable.
    */
-
   function getViewport(svg) {
     var initialViewportCTM, svgViewBox;
     if (!svg.__viewportElement) {
@@ -175,7 +141,6 @@ window.svgPanZoom = (function(){
   /**
    * Get an SVGPoint of the mouse co-ordinates of the event, relative to the SVG element.
    */
-
   function getRelativeMousePoint(evt) {
     var svg = (evt.target.tagName === 'svg' || evt.target.tagName === 'SVG') ? evt.target : evt.target.ownerSVGElement || evt.target.correspondingElement.ownerSVGElement;
     var point = svg.createSVGPoint();
@@ -183,7 +148,7 @@ window.svgPanZoom = (function(){
     point.y = evt.clientY;
     point = point.matrixTransform(svg.getScreenCTM().inverse());
     return point;
-  };
+  }
 
   /**
    * Instance an SVGPoint object with given event coordinates.
@@ -203,7 +168,6 @@ window.svgPanZoom = (function(){
   /**
    * Sets the current transform matrix of an element.
    */
-
   function setCTM(element, matrix) {
     var s = 'matrix(' + matrix.a + ',' + matrix.b + ',' + matrix.c + ',' + matrix.d + ',' + matrix.e + ',' + matrix.f + ')';
     element.setAttribute('transform', s);
@@ -212,7 +176,6 @@ window.svgPanZoom = (function(){
   /**
    * Dumps a matrix to a string (useful for debug).
    */
-
   function dumpMatrix(matrix) {
     var s = '[ ' + matrix.a + ', ' + matrix.c + ', ' + matrix.e + '\n  ' + matrix.b + ', ' + matrix.d + ', ' + matrix.f + '\n  0, 0, 1 ]';
     return s;
@@ -457,7 +420,6 @@ window.svgPanZoom = (function(){
   /**
    * Handle mouse wheel event.
    */
-
   function handleMouseWheel(evt) {
     if(!zoomEnabled) {
       return;
@@ -491,9 +453,9 @@ window.svgPanZoom = (function(){
     var wasZoom = g.getCTM();
     var setZoom = g.getCTM().multiply(k);
 
-    if ( setZoom.a < minZoom ) { setZoom.a = setZoom.d = wasZoom.a }
-    if ( setZoom.a > maxZoom ) { setZoom.a = setZoom.d = wasZoom.a }
-    if ( setZoom.a != wasZoom.a ) { setCTM(g, setZoom) }
+    if ( setZoom.a < minZoom ) { setZoom.a = setZoom.d = wasZoom.a; }
+    if ( setZoom.a > maxZoom ) { setZoom.a = setZoom.d = wasZoom.a; }
+    if ( setZoom.a != wasZoom.a ) { setCTM(g, setZoom); }
 
     if(typeof(stateTf) == 'undefined')
       stateTf = g.getCTM().inverse();
@@ -505,7 +467,6 @@ window.svgPanZoom = (function(){
   /**
    * Handle mouse move event.
    */
-
   function handleMouseMove(evt) {
     if(evt.preventDefault) {
       evt.preventDefault();
@@ -533,11 +494,10 @@ window.svgPanZoom = (function(){
     }
   }
 
-/**
+  /**
    * Handle double click event.
    * See handleMouseDown() for alternate detection method.
    */
-
   function handleDblClick(evt) {
     if(evt.preventDefault) {
       evt.preventDefault();
@@ -547,7 +507,7 @@ window.svgPanZoom = (function(){
     }
 
     var svg = (evt.target.tagName === 'svg' || evt.target.tagName === 'SVG') ? evt.target : evt.target.ownerSVGElement || evt.target
-.correspondingElement.ownerSVGElement;
+      .correspondingElement.ownerSVGElement;
 
     var zoomFactor = 4; // 4x zoom!
     if(evt.shiftKey){
@@ -567,9 +527,9 @@ window.svgPanZoom = (function(){
     var wasZoom = g.getCTM();
     var setZoom = g.getCTM().multiply(k);
 
-    if ( setZoom.a < minZoom ) { setZoom.a = setZoom.d = wasZoom.a }
-    if ( setZoom.a > maxZoom ) { setZoom.a = setZoom.d = wasZoom.a }
-    if ( setZoom.a != wasZoom.a ) { setCTM(g, setZoom) }
+    if ( setZoom.a < minZoom ) { setZoom.a = setZoom.d = wasZoom.a; }
+    if ( setZoom.a > maxZoom ) { setZoom.a = setZoom.d = wasZoom.a; }
+    if ( setZoom.a != wasZoom.a ) { setCTM(g, setZoom); }
 
     if(typeof(stateTf) == 'undefined')
       stateTf = g.getCTM().inverse();
@@ -581,7 +541,6 @@ window.svgPanZoom = (function(){
   /**
    * Handle click event.
    */
-
   function handleMouseDown(evt) {
     // Double click detection; more consistent than ondblclick
     if(evt.detail==2){
@@ -624,7 +583,6 @@ window.svgPanZoom = (function(){
   /**
    * Handle mouse button release event.
    */
-
   function handleMouseUp(evt) {
     if(evt.preventDefault) {
       evt.preventDefault();
