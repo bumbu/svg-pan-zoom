@@ -1,4 +1,4 @@
-window.svgPanZoom = (function(){
+window.svgPanZoom = (function(document) {
 
   'use strict';
 
@@ -618,4 +618,4 @@ window.svgPanZoom = (function(){
     enableDrag:enableDrag,
     disableDrag:disableDrag
   };
-})();
+})(document);
