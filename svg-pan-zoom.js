@@ -410,8 +410,8 @@ window.svgPanZoom = (function(document) {
       var newScale = Math.min(boundingClientRect.width/bBox.width, boundingClientRect.height/bBox.height);
       newCTM.a = newScale * oldCTM.a; //x-scale
       newCTM.d = newScale * oldCTM.d; //y-scale
-      newCTM.e = oldCTM.e * newScale - (boundingClientRect.width - bBox.width * newScale)/2 - bBox.x * newScale; //x-transform
-      newCTM.f = oldCTM.f * newScale - (boundingClientRect.height - bBox.height * newScale)/2 - bBox.y * newScale; //y-transform
+      newCTM.e = oldCTM.e * newScale + (boundingClientRect.width - bBox.width * newScale)/2 - bBox.x * newScale; //x-transform
+      newCTM.f = oldCTM.f * newScale + (boundingClientRect.height - bBox.height * newScale)/2 - bBox.y * newScale; //y-transform
       setCTM(viewport, newCTM);
       if (onZoom) { onZoom(newCTM.a); }
     });
