@@ -98,6 +98,11 @@ window.svgPanZoom = (function(document) {
     svg.setAttributeNS('xmlns', 'xlink', 'http://www.w3.org/1999/xlink');
     svg.setAttributeNS('xmlns', 'ev', 'http://www.w3.org/2001/xml-events');
 
+    //Needed for Internet Explorer, otherwise the viewport overflows.
+    if (svg.parentNode !== null) {
+      svg.setAttribute('style', 'overflow: hidden');
+    }
+
     if(navigator.userAgent.toLowerCase().indexOf('webkit') >= 0) {
       svg.addEventListener('mousewheel', handleMouseWheel, false); // Chrome/Safari
     }
@@ -144,10 +149,19 @@ window.svgPanZoom = (function(document) {
   function getRelativeMousePoint(evt) {
     var svg = (evt.target.tagName === 'svg' || evt.target.tagName === 'SVG') ? evt.target : evt.target.ownerSVGElement || evt.target.correspondingElement.ownerSVGElement;
     var point = svg.createSVGPoint();
-    point.x = evt.clientX
+    point.x = evt.clientX;
     point.y = evt.clientY;
     point = point.matrixTransform(svg.getScreenCTM().inverse());
     return point;
+  }
+
+  function getSvgCenterPoint(svg) {
+	var width = svg.width.baseVal.valueInSpecifiedUnits;
+	var height = svg.height.baseVal.valueInSpecifiedUnits;
+	var point = svg.createSVGPoint();
+	point.x = width/2;
+	point.y = height/2;
+	return point;
   }
 
   /**
@@ -364,38 +378,22 @@ window.svgPanZoom = (function(document) {
       throw new Error('No scale specified for zoom. Please enter a number.');
     }
     getSvg(args.selector, function(err, svg) {
-      var viewport = getViewport(svg);
-      viewportCTM.a = viewportCTM.d = args.scale;
-      if ( viewportCTM.a < minZoom ) { viewportCTM.a = viewportCTM.d = minZoom ; }
-      if ( viewportCTM.a > maxZoom ) { viewportCTM.a = viewportCTM.d = maxZoom ; }
-      setCTM(viewport, viewportCTM);
-      if (onZoom) { onZoom(viewportCTM.a); }
+      var p = getSvgCenterPoint(svg);
+      zoomAtPoint(svg, p, args.scale, true);
     });
   }
 
   function zoomIn(selector) {
-
-    // TODO zoom origin isn't center of screen
-
     getSvg(selector, function(err, svg) {
-      var viewport = getViewport(svg);
-      viewportCTM.a = viewportCTM.d = (1 + zoomScaleSensitivity) * viewportCTM.a;
-      if ( viewportCTM.a > maxZoom ) { viewportCTM.a = viewportCTM.d = maxZoom ; }
-      setCTM(viewport, viewportCTM);
-      if (onZoom) { onZoom(viewportCTM.a); }
+      var p = getSvgCenterPoint(svg);
+      zoomAtPoint(svg, p, 1 + zoomScaleSensitivity);
     });
   }
 
   function zoomOut(selector) {
-
-    // TODO zoom origin isn't center of screen
-
     getSvg(selector, function(err, svg) {
-      var viewport = getViewport(svg);
-      viewportCTM.a = viewportCTM.d = (1/(1 + zoomScaleSensitivity)) * viewportCTM.a;
-      if ( viewportCTM.a < minZoom ) { viewportCTM.a = viewportCTM.d = minZoom ; }
-      setCTM(viewport, viewportCTM);
-      if (onZoom) { onZoom(viewportCTM.a); }
+      var p = getSvgCenterPoint(svg);
+      zoomAtPoint(svg, p, 1/(1 + zoomScaleSensitivity));
     });
   }
 
@@ -441,29 +439,42 @@ window.svgPanZoom = (function(document) {
     else
       delta = evt.detail / -9; // Mozilla
 
-    var z = Math.pow(1 + zoomScaleSensitivity, delta);
-
-    var g = getViewport(svg);
-
     var p = getRelativeMousePoint(evt);
-    p = p.matrixTransform(g.getCTM().inverse());
+    zoomAtPoint(svg, p, Math.pow(1 + zoomScaleSensitivity, delta));
+  }
 
-    // Compute new scale matrix in current mouse position
-    var k = svg.createSVGMatrix().translate(p.x, p.y).scale(z).translate(-p.x, -p.y);
-    var wasZoom = g.getCTM();
-    var setZoom = g.getCTM().multiply(k);
+  /**
+   * Zoom in at an SVG point.
+   * @param svg The SVG element
+   * @param point The SVG point at which the zoom should happen (where 0,0 is top left corner)
+   * @param zoomScale Number representing how much to zoom.
+   * @param zoomAbsolute Default false. If true, zoomScale is treated as an absolute value.
+   *					 Otherwise, zoomScale is treated as a multiplied (e.g. 1.10 would zoom in 10%)
+   */
+  function zoomAtPoint(svg, point, zoomScale, zoomAbsolute) {
+    var viewport = getViewport(svg);
+    var viewportCTM = viewport.getCTM();
+    point = point.matrixTransform(viewportCTM.inverse());
+
+    var k = svg.createSVGMatrix().translate(point.x, point.y).scale(zoomScale).translate(-point.x, -point.y);
+    var wasZoom = viewportCTM;
+    var setZoom = viewportCTM.multiply(k);
+
+    if (zoomAbsolute) {
+      setZoom.a = setZoom.d = zoomScale;
+    }
 
     if ( setZoom.a < minZoom ) { setZoom.a = setZoom.d = wasZoom.a; }
     if ( setZoom.a > maxZoom ) { setZoom.a = setZoom.d = wasZoom.a; }
-    if ( setZoom.a != wasZoom.a ) { setCTM(g, setZoom); }
+    if ( setZoom.a != wasZoom.a ) { setCTM(viewport, setZoom); }
 
     if(typeof(stateTf) == 'undefined')
-      stateTf = g.getCTM().inverse();
+      stateTf = viewport.getCTM().inverse();
 
     stateTf = stateTf.multiply(k.inverse());
-    if (onZoom) { onZoom(g.getCTM().a); }
+    if (onZoom) { onZoom(viewport.getCTM().a); }
   }
-
+  
   /**
    * Handle mouse move event.
    */
@@ -509,33 +520,16 @@ window.svgPanZoom = (function(document) {
     var svg = (evt.target.tagName === 'svg' || evt.target.tagName === 'SVG') ? evt.target : evt.target.ownerSVGElement || evt.target
       .correspondingElement.ownerSVGElement;
 
-    var zoomFactor = 4; // 4x zoom!
+    var zoomFactor;
     if(evt.shiftKey){
-        zoomFactor = -1.66; // zoom out when shift key pressed
+      zoomFactor = 1/((1 + zoomScaleSensitivity) * 2); // zoom out when shift key pressed
+    }
+    else {
+      zoomFactor = (1 + zoomScaleSensitivity) * 2;
     }
 
-    var z = 1 + zoomScaleSensitivity * zoomFactor;
-
-    var g = getViewport(svg);
-
-    var p = getEventPoint(evt);
-
-    p = p.matrixTransform(g.getCTM().inverse());
-
-    // Compute new scale matrix in current mouse position
-    var k = svg.createSVGMatrix().translate(p.x, p.y).scale(z).translate(-p.x, -p.y);
-    var wasZoom = g.getCTM();
-    var setZoom = g.getCTM().multiply(k);
-
-    if ( setZoom.a < minZoom ) { setZoom.a = setZoom.d = wasZoom.a; }
-    if ( setZoom.a > maxZoom ) { setZoom.a = setZoom.d = wasZoom.a; }
-    if ( setZoom.a != wasZoom.a ) { setCTM(g, setZoom); }
-
-    if(typeof(stateTf) == 'undefined')
-      stateTf = g.getCTM().inverse();
-
-    stateTf = stateTf.multiply(k.inverse());
-    if (onZoom) { onZoom(g.getCTM().a); }
+    var p = getRelativeMousePoint(evt);
+    zoomAtPoint(svg, p, zoomFactor );
   }
 
   /**
