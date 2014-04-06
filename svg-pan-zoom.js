@@ -1,8 +1,9 @@
+
 window.svgPanZoom = (function(document) {
 
   'use strict';
 
-  var state = 'none', viewportCTM, stateTarget, stateOrigin, stateTf;
+  var state = 'none', stateTarget, stateOrigin, stateTf;
 
   /// CONFIGURATION
   /// ====>
@@ -91,7 +92,10 @@ window.svgPanZoom = (function(document) {
       'onmouseup': 'svgPanZoom.handleMouseUp(evt)',
       'onmousedown': 'svgPanZoom.handleMouseDown(evt)',
       'onmousemove': 'svgPanZoom.handleMouseMove(evt)',
-      'onmouseleave' : 'svgPanZoom.handleMouseUp(evt)', // Decomment this to stop the pan functionality when dragging out of the SVG element; Note that 'onmouseleave' works over parent svg and all children.
+
+      // Decomment this to stop the pan functionality when dragging out of the SVG element;
+      // Note that 'onmouseleave' works over parent svg and all children.
+      'onmouseleave' : 'svgPanZoom.handleMouseUp(evt)',
     });
 
     svg.setAttribute('xmlns', 'http://www.w3.org/1999/xlink');
@@ -103,16 +107,11 @@ window.svgPanZoom = (function(document) {
       svg.setAttribute('style', 'overflow: hidden');
     }
 
-    if(navigator.userAgent.toLowerCase().indexOf('webkit') >= 0) {
-      svg.addEventListener('mousewheel', handleMouseWheel, false); // Chrome/Safari
-    }
-    else {
-      svg.addEventListener('DOMMouseScroll', handleMouseWheel, false); // Others
-    }
+    window.addWheelListener(svg, handleMouseWheel);
   }
 
   /**
-   * Retrieves the svg element for SVG manipulation. The element is then cached into the viewport global variable.
+   * Retrieves the svg element for SVG manipulation.
    */
   function getViewport(svg) {
     var initialViewportCTM, svgViewBox;
@@ -139,19 +138,43 @@ window.svgPanZoom = (function(document) {
       }
     }
 
-    viewportCTM = svg.__viewportElement.getCTM();
     return svg.__viewportElement;
   }
 
   /**
+   * Time-based cache for svg.getScreenCTM().
+   * Needed because getScreenCTM() is very slow on Firefox (FF 28 at time of writing).
+   * The cache expires every 300ms... this is a pretty safe time because it's only called
+   * when we're zooming, when the screenCTM is unlikely/impossible to change.
+   */
+  var getScreenCTMCached = (function() {
+    var svgs = {};
+    return function(svg) {
+      var cur = Date.now();
+      if (svgs.hasOwnProperty(svg)) {
+        var cached = svgs[svg];
+        if (cur - cached.time > 300) {
+          //Cache expired
+          cached.time = cur;
+          cached.ctm = svg.getScreenCTM();
+        }
+        return cached.ctm;
+      } else {
+        var ctm = svg.getScreenCTM();
+        svgs[svg] = {time: cur, ctm: ctm};
+        return ctm;
+      }
+    }
+  })();
+
+  /**
    * Get an SVGPoint of the mouse co-ordinates of the event, relative to the SVG element.
    */
-  function getRelativeMousePoint(evt) {
-    var svg = (evt.target.tagName === 'svg' || evt.target.tagName === 'SVG') ? evt.target : evt.target.ownerSVGElement || evt.target.correspondingElement.ownerSVGElement;
+  function getRelativeMousePoint(svg, evt) {
     var point = svg.createSVGPoint();
     point.x = evt.clientX;
     point.y = evt.clientY;
-    point = point.matrixTransform(svg.getScreenCTM().inverse());
+    point = point.matrixTransform(getScreenCTMCached(svg).inverse());
     return point;
   }
 
@@ -367,6 +390,7 @@ window.svgPanZoom = (function(document) {
       var viewport = getViewport(svg);
       tx = svg.getBBox().width * panIncrement * directionXY.x;
       ty = svg.getBBox().height * panIncrement * directionXY.y;
+      var viewportCTM = viewport.getCTM();
       viewportCTM.e += tx;
       viewportCTM.f += ty;
       setCTM(viewport, viewportCTM);
@@ -404,7 +428,7 @@ window.svgPanZoom = (function(document) {
 
       var bBox = svg.getBBox();
       var boundingClientRect = svg.getBoundingClientRect();
-      oldCTM = newCTM = viewportCTM;
+      oldCTM = newCTM = viewport.getCTM();
       var newScale = Math.min(boundingClientRect.width/bBox.width, boundingClientRect.height/bBox.height);
       newCTM.a = newScale * oldCTM.a; //x-scale
       newCTM.d = newScale * oldCTM.d; //y-scale
@@ -434,13 +458,30 @@ window.svgPanZoom = (function(document) {
 
     var delta;
 
-    if(evt.wheelDelta)
-      delta = evt.wheelDelta / 360; // Chrome/Safari
-    else
-      delta = evt.detail / -9; // Mozilla
+    if ('deltaMode' in evt && evt.deltaMode === 0) {
+      //Make empirical adjustments for browsers that give deltaY in 
+      //pixels (deltaMode=0).
 
-    var p = getRelativeMousePoint(evt);
-    zoomAtPoint(svg, p, Math.pow(1 + zoomScaleSensitivity, delta));
+      if (evt.wheelDelta) {
+        //Normalizer for Chrome
+        delta = evt.deltaY / Math.abs(evt.wheelDelta/3) 
+      } else {
+        //Others. Possibly tablets? Use a value just in case
+        delta = evt.deltaY / 120;
+      }
+    } else if ('mozPressure' in evt) {
+      //Normalizer for newer Firefox
+      //NOTE: May need to change detection at some point if mozPressure disappears.
+      delta = evt.deltaY / 3;
+    }
+    else {
+      //Others should be reasonably normalized by the mousewheel code at the end of the file.
+      delta = evt.deltaY;
+    }
+
+    var p = getRelativeMousePoint(svg, evt);
+    var zoom = Math.pow(1 + zoomScaleSensitivity, delta);
+    zoomAtPoint(svg, p, zoom);
   }
 
   /**
@@ -469,10 +510,10 @@ window.svgPanZoom = (function(document) {
     if ( setZoom.a != wasZoom.a ) { setCTM(viewport, setZoom); }
 
     if(typeof(stateTf) == 'undefined')
-      stateTf = viewport.getCTM().inverse();
+      stateTf = setZoom.inverse();
 
     stateTf = stateTf.multiply(k.inverse());
-    if (onZoom) { onZoom(viewport.getCTM().a); }
+    if (onZoom) { onZoom(setZoom.a); }
   }
   
   /**
@@ -528,7 +569,7 @@ window.svgPanZoom = (function(document) {
       zoomFactor = (1 + zoomScaleSensitivity) * 2;
     }
 
-    var p = getRelativeMousePoint(evt);
+    var p = getRelativeMousePoint(svg, evt);
     zoomAtPoint(svg, p, zoomFactor );
   }
 
@@ -613,3 +654,74 @@ window.svgPanZoom = (function(document) {
     disableDrag:disableDrag
   };
 })(document);
+
+//Cross-browser wheel event, from: https://developer.mozilla.org/en-US/docs/Web/Reference/Events/wheel
+if (!window.hasOwnProperty('addWheelListener')) {
+	// creates a global "addWheelListener" method
+	// example: addWheelListener( elem, function( e ) { console.log( e.deltaY ); e.preventDefault(); } );
+	(function(window,document) {
+
+		var prefix = "", _addEventListener, onwheel, support;
+
+		// detect event model
+		if ( window.addEventListener ) {
+			_addEventListener = "addEventListener";
+		} else {
+			_addEventListener = "attachEvent";
+			prefix = "on";
+		}
+
+		// detect available wheel event
+		support = "onwheel" in document.createElement("div") ? "wheel" : // Modern browsers support "wheel"
+				  document.onmousewheel !== undefined ? "mousewheel" : // Webkit and IE support at least "mousewheel"
+				  "DOMMouseScroll"; // let's assume that remaining browsers are older Firefox
+
+        window.addWheelListener = function( elem, callback, useCapture ) {
+			_addWheelListener( elem, support, callback, useCapture );
+
+			// handle MozMousePixelScroll in older Firefox
+			if( support == "DOMMouseScroll" ) {
+				_addWheelListener( elem, "MozMousePixelScroll", callback, useCapture );
+			}
+		};
+
+		function _addWheelListener( elem, eventName, callback, useCapture ) {
+			elem[ _addEventListener ]( prefix + eventName, support == "wheel" ? callback : function( originalEvent ) {
+				!originalEvent && ( originalEvent = window.event );
+
+				// create a normalized event object
+				var event = {
+					// keep a ref to the original event object
+					originalEvent: originalEvent,
+					// NOTE: clientX and clientY are not in Mozilla example, but are needed for svg-pan-zoom
+					clientX: originalEvent.clientX,
+					clientY: originalEvent.clientY,
+					target: originalEvent.target || originalEvent.srcElement,
+					type: "wheel",
+					deltaMode: originalEvent.type == "MozMousePixelScroll" ? 0 : 1,
+					deltaX: 0,
+					deltaZ: 0,
+					preventDefault: function() {
+						originalEvent.preventDefault ?
+							originalEvent.preventDefault() :
+							originalEvent.returnValue = false;
+					}
+				};
+
+				// calculate deltaY (and deltaX) according to the event
+				if ( support == "mousewheel" ) {
+					event.deltaY = - 1/40 * originalEvent.wheelDelta;
+					// Webkit also support wheelDeltaX
+					originalEvent.wheelDeltaX && ( event.deltaX = - 1/40 * originalEvent.wheelDeltaX );
+				} else {
+					event.deltaY = originalEvent.detail;
+				}
+
+				// it's time to fire the callback
+				return callback( event );
+
+			}, useCapture || false );
+		}
+
+	})(window,document);
+}
