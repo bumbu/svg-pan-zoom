@@ -100,47 +100,15 @@ You can configure the default enabled/disabled state of pan/zoom/drag with the v
 
 Known issues
 ------------
-  * Mouse zoom does not work at all with IE, and pan does not work correctly. See [Issue #21](https://github.com/ariutta/svg-pan-zoom/issues/21).
-  * Programmatical Zoom does not zoom on center. See [Issue #4](https://github.com/ariutta/svg-pan-zoom/issues/4).
-  * Zooming (while panning) on Safari has still some issues. See [Issue #15](https://github.com/ariutta/svg-pan-zoom/issues/15).
+  * Zooming (while panning) on Safari might have some issues. See [Issue #15](https://github.com/ariutta/svg-pan-zoom/issues/15).
 
 Related Work
 ------------
-This library is based on the [SVGPan](https://code.google.com/p/svgpan/) library. SVGPan is intended for use with the [SVG 'script' element](http://www.w3.org/TR/SVG/script.html), whereas svg-pan-zoom is intended for use with the [HTML 'script' element](http://www.w3.org/TR/html401/interact/scripts.html).
-
-  * 1.3.2), Thu Dec 5 2013, Anders Riutta
-    * Addressed issue of overwriting existing viewport transform
-    * Added capability to handle SVG documents in object elements
- 
-  * 1.3.1), Mon Nov 19 2013, Anders Riutta
-    * Added programmatic control for pan and zoom 
-    * Changed certain terms to make them more intuitive
-
-  * 1.3.0), Mon Nov 18 2013, Anders Riutta
-    * Added programmatic control for zoom/pan enabled/disabled
-
-  * 1.2.2) Tue Aug 30 17:21:56 CEST 2011, Andrea Leofreddi
-    * Fixed viewBox on svg tag (#7)
-    * Improved zoom speed (#2)
-
-  * 1.2.1) Mon Jul  4 00:33:18 CEST 2011, Andrea Leofreddi
-    * Fixed a regression with mouse wheel (now working on Firefox 5)
-    * Working with viewBox attribute (#4)
-    * Added 'use strict;' and fixed resulting warnings (#5)
-    * Added configuration variables, dragging is disabled by default (#3)
-
-  * 1.2) Sat Mar 20 08:42:50 GMT 2010, Zeng Xiaohui
-    * Fixed a bug with browser mouse handler interaction
-
-  * 1.1) Wed Feb  3 17:39:33 GMT 2010, Zeng Xiaohui
-    * Updated the zoom code to support the mouse wheel on Safari/Chrome
-
-  * 1.0) Andrea Leofreddi
-    * First release
+This library used the [SVGPan](https://code.google.com/p/svgpan/) library as a starting point. SVGPan is intended for use with the [SVG 'script' element](http://www.w3.org/TR/SVG/script.html), whereas svg-pan-zoom is intended for use with the [HTML 'script' element](http://www.w3.org/TR/html401/interact/scripts.html).
 
 License
 -------
- This code is licensed under the following BSD license:
+ The code from the SVGPan library is licensed under the following BSD license:
 
  ```
  Copyright 2009-2010 Andrea Leofreddi <a.leofreddi@itcharm.com>. All rights reserved.
@@ -169,3 +137,5 @@ License
   authors and should not be interpreted as representing official policies, either expressed
   or implied, of Andrea Leofreddi.
 ```
+
+The code from the updates and changes to SVGPan are licensed under the same BSD license, with the copyright for the code from each change held by the author of that code. Submitting a pull request constitutes acceptance of this licensing.
