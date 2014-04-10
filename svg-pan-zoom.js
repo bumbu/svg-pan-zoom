@@ -1,4 +1,3 @@
-
 window.svgPanZoom = (function(document) {
 
   'use strict';
@@ -10,11 +9,13 @@ window.svgPanZoom = (function(document) {
 
   var panEnabled = true; // true or false: enable or disable panning (default enabled)
   var zoomEnabled = true; // true or false: enable or disable zooming (default enabled)
+  var zoomControlIconsEnabled = true; // true or false: insert icons to give user an option in addition to mouse events to control zoom (default enabled)
   var dragEnabled = false; // true or false: enable or disable dragging (default disabled)
   var zoomScaleSensitivity = 0.2; // Zoom sensitivity
   var minZoom = 0.5; // Minimum Zoom
   var maxZoom = 10; // Maximum Zoom
   var onZoom = null; // Zoom callback
+  var containerWidth, containerHeight;
 
   /// <====
   /// END OF CONFIGURATION
@@ -24,13 +25,53 @@ window.svgPanZoom = (function(document) {
    */
   function init(args) {
     args = args || {};
+    svgPanZoom.controlIcons = svgPanZoom.controlIcons || {};
     getSvg(args.selector, function(err, svg) {
+      var container = svg.parentElement || svgElement.parentNode;
+      var containerBoundingClientRect = container.getBoundingClientRect();
+      containerWidth = parseInt(containerBoundingClientRect.width);
+      containerHeight = parseInt(containerBoundingClientRect.height);
+      svgPanZoom.controlIcons.containerWidth = containerWidth; // is there a better way to do this?
+      svgPanZoom.controlIcons.containerHeight = containerHeight;
+
+      var viewport = getViewport(svg);
+      var svgViewBox = svg.getAttribute('viewBox');
+      if (svgViewBox) {
+        var bBox = svg.getBBox();
+        var boundingClientRect = svg.getBoundingClientRect();
+        var viewBoxValues = svgViewBox.split(' ').map(function(viewBoxValue) {
+          return parseFloat(viewBoxValue);
+        });
+        var viewBoxWidth = viewBoxValues[2];
+        var viewBoxHeight = viewBoxValues[3];
+        //svg.__viewportElement.setAttribute('viewBox', svgViewBox); // does this do anything? It didn't appear to, at least in Chrome.
+
+        svg.removeAttribute('viewBox');
+        var oldCTM, newCTM;
+        oldCTM = newCTM = svg.__viewportElement.getCTM();
+        var newScale = Math.min(containerWidth/viewBoxWidth, containerHeight/viewBoxHeight);
+        //var newScale = Math.min(boundingClientRect.width/bBox.width, boundingClientRect.height/bBox.height);
+        newCTM.a = newScale * oldCTM.a; //x-scale
+        newCTM.d = newScale * oldCTM.d; //y-scale
+        newCTM.e = oldCTM.e * newScale; //x-transform
+        newCTM.f = oldCTM.f * newScale; //y-transform
+        setCTM(svg.__viewportElement, newCTM);
+      }
+      
+
       if (args.hasOwnProperty('panEnabled')) {
         panEnabled = args.panEnabled;
       }
       if (args.hasOwnProperty('zoomEnabled')) {
         zoomEnabled = args.zoomEnabled;
+        if (zoomEnabled && args.hasOwnProperty('zoomControlIconsEnabled')) {
+          zoomControlIconsEnabled = args.zoomControlIconsEnabled;
+        }
       }
+      if (zoomEnabled && zoomControlIconsEnabled) {
+        svgPanZoom.controlIcons.add(svg);
+      }
+
       if (args.hasOwnProperty('dragEnabled')) {
         dragEnabled = args.dragEnabled;
       }
@@ -114,14 +155,24 @@ window.svgPanZoom = (function(document) {
    * Retrieves the svg element for SVG manipulation.
    */
   function getViewport(svg) {
-    var initialViewportCTM, svgViewBox;
+    // CTM refers to the current transformation matrix.
+    // Its values can be represented as (a, c, b, d, tx, ty), where
+    // a: x scale
+    // d: y scale
+    // c and b: skew
+    // tx: translate x
+    // ty: translate y
+    //
+    // getBBox() gives dimensions of content at current zoom level (the content bounds)
+    // getBoundingClientRect() gives dimensions of svg element (the container size).
+    var initialViewportCTM;
     if (!svg.__viewportElement) {
       svg.__viewportElement = svg.getElementById('viewport');
       if (!svg.__viewportElement) {
 
         // If no g container with id 'viewport' exists, as last resort, use first g element.
 
-        svg.__viewportElement = svg.getElementsByTagName('g')[0]
+        svg.__viewportElement = svg.getElementsByTagName('g')[0];
       }
 
       if (!svg.__viewportElement) {
@@ -129,12 +180,6 @@ window.svgPanZoom = (function(document) {
         // TODO could automatically move all elements from SVG into a newly created viewport g element.
 
         throw new Error('No g element containers in SVG document to use for viewport.');
-      }
-
-      svgViewBox = svg.getAttribute('viewBox');
-      if (svgViewBox) {
-        svg.__viewportElement.setAttribute('viewBox', svgViewBox);
-        svg.removeAttribute('viewBox');
       }
     }
 
@@ -164,7 +209,7 @@ window.svgPanZoom = (function(document) {
         svgs[svg] = {time: cur, ctm: ctm};
         return ctm;
       }
-    }
+    };
   })();
 
   /**
@@ -594,8 +639,7 @@ window.svgPanZoom = (function(document) {
     var g = getViewport(svg);
 
     if(
-      evt.target.tagName == 'svg'
-        || !dragEnabled // Pan anyway when drag is disabled and the user clicked on an element
+      evt.target.tagName == 'svg' || !dragEnabled // Pan anyway when drag is disabled and the user clicked on an element
     ) {
       // Pan mode
       state = 'pan';
@@ -673,8 +717,8 @@ if (!window.hasOwnProperty('addWheelListener')) {
 
 		// detect available wheel event
 		support = "onwheel" in document.createElement("div") ? "wheel" : // Modern browsers support "wheel"
-				  document.onmousewheel !== undefined ? "mousewheel" : // Webkit and IE support at least "mousewheel"
-				  "DOMMouseScroll"; // let's assume that remaining browsers are older Firefox
+      document.onmousewheel !== undefined ? "mousewheel" : // Webkit and IE support at least "mousewheel"
+      "DOMMouseScroll"; // let's assume that remaining browsers are older Firefox
 
         window.addWheelListener = function( elem, callback, useCapture ) {
 			_addWheelListener( elem, support, callback, useCapture );
