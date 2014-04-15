@@ -4,7 +4,7 @@ var svgPanZoom = {
 
   panEnabled: true, // true or false: enable or disable panning (default enabled)
   zoomEnabled: true, // true or false: enable or disable zooming (default enabled)
-  controlIconsEnabled: true, // true or false: insert icons to give user an option in addition to mouse events to control pan/zoom (default enabled)
+  controlIconsEnabled: false, // true or false: insert icons to give user an option in addition to mouse events to control pan/zoom (default disabled)
   dragEnabled: false, // true or false: enable or disable dragging (default disabled)
   zoomScaleSensitivity: 0.2, // Zoom sensitivity
   minZoom: 0.5, // Minimum Zoom
