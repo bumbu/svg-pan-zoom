@@ -49,18 +49,27 @@ var svgPanZoom = {
         svgPanZoomInstance.setCTM(svg.__viewportElement, newCTM);
         svgPanZoomInstance.initialCTM = newCTM;
       }
+      else {
+        svgPanZoomInstance.initialCTM = viewport.getCTM();
+      }
       
 
       if (args.hasOwnProperty('panEnabled')) {
         svgPanZoomInstance.panEnabled = args.panEnabled;
       }
+      if (args.hasOwnProperty('controlIconsEnabled')) {
+        svgPanZoomInstance.controlIconsEnabled = args.controlIconsEnabled;
+      }
       if (args.hasOwnProperty('zoomEnabled')) {
         svgPanZoomInstance.zoomEnabled = args.zoomEnabled;
+        /*
         if (svgPanZoomInstance.zoomEnabled && args.hasOwnProperty('controlIconsEnabled')) {
           svgPanZoomInstance.controlIconsEnabled = args.controlIconsEnabled;
         }
+        //*/
       }
-      if (svgPanZoomInstance.zoomEnabled && svgPanZoomInstance.controlIconsEnabled) {
+      //if (svgPanZoomInstance.zoomEnabled && svgPanZoomInstance.controlIconsEnabled) {
+      if (svgPanZoomInstance.controlIconsEnabled) {
         args.svg = svg;
         args.svgWidth = svgWidth;
         args.svgHeight = svgHeight;
