@@ -1,21 +1,14 @@
-window.svgPanZoom = (function(document) {
-
-  'use strict';
-
-  var state = 'none', stateTarget, stateOrigin, stateTf;
-
+var svgPanZoom = {
   /// CONFIGURATION
   /// ====>
 
-  var panEnabled = true; // true or false: enable or disable panning (default enabled)
-  var zoomEnabled = true; // true or false: enable or disable zooming (default enabled)
-  var zoomControlIconsEnabled = true; // true or false: insert icons to give user an option in addition to mouse events to control zoom (default enabled)
-  var dragEnabled = false; // true or false: enable or disable dragging (default disabled)
-  var zoomScaleSensitivity = 0.2; // Zoom sensitivity
-  var minZoom = 0.5; // Minimum Zoom
-  var maxZoom = 10; // Maximum Zoom
-  var onZoom = null; // Zoom callback
-  var containerWidth, containerHeight;
+  panEnabled: true, // true or false: enable or disable panning (default enabled)
+  zoomEnabled: true, // true or false: enable or disable zooming (default enabled)
+  controlIconsEnabled: true, // true or false: insert icons to give user an option in addition to mouse events to control pan/zoom (default enabled)
+  dragEnabled: false, // true or false: enable or disable dragging (default disabled)
+  zoomScaleSensitivity: 0.2, // Zoom sensitivity
+  minZoom: 0.5, // Minimum Zoom
+  maxZoom: 10, // Maximum Zoom
 
   /// <====
   /// END OF CONFIGURATION
@@ -23,18 +16,16 @@ window.svgPanZoom = (function(document) {
   /**
    * Enable svgPanZoom
    */
-  function init(args) {
+  init: function(args) {
     args = args || {};
-    svgPanZoom.controlIcons = svgPanZoom.controlIcons || {};
-    getSvg(args.selector, function(err, svg) {
-      var container = svg.parentElement || svgElement.parentNode;
-      var containerBoundingClientRect = container.getBoundingClientRect();
-      containerWidth = parseInt(containerBoundingClientRect.width);
-      containerHeight = parseInt(containerBoundingClientRect.height);
-      svgPanZoom.controlIcons.containerWidth = containerWidth; // is there a better way to do this?
-      svgPanZoom.controlIcons.containerHeight = containerHeight;
-
-      var viewport = getViewport(svg);
+    var selector = args.selector;
+    this.getSvg(selector, function(err, svg, svgPanZoomInstance) {
+      svg.__svgPanZoom = {};
+      svg.__svgPanZoom.state = 'none';
+      var svgDimensions = svgPanZoomInstance.getSvgDimensions(svg);
+      var svgWidth = svgDimensions.width;
+      var svgHeight = svgDimensions.height;
+      viewport = svgPanZoomInstance.getViewport(svg);
       var svgViewBox = svg.getAttribute('viewBox');
       if (svgViewBox) {
         var bBox = svg.getBBox();
@@ -49,95 +40,123 @@ window.svgPanZoom = (function(document) {
         svg.removeAttribute('viewBox');
         var oldCTM, newCTM;
         oldCTM = newCTM = svg.__viewportElement.getCTM();
-        var newScale = Math.min(containerWidth/viewBoxWidth, containerHeight/viewBoxHeight);
+        var newScale = Math.min(svgWidth/viewBoxWidth, svgHeight/viewBoxHeight);
         //var newScale = Math.min(boundingClientRect.width/bBox.width, boundingClientRect.height/bBox.height);
         newCTM.a = newScale * oldCTM.a; //x-scale
         newCTM.d = newScale * oldCTM.d; //y-scale
         newCTM.e = oldCTM.e * newScale; //x-transform
         newCTM.f = oldCTM.f * newScale; //y-transform
-        setCTM(svg.__viewportElement, newCTM);
+        svgPanZoomInstance.setCTM(svg.__viewportElement, newCTM);
+        svgPanZoomInstance.initialCTM = newCTM;
       }
       
 
       if (args.hasOwnProperty('panEnabled')) {
-        panEnabled = args.panEnabled;
+        svgPanZoomInstance.panEnabled = args.panEnabled;
       }
       if (args.hasOwnProperty('zoomEnabled')) {
-        zoomEnabled = args.zoomEnabled;
-        if (zoomEnabled && args.hasOwnProperty('zoomControlIconsEnabled')) {
-          zoomControlIconsEnabled = args.zoomControlIconsEnabled;
+        svgPanZoomInstance.zoomEnabled = args.zoomEnabled;
+        if (svgPanZoomInstance.zoomEnabled && args.hasOwnProperty('controlIconsEnabled')) {
+          svgPanZoomInstance.controlIconsEnabled = args.controlIconsEnabled;
         }
       }
-      if (zoomEnabled && zoomControlIconsEnabled) {
-        svgPanZoom.controlIcons.add(svg);
+      if (svgPanZoomInstance.zoomEnabled && svgPanZoomInstance.controlIconsEnabled) {
+        args.svg = svg;
+        args.svgWidth = svgWidth;
+        args.svgHeight = svgHeight;
+        args.viewport = viewport;
+        args.svgPanZoomInstance = svgPanZoomInstance;
+        svgPanZoomInstance.controlIcons.add(args);
       }
 
       if (args.hasOwnProperty('dragEnabled')) {
-        dragEnabled = args.dragEnabled;
+        svgPanZoomInstance.dragEnabled = args.dragEnabled;
       }
       if (args.hasOwnProperty('zoomScaleSensitivity')) {
-        zoomScaleSensitivity = args.zoomScaleSensitivity;
+        svgPanZoomInstance.zoomScaleSensitivity = args.zoomScaleSensitivity;
       }
       if (args.hasOwnProperty('onZoom')) {
-        onZoom = args.onZoom;
+        svgPanZoomInstance.onZoom = args.onZoom;
       }
       if (args.hasOwnProperty('minZoom')) {
-        minZoom = args.minZoom;
+        svgPanZoomInstance.minZoom = args.minZoom;
       }
       if (args.hasOwnProperty('maxZoom')) {
-        maxZoom = args.maxZoom;
+        svgPanZoomInstance.maxZoom = args.maxZoom;
       }
-      setupHandlers(svg);
-      if (!!svg.ownerDocument.documentElement.tagName.toLowerCase() !== 'svg') {
+      svgPanZoomInstance.setupHandlers(svg);
+      if (svg.ownerDocument.documentElement.tagName.toLowerCase() !== 'svg') {
         svg.ownerDocument.defaultView.svgPanZoom = svgPanZoom;
       }
     });
-  }
+  },
 
   /**
    * Change settings
    */
-  function setZoomScaleSensitivity(newZoomScaleSensitivity) {
-    zoomScaleSensitivity = newZoomScaleSensitivity;
-  }
+  setZoomScaleSensitivity: function (newZoomScaleSensitivity) {
+    this.zoomScaleSensitivity = newZoomScaleSensitivity;
+  },
 
-  function enablePan() {
-    panEnabled = true;
-  }
+  enablePan: function () {
+    this.panEnabled = true;
+  },
 
-  function disablePan() {
-    panEnabled = false;
-  }
+  disablePan: function () {
+    this.panEnabled = false;
+  },
 
-  function enableZoom() {
-    zoomEnabled = true;
-  }
+  enableZoom: function () {
+    this.zoomEnabled = true;
+  },
 
-  function disableZoom() {
-    zoomEnabled = false;
-  }
+  disableZoom: function () {
+    this.zoomEnabled = false;
+  },
 
-  function enableDrag() {
-    dragEnabled = true;
-  }
+  enableDrag: function () {
+    this.dragEnabled = true;
+  },
 
-  function disableDrag() {
-    dragEnabled = false;
-  }
+  disableDrag: function () {
+    this.dragEnabled = false;
+  },
 
   /**
    * Register handlers
    */
-  function setupHandlers(svg){
-    setAttributes(svg, {
-      'onmouseup': 'svgPanZoom.handleMouseUp(evt)',
-      'onmousedown': 'svgPanZoom.handleMouseDown(evt)',
-      'onmousemove': 'svgPanZoom.handleMouseMove(evt)',
+  setupHandlers: function (svg){
+    var svgPanZoomInstance = this;
+    svg.addEventListener("mousedown", function(evt) {
+      return svgPanZoomInstance.handleMouseDown(evt);
+    }, false);
+    svg.addEventListener("touchstart", function(evt) {
+      return svgPanZoomInstance.handleMouseDown(evt);
+    }, false);
 
-      // Decomment this to stop the pan functionality when dragging out of the SVG element;
-      // Note that 'onmouseleave' works over parent svg and all children.
-      'onmouseleave' : 'svgPanZoom.handleMouseUp(evt)',
-    });
+    svg.addEventListener("mouseup", function(evt) {
+      return svgPanZoomInstance.handleMouseUp(evt);
+    }, false);
+    svg.addEventListener("touchend", function(evt) {
+      return svgPanZoomInstance.handleMouseUp(evt);
+    }, false);
+
+    svg.addEventListener("mousemove", function(evt) {
+      return svgPanZoomInstance.handleMouseMove(evt);
+    }, false);
+    svg.addEventListener("touchmove", function(evt) {
+      return svgPanZoomInstance.handleMouseMove(evt);
+    }, false);
+
+    svg.addEventListener("mouseleave", function(evt) {
+      return svgPanZoomInstance.handleMouseUp(evt);
+    }, false);
+    svg.addEventListener("touchleave", function(evt) {
+      return svgPanZoomInstance.handleMouseUp(evt);
+    }, false);
+    svg.addEventListener("touchcancel", function(evt) {
+      return svgPanZoomInstance.handleMouseUp(evt);
+    }, false);
 
     svg.setAttribute('xmlns', 'http://www.w3.org/1999/xlink');
     svg.setAttributeNS('xmlns', 'xlink', 'http://www.w3.org/1999/xlink');
@@ -145,46 +164,86 @@ window.svgPanZoom = (function(document) {
 
     //Needed for Internet Explorer, otherwise the viewport overflows.
     if (svg.parentNode !== null) {
-      svg.setAttribute('style', 'overflow: hidden');
+      var style = svg.getAttribute('style') || '';
+      if (style.toLowerCase().indexOf('overflow') === -1) {
+        svg.setAttribute('style', 'overflow: hidden; ' + style);
+      }
     }
 
-    window.addWheelListener(svg, handleMouseWheel);
-  }
+    window.addWheelListener(svg, function(evt) {
+      return svgPanZoomInstance.handleMouseWheel(evt);
+    });
+  },
 
   /**
-   * Retrieves the svg element for SVG manipulation.
+   * Retrieves the "g" element to be used as container for view manipulation.
    */
-  function getViewport(svg) {
-    // CTM refers to the current transformation matrix.
-    // Its values can be represented as (a, c, b, d, tx, ty), where
-    // a: x scale
-    // d: y scale
-    // c and b: skew
-    // tx: translate x
-    // ty: translate y
-    //
-    // getBBox() gives dimensions of content at current zoom level (the content bounds)
-    // getBoundingClientRect() gives dimensions of svg element (the container size).
-    var initialViewportCTM;
+  getViewport: function (svg) {
     if (!svg.__viewportElement) {
       svg.__viewportElement = svg.getElementById('viewport');
-      if (!svg.__viewportElement) {
+      if (!svg.__viewportElement) { // If no g container with id 'viewport' exists, as last resort, use first g element.
+        var g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        g.setAttribute('id', 'viewport');
 
-        // If no g container with id 'viewport' exists, as last resort, use first g element.
+        var svgChildren = svg.childNodes || svg.children;
+        do {
+          g.appendChild(svgChildren[0]);
+        } while (svgChildren.length > 0);
+        svg.appendChild(g);
+        svg.__viewportElement = g;
 
-        svg.__viewportElement = svg.getElementsByTagName('g')[0];
-      }
-
-      if (!svg.__viewportElement) {
-
-        // TODO could automatically move all elements from SVG into a newly created viewport g element.
-
-        throw new Error('No g element containers in SVG document to use for viewport.');
+        if(typeof console !== "undefined") {
+          console.warn('No g element with id "viewport" in SVG document. Adding one as container element for SVG pan/zoom manipulation.');
+        }
       }
     }
 
     return svg.__viewportElement;
-  }
+  },
+
+  getSvgDimensions: function(svg) {
+    var svgBoundingClientRect = svg.getBoundingClientRect();
+    var boundingClientWidth = parseFloat(svgBoundingClientRect.width);
+    var boundingClientHeight = parseFloat(svgBoundingClientRect.height);
+    var styleWidth, styleHeight;
+
+    if (!!parseFloat(svg.clip)) {
+      styleWidth = svg.clip.width;
+      styleHeight = svg.clip.height;
+    }
+    else if (!!parseFloat(svg.style.pixelWidth)) {
+      styleWidth = svg.style.pixelWidth;
+      styleHeight = svg.style.pixelWidth;
+    }
+    else if (!!parseFloat(svg.style.width)) {
+      styleWidth = svg.style.width;
+      styleHeight = svg.style.height;
+    }
+    else {
+      styleWidth = svg.getAttribute('width');
+      styleHeight = svg.getAttribute('height');
+    }
+
+    styleWidth = styleWidth || 0;
+    styleHeight = styleHeight || 0;
+    if (styleWidth.toString().indexOf('%') === -1) {
+      styleWidth = parseFloat(styleWidth);
+    }
+    else {
+      styleWidth = 0;
+    }
+    if (styleHeight.toString().indexOf('%') === -1) {
+      styleHeight = parseFloat(styleHeight);
+    }
+    else {
+      styleHeight = 0;
+    }
+    var result = {
+      width: Math.max(boundingClientWidth, styleWidth),
+      height: Math.max(boundingClientHeight, styleHeight)
+    };
+    return result;
+  },
 
   /**
    * Time-based cache for svg.getScreenCTM().
@@ -192,7 +251,7 @@ window.svgPanZoom = (function(document) {
    * The cache expires every 300ms... this is a pretty safe time because it's only called
    * when we're zooming, when the screenCTM is unlikely/impossible to change.
    */
-  var getScreenCTMCached = (function() {
+  getScreenCTMCached: (function() {
     var svgs = {};
     return function(svg) {
       var cur = Date.now();
@@ -210,33 +269,36 @@ window.svgPanZoom = (function(document) {
         return ctm;
       }
     };
-  })();
+  })(),
 
   /**
    * Get an SVGPoint of the mouse co-ordinates of the event, relative to the SVG element.
    */
-  function getRelativeMousePoint(svg, evt) {
+  getRelativeMousePoint: function (svg, evt) {
     var point = svg.createSVGPoint();
     point.x = evt.clientX;
     point.y = evt.clientY;
-    point = point.matrixTransform(getScreenCTMCached(svg).inverse());
+    point = point.matrixTransform(this.getScreenCTMCached(svg).inverse());
     return point;
-  }
+  },
 
-  function getSvgCenterPoint(svg) {
-	var width = svg.width.baseVal.valueInSpecifiedUnits;
-	var height = svg.height.baseVal.valueInSpecifiedUnits;
-	var point = svg.createSVGPoint();
-	point.x = width/2;
-	point.y = height/2;
-	return point;
-  }
+  getSvgCenterPoint: function (svg) {
+    var bBox = svg.getBBox();
+    var boundingClientRect = svg.getBoundingClientRect();
+
+    var width = boundingClientRect.width;
+    var height = boundingClientRect.height;
+    var point = svg.createSVGPoint();
+    point.x = width/2;
+    point.y = height/2;
+    return point;
+  },
 
   /**
    * Instance an SVGPoint object with given event coordinates.
    */
 
-  function getEventPoint(evt) {
+  getEventPoint: function (evt) {
     var svg = (evt.target.tagName === 'svg' || evt.target.tagName === 'SVG') ? evt.target : evt.target.ownerSVGElement || evt.target.correspondingElement.ownerSVGElement;
 
     var p = svg.createSVGPoint();
@@ -245,35 +307,35 @@ window.svgPanZoom = (function(document) {
     p.y = evt.clientY;
 
     return p;
-  }
+  },
 
   /**
    * Sets the current transform matrix of an element.
    */
-  function setCTM(element, matrix) {
+  setCTM: function (element, matrix) {
     var s = 'matrix(' + matrix.a + ',' + matrix.b + ',' + matrix.c + ',' + matrix.d + ',' + matrix.e + ',' + matrix.f + ')';
     element.setAttribute('transform', s);
-  }
+  },
 
   /**
    * Dumps a matrix to a string (useful for debug).
    */
-  function dumpMatrix(matrix) {
+  dumpMatrix: function (matrix) {
     var s = '[ ' + matrix.a + ', ' + matrix.c + ', ' + matrix.e + '\n  ' + matrix.b + ', ' + matrix.d + ', ' + matrix.f + '\n  0, 0, 1 ]';
     return s;
-  }
+  },
 
   /**
    * Sets attributes of an element.
    */
-  function setAttributes(element, attributes){
+  setAttributes: function (element, attributes){
     for (var i in attributes)
       element.setAttributeNS(null, i, attributes[i]);
-  }
+  },
 
-  function findFirstSvg(callback) {
+  findFirstSvg: function (callback) {
     var i, candidateSvg, foundSvg;
-    var candidateSvg = document.querySelector('svg');
+    candidateSvg = document.querySelector('svg');
     if (!!candidateSvg) {
       foundSvg = candidateSvg;
       callback(foundSvg);
@@ -283,7 +345,7 @@ window.svgPanZoom = (function(document) {
     i = 0;
     do {
       i += 1;
-      getSvg('object:nth-of-type(' + i + ')', function(err, candidateSvg) {
+      this.getSvg('object:nth-of-type(' + i + ')', function(err, candidateSvg) { // linter says "Don't make functions within a loop." Can this be done better?
         if (!!candidateSvg) {
           foundSvg = candidateSvg;
           callback(foundSvg);
@@ -295,7 +357,7 @@ window.svgPanZoom = (function(document) {
     i = 0;
     do {
       i += 1;
-      getSvg('embed:nth-of-type(' + i + ')', function(err, candidateSvg) {
+      this.getSvg('embed:nth-of-type(' + i + ')', function(err, candidateSvg) {
         if (!!candidateSvg) {
           foundSvg = candidateSvg;
           callback(foundSvg);
@@ -304,20 +366,20 @@ window.svgPanZoom = (function(document) {
     } while (i < candidateEmbedElements.length);
 
     // TODO add a timeout
-  }
+  },
 
-  function getSvg(selector, callback) {
-    var target, err, svg;
+  getSvg: function (selector, callback) {
+    var target, err;
     if (!selector) {
       if(typeof console !== "undefined") {
         console.warn('No selector specified for getSvg(). Using first svg element found.');
       }
-      target = findFirstSvg(function(svg) {
+      target = this.findFirstSvg(function(svg) {
         if (!svg) {
           err = new Error('No SVG found in this document.');
         }
         if (!!callback) {
-          callback(err, svg);
+          callback(err, svg, this);
         }
         else {
           if (!svg) {
@@ -357,7 +419,7 @@ window.svgPanZoom = (function(document) {
       }
 
       if (!!callback) {
-        callback(err, svg);
+        callback(err, svg, this);
       }
       else {
         if (!svg) {
@@ -366,9 +428,9 @@ window.svgPanZoom = (function(document) {
         return svg;
       }
     }
-  }
+  },
 
-  function pan(selector, direction) {
+  pan: function (selector, direction) {
     if (!direction) {
       throw new Error('No direction specified for direction of panning. Please enter a string value of up, right, down or left.');
     }
@@ -431,64 +493,55 @@ window.svgPanZoom = (function(document) {
       throw new Error('Direction specified was not understood. Please enter a string value of up, right, down or left.');
     }
 
-    getSvg(selector, function(err, svg) {
-      var viewport = getViewport(svg);
+    this.getSvg(selector, function(err, svg, svgPanZoomInstance) {
+      var viewport = svgPanZoomInstance.getViewport(svg);
       tx = svg.getBBox().width * panIncrement * directionXY.x;
       ty = svg.getBBox().height * panIncrement * directionXY.y;
       var viewportCTM = viewport.getCTM();
       viewportCTM.e += tx;
       viewportCTM.f += ty;
-      setCTM(viewport, viewportCTM);
+      svgPanZoomInstance.setCTM(viewport, viewportCTM);
     });
-  }
+  },
 
-  function zoom(args) {
+  zoom: function (args) {
     if (!args.scale) {
       throw new Error('No scale specified for zoom. Please enter a number.');
     }
-    getSvg(args.selector, function(err, svg) {
-      var p = getSvgCenterPoint(svg);
-      zoomAtPoint(svg, p, args.scale, true);
+    this.getSvg(args.selector, function(err, svg, svgPanZoomInstance) {
+      var p = svgPanZoomInstance.getSvgCenterPoint(svg);
+      svgPanZoomInstance.zoomAtPoint(svg, p, args.scale, true);
     });
-  }
+  },
 
-  function zoomIn(selector) {
-    getSvg(selector, function(err, svg) {
-      var p = getSvgCenterPoint(svg);
-      zoomAtPoint(svg, p, 1 + zoomScaleSensitivity);
+  zoomIn: function (selector) {
+    this.getSvg(selector, function(err, svg, svgPanZoomInstance) {
+      var p = svgPanZoomInstance.getSvgCenterPoint(svg);
+      svgPanZoomInstance.zoomAtPoint(svg, p, 1 + svgPanZoomInstance.zoomScaleSensitivity);
     });
-  }
+  },
 
-  function zoomOut(selector) {
-    getSvg(selector, function(err, svg) {
-      var p = getSvgCenterPoint(svg);
-      zoomAtPoint(svg, p, 1/(1 + zoomScaleSensitivity));
+  zoomOut: function (selector) {
+    this.getSvg(selector, function(err, svg, svgPanZoomInstance) {
+      var p = svgPanZoomInstance.getSvgCenterPoint(svg);
+      svgPanZoomInstance.zoomAtPoint(svg, p, 1/(1 + svgPanZoomInstance.zoomScaleSensitivity));
     });
-  }
+  },
 
-  function resetZoom(selector) {
+  resetZoom: function (selector) {
     var oldCTM, newCTM;
-    getSvg(selector, function(err, svg) {
-      var viewport = getViewport(svg);
-
-      var bBox = svg.getBBox();
-      var boundingClientRect = svg.getBoundingClientRect();
-      oldCTM = newCTM = viewport.getCTM();
-      var newScale = Math.min(boundingClientRect.width/bBox.width, boundingClientRect.height/bBox.height);
-      newCTM.a = newScale * oldCTM.a; //x-scale
-      newCTM.d = newScale * oldCTM.d; //y-scale
-      newCTM.e = oldCTM.e * newScale + (boundingClientRect.width - bBox.width * newScale)/2 - bBox.x * newScale; //x-transform
-      newCTM.f = oldCTM.f * newScale + (boundingClientRect.height - bBox.height * newScale)/2 - bBox.y * newScale; //y-transform
-      setCTM(viewport, newCTM);
-      if (onZoom) { onZoom(newCTM.a); }
+    this.getSvg(selector, function(err, svg, svgPanZoomInstance) {
+      var viewport = svgPanZoomInstance.getViewport(svg);
+      svgPanZoomInstance.setCTM(viewport, svgPanZoomInstance.initialCTM);
+      if (svgPanZoomInstance.onZoom) { svgPanZoomInstance.onZoom(svgPanZoomInstance.initialCTM.a); }
     });
-  }
+  },
 
   /**
    * Handle mouse wheel event.
    */
-  function handleMouseWheel(evt) {
-    if(!zoomEnabled) {
+  handleMouseWheel: function(evt) {
+    if (!this.zoomEnabled) {
       return;
     }
 
@@ -509,7 +562,7 @@ window.svgPanZoom = (function(document) {
 
       if (evt.wheelDelta) {
         //Normalizer for Chrome
-        delta = evt.deltaY / Math.abs(evt.wheelDelta/3) 
+        delta = evt.deltaY / Math.abs(evt.wheelDelta/3);
       } else {
         //Others. Possibly tablets? Use a value just in case
         delta = evt.deltaY / 120;
@@ -524,10 +577,10 @@ window.svgPanZoom = (function(document) {
       delta = evt.deltaY;
     }
 
-    var p = getRelativeMousePoint(svg, evt);
-    var zoom = Math.pow(1 + zoomScaleSensitivity, delta);
-    zoomAtPoint(svg, p, zoom);
-  }
+    var p = this.getRelativeMousePoint(svg, evt);
+    var zoom = Math.pow(1 + this.zoomScaleSensitivity, (-1) * delta); // multiplying by neg. 1 so as to make zoom in/out behavior match Google maps behavior
+    this.zoomAtPoint(svg, p, zoom);
+  },
 
   /**
    * Zoom in at an SVG point.
@@ -535,10 +588,10 @@ window.svgPanZoom = (function(document) {
    * @param point The SVG point at which the zoom should happen (where 0,0 is top left corner)
    * @param zoomScale Number representing how much to zoom.
    * @param zoomAbsolute Default false. If true, zoomScale is treated as an absolute value.
-   *					 Otherwise, zoomScale is treated as a multiplied (e.g. 1.10 would zoom in 10%)
+   * Otherwise, zoomScale is treated as a multiplied (e.g. 1.10 would zoom in 10%)
    */
-  function zoomAtPoint(svg, point, zoomScale, zoomAbsolute) {
-    var viewport = getViewport(svg);
+  zoomAtPoint: function(svg, point, zoomScale, zoomAbsolute) {
+    var viewport = this.getViewport(svg);
     var viewportCTM = viewport.getCTM();
     point = point.matrixTransform(viewportCTM.inverse());
 
@@ -550,22 +603,24 @@ window.svgPanZoom = (function(document) {
       setZoom.a = setZoom.d = zoomScale;
     }
 
-    if ( setZoom.a < minZoom ) { setZoom.a = setZoom.d = wasZoom.a; }
-    if ( setZoom.a > maxZoom ) { setZoom.a = setZoom.d = wasZoom.a; }
-    if ( setZoom.a != wasZoom.a ) { setCTM(viewport, setZoom); }
+    if ( setZoom.a < this.minZoom * this.initialCTM.a ) { setZoom.a = setZoom.d = wasZoom.a; }
+    if ( setZoom.a > this.maxZoom * this.initialCTM.a ) { setZoom.a = setZoom.d = wasZoom.a; }
+    if ( setZoom.a !== wasZoom.a ) { this.setCTM(viewport, setZoom); }
 
-    if(typeof(stateTf) == 'undefined')
-      stateTf = setZoom.inverse();
+    if (!this.stateTf) {
+      this.stateTf = setZoom.inverse();
+    }
 
-    stateTf = stateTf.multiply(k.inverse());
-    if (onZoom) { onZoom(setZoom.a); }
-  }
+    this.stateTf = this.stateTf.multiply(k.inverse());
+
+    if (!!this.onZoom) { this.onZoom(setZoom.a); }
+  },
   
   /**
    * Handle mouse move event.
    */
-  function handleMouseMove(evt) {
-    if(evt.preventDefault) {
+  handleMouseMove: function(evt) {
+    if (evt.preventDefault) {
       evt.preventDefault();
     }
     else {
@@ -573,61 +628,70 @@ window.svgPanZoom = (function(document) {
     }
 
     var svg = (evt.target.tagName === 'svg' || evt.target.tagName === 'SVG') ? evt.target : evt.target.ownerSVGElement || evt.target.correspondingElement.ownerSVGElement;
+    var g = this.getViewport(svg);
+    var state = svg.__svgPanZoom.state;
 
-    var g = getViewport(svg);
-
-    if(state == 'pan' && panEnabled) {
+    var p;
+    if (state === 'pan' && this.panEnabled) {
       // Pan mode
-      var p = getEventPoint(evt).matrixTransform(stateTf);
+      p = this.getEventPoint(evt).matrixTransform(this.stateTf);
 
-      setCTM(g, stateTf.inverse().translate(p.x - stateOrigin.x, p.y - stateOrigin.y));
-    } else if(state == 'drag' && dragEnabled) {
+      this.setCTM(g, this.stateTf.inverse().translate(p.x - this.stateOrigin.x, p.y - this.stateOrigin.y));
+    } 
+    else if (state === 'drag' && this.dragEnabled) {
       // Drag mode
-      var p = getEventPoint(evt).matrixTransform(g.getCTM().inverse());
+      p = this.getEventPoint(evt).matrixTransform(g.getCTM().inverse());
 
-      setCTM(stateTarget, svg.createSVGMatrix().translate(p.x - stateOrigin.x, p.y - stateOrigin.y).multiply(g.getCTM().inverse()).multiply(stateTarget.getCTM()));
+      this.setCTM(this.stateTarget, svg.createSVGMatrix().translate(p.x - this.stateOrigin.x, p.y - this.stateOrigin.y).multiply(g.getCTM().inverse()).multiply(this.stateTarget.getCTM()));
 
-      stateOrigin = p;
+      this.stateOrigin = p;
     }
-  }
+  },
 
   /**
    * Handle double click event.
    * See handleMouseDown() for alternate detection method.
    */
-  function handleDblClick(evt) {
-    if(evt.preventDefault) {
+  handleDblClick: function (evt) {
+    var target = evt.target;
+    
+    if (evt.preventDefault) {
       evt.preventDefault();
     }
     else {
       evt.returnValue = false;
     }
 
-    var svg = (evt.target.tagName === 'svg' || evt.target.tagName === 'SVG') ? evt.target : evt.target.ownerSVGElement || evt.target
-      .correspondingElement.ownerSVGElement;
+    var svg = (target.tagName === 'svg' || target.tagName === 'SVG') ? target : target.ownerSVGElement || target.correspondingElement.ownerSVGElement;
+    if (this.controlIconsEnabled) {
+      var targetClass = target.getAttribute('class') || '';
+      if (targetClass.indexOf('svg-pan-zoom-control') > -1) {
+        return false;
+      }
+    }
 
     var zoomFactor;
     if(evt.shiftKey){
-      zoomFactor = 1/((1 + zoomScaleSensitivity) * 2); // zoom out when shift key pressed
+      zoomFactor = 1/((1 + this.zoomScaleSensitivity) * 2); // zoom out when shift key pressed
     }
     else {
-      zoomFactor = (1 + zoomScaleSensitivity) * 2;
+      zoomFactor = (1 + this.zoomScaleSensitivity) * 2;
     }
 
-    var p = getRelativeMousePoint(svg, evt);
-    zoomAtPoint(svg, p, zoomFactor );
-  }
+    var p = this.getRelativeMousePoint(svg, evt);
+    this.zoomAtPoint(svg, p, zoomFactor );
+  },
 
   /**
    * Handle click event.
    */
-  function handleMouseDown(evt) {
+  handleMouseDown: function (evt) {
     // Double click detection; more consistent than ondblclick
-    if(evt.detail==2){
-        handleDblClick(evt);
+    if (evt.detail === 2){
+      this.handleDblClick(evt);
     }
 
-    if(evt.preventDefault) {
+    if (evt.preventDefault) {
       evt.preventDefault();
     }
     else {
@@ -635,35 +699,34 @@ window.svgPanZoom = (function(document) {
     }
 
     var svg = (evt.target.tagName === 'svg' || evt.target.tagName === 'SVG') ? evt.target : evt.target.ownerSVGElement || evt.target.correspondingElement.ownerSVGElement;
+    var g = this.getViewport(svg);
 
-    var g = getViewport(svg);
-
-    if(
-      evt.target.tagName == 'svg' || !dragEnabled // Pan anyway when drag is disabled and the user clicked on an element
-    ) {
+    if (evt.target.tagName === 'svg' || !this.dragEnabled) // Pan anyway when drag is disabled and the user clicked on an element
+    {
       // Pan mode
-      state = 'pan';
+      svg.__svgPanZoom.state = 'pan';
 
-      stateTf = g.getCTM().inverse();
+      this.stateTf = g.getCTM().inverse();
 
-      stateOrigin = getEventPoint(evt).matrixTransform(stateTf);
-    } else {
-      // Drag mode
-      state = 'drag';
-
-      stateTarget = evt.target;
-
-      stateTf = g.getCTM().inverse();
-
-      stateOrigin = getEventPoint(evt).matrixTransform(stateTf);
+      this.stateOrigin = this.getEventPoint(evt).matrixTransform(this.stateTf);
     }
-  }
+    else {
+      // Drag mode
+      svg.__svgPanZoom.state = 'drag';
+
+      this.stateTarget = evt.target;
+
+      this.stateTf = g.getCTM().inverse();
+
+      this.stateOrigin = this.getEventPoint(evt).matrixTransform(this.stateTf);
+    }
+  },
 
   /**
    * Handle mouse button release event.
    */
-  function handleMouseUp(evt) {
-    if(evt.preventDefault) {
+  handleMouseUp: function (evt) {
+    if (evt.preventDefault) {
       evt.preventDefault();
     }
     else {
@@ -671,33 +734,14 @@ window.svgPanZoom = (function(document) {
     }
 
     var svg = (evt.target.tagName === 'svg' || evt.target.tagName === 'SVG') ? evt.target : evt.target.ownerSVGElement || evt.target.correspondingElement.ownerSVGElement;
+    var state = svg.__svgPanZoom.state;
 
-    if(state == 'pan' || state == 'drag') {
+    if (state === 'pan' || state === 'drag') {
       // Quit pan mode
-      state = '';
+      svg.__svgPanZoom.state = 'none';
     }
   }
-
-  return{
-    init:init,
-    handleMouseUp:handleMouseUp,
-    handleMouseDown:handleMouseDown,
-    handleMouseMove:handleMouseMove,
-    handleDblClick:handleDblClick,
-    pan:pan,
-    zoom:zoom,
-    zoomIn:zoomIn,
-    zoomOut:zoomOut,
-    resetZoom:resetZoom,
-    setZoomScaleSensitivity:setZoomScaleSensitivity,
-    enablePan:enablePan,
-    disablePan:disablePan,
-    enableZoom:enableZoom,
-    disableZoom:disableZoom,
-    enableDrag:enableDrag,
-    disableDrag:disableDrag
-  };
-})(document);
+};
 
 //Cross-browser wheel event, from: https://developer.mozilla.org/en-US/docs/Web/Reference/Events/wheel
 if (!window.hasOwnProperty('addWheelListener')) {
@@ -762,7 +806,7 @@ if (!window.hasOwnProperty('addWheelListener')) {
 				}
 
 				// it's time to fire the callback
-				return callback( event );
+				return callback(event);
 
 			}, useCapture || false );
 		}

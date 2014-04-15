@@ -37,6 +37,7 @@ svgPanZoom.init({
   'selector': '#my-svg',
   'panEnabled': true, 
   'zoomEnabled': true,
+  'zoomControlIconsEnabled': true,
   'dragEnabled': false,
   'zoomScaleSensitivity': 0.2,
   'minZoom': 0.5,
