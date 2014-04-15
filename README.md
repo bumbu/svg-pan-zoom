@@ -21,9 +21,9 @@ How To Use
 <g id="viewport"></g>
 ```
 
-If the target SVG does not have this element, the library will use the first 'g' element found.
+If the target SVG does not have this element, the library will create it.
 
-2) Reference the [svg-pan-zoom.js file](http://ariutta.github.io/svg-pan-zoom/svg-pan-zoom.js) from your HTML document and call the init method:
+2) Reference the [svg-pan-zoom.js file](http://ariutta.github.io/svg-pan-zoom/svg-pan-zoom.js) and optionally the [control icons plugin file](http://ariutta.github.io/svg-pan-zoom/control-icons.js) from your HTML document. Then call the init method:
 
 ```js
 svgPanZoom.init();
@@ -37,7 +37,7 @@ svgPanZoom.init({
   'selector': '#my-svg',
   'panEnabled': true, 
   'zoomEnabled': true,
-  'zoomControlIconsEnabled': true,
+  'controlIconsEnabled': true,
   'dragEnabled': false,
   'zoomScaleSensitivity': 0.2,
   'minZoom': 0.5,
