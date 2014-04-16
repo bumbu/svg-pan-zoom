@@ -20,10 +20,16 @@ var svgPanZoom = {
     args = args || {};
     var selector = args.selector;
     this.selector = selector;
-    this.svg = args.svg;
-    this.svgWidth = args.svgWidth;
-    this.svgHeight = args.svgHeight;
-    this.viewport = args.viewport;
+
+    // if these arguments are specified, use them. Otherwise, use the defaults.
+    this.panEnabled = args.panEnabled || this.panEnabled;
+    this.controlIconsEnabled = args.controlIconsEnabled || this.controlIconsEnabled;
+    this.zoomEnabled = args.zoomEnabled || this.zoomEnabled;
+    this.dragEnabled = args.dragEnabled || this.dragEnabled;
+    this.zoomScaleSensitivity = args.zoomScaleSensitivity || this.zoomScaleSensitivity;
+    this.minZoom = args.minZoom || this.minZoom;
+    this.maxZoom = args.maxZoom || this.maxZoom;
+
     this.getSvg(selector, function(err, svg, svgPanZoomInstance) {
       svg.__svgPanZoom = {};
       svg.__svgPanZoom.state = 'none';
@@ -33,7 +39,6 @@ var svgPanZoom = {
       viewport = svgPanZoomInstance.getViewport(svg);
       var svgViewBox = svg.getAttribute('viewBox');
       if (svgViewBox) {
-        var bBox = svg.getBBox();
         var boundingClientRect = svg.getBoundingClientRect();
         var viewBoxValues = svgViewBox.split(' ').map(function(viewBoxValue) {
           return parseFloat(viewBoxValue);
@@ -46,7 +51,6 @@ var svgPanZoom = {
         var oldCTM, newCTM;
         oldCTM = newCTM = svg.__viewportElement.getCTM();
         var newScale = Math.min(svgWidth/viewBoxWidth, svgHeight/viewBoxHeight);
-        //var newScale = Math.min(boundingClientRect.width/bBox.width, boundingClientRect.height/bBox.height);
         newCTM.a = newScale * oldCTM.a; //x-scale
         newCTM.d = newScale * oldCTM.d; //y-scale
         newCTM.e = oldCTM.e * newScale; //x-transform
@@ -62,34 +66,12 @@ var svgPanZoom = {
       svgPanZoomInstance.svgHeight = svgHeight;
       svgPanZoomInstance.viewport = viewport;
       
-      if (args.hasOwnProperty('panEnabled')) {
-        svgPanZoomInstance.panEnabled = args.panEnabled;
-      }
-      if (args.hasOwnProperty('controlIconsEnabled')) {
-        svgPanZoomInstance.controlIconsEnabled = args.controlIconsEnabled;
+      if (svgPanZoomInstance.zoomEnabled && svgPanZoomInstance.controlIconsEnabled) {
+        svgPanZoomInstance.enableZoom();
       }
 
-      if (args.hasOwnProperty('zoomEnabled')) {
-        svgPanZoomInstance.zoomEnabled = args.zoomEnabled;
-        if (svgPanZoomInstance.zoomEnabled && svgPanZoomInstance.controlIconsEnabled) {
-          svgPanZoomInstance.enableZoom();
-        }
-      }
-
-      if (args.hasOwnProperty('dragEnabled')) {
-        svgPanZoomInstance.dragEnabled = args.dragEnabled;
-      }
-      if (args.hasOwnProperty('zoomScaleSensitivity')) {
-        svgPanZoomInstance.zoomScaleSensitivity = args.zoomScaleSensitivity;
-      }
       if (args.hasOwnProperty('onZoom')) {
         svgPanZoomInstance.onZoom = args.onZoom;
-      }
-      if (args.hasOwnProperty('minZoom')) {
-        svgPanZoomInstance.minZoom = args.minZoom;
-      }
-      if (args.hasOwnProperty('maxZoom')) {
-        svgPanZoomInstance.maxZoom = args.maxZoom;
       }
       svgPanZoomInstance.setupHandlers(svg);
       if (svg.ownerDocument.documentElement.tagName.toLowerCase() !== 'svg') {
@@ -212,46 +194,26 @@ var svgPanZoom = {
   },
 
   getSvgDimensions: function(svg) {
-    var svgBoundingClientRect = svg.getBoundingClientRect();
-    var boundingClientWidth = parseFloat(svgBoundingClientRect.width);
-    var boundingClientHeight = parseFloat(svgBoundingClientRect.height);
-    var styleWidth, styleHeight;
-
-    if (!!parseFloat(svg.clip)) {
-      styleWidth = svg.clip.width;
-      styleHeight = svg.clip.height;
-    }
-    else if (!!parseFloat(svg.style.pixelWidth)) {
-      styleWidth = svg.style.pixelWidth;
-      styleHeight = svg.style.pixelWidth;
-    }
-    else if (!!parseFloat(svg.style.width)) {
-      styleWidth = svg.style.width;
-      styleHeight = svg.style.height;
+    var svgWidth, svgHeight;
+    var svgClientRects = svg.getClientRects();
+    if (typeof svgClientRects !== 'undefined' && svgClientRects.length > 0) {
+      var svgClientRect = svgClientRects[0];
+      var svgWidth = parseFloat(svgClientRect.width);
+      var svgHeight = parseFloat(svgClientRect.height);
     }
     else {
-      styleWidth = svg.getAttribute('width');
-      styleHeight = svg.getAttribute('height');
+      var svgBoundingClientRect = svg.getBoundingClientRect();
+      if (!!svgBoundingClientRect) {
+        var svgWidth = parseFloat(svgBoundingClientRect.width);
+        var svgHeight = parseFloat(svgBoundingClientRect.height);
+      }
+      else {
+        throw new Error('Cannot determine SVG width and height.');
+      }
     }
-
-    styleWidth = styleWidth || 0;
-    styleHeight = styleHeight || 0;
-    if (styleWidth.toString().indexOf('%') === -1) {
-      styleWidth = parseFloat(styleWidth);
-    }
-    else {
-      styleWidth = 0;
-    }
-    if (styleHeight.toString().indexOf('%') === -1) {
-      styleHeight = parseFloat(styleHeight);
-    }
-    else {
-      styleHeight = 0;
-    }
-    var result = {
-      width: Math.max(boundingClientWidth, styleWidth),
-      height: Math.max(boundingClientHeight, styleHeight)
-    };
+    var result = {};
+    result.width = svgWidth;
+    result.height = svgHeight;
     return result;
   },
 
@@ -293,9 +255,7 @@ var svgPanZoom = {
   },
 
   getSvgCenterPoint: function (svg) {
-    var bBox = svg.getBBox();
     var boundingClientRect = svg.getBoundingClientRect();
-
     var width = boundingClientRect.width;
     var height = boundingClientRect.height;
     var point = svg.createSVGPoint();
@@ -348,38 +308,41 @@ var svgPanZoom = {
     candidateSvg = document.querySelector('svg');
     if (!!candidateSvg) {
       foundSvg = candidateSvg;
-      callback(foundSvg);
     }
-
-    var candidateObjectElements = document.querySelectorAll('object');
-    i = 0;
-    do {
-      i += 1;
-      this.getSvg('object:nth-of-type(' + i + ')', function(err, candidateSvg) { // linter says "Don't make functions within a loop." Can this be done better?
-        if (!!candidateSvg) {
-          foundSvg = candidateSvg;
-          callback(foundSvg);
-        }
-      });
-    } while (i < candidateObjectElements.length);
-
-    var candidateEmbedElements = document.querySelectorAll('embed');
-    i = 0;
-    do {
-      i += 1;
-      this.getSvg('embed:nth-of-type(' + i + ')', function(err, candidateSvg) {
-        if (!!candidateSvg) {
-          foundSvg = candidateSvg;
-          callback(foundSvg);
-        }
-      });
-    } while (i < candidateEmbedElements.length);
+    else {
+      var candidateObjectElements = document.querySelectorAll('object');
+      if (candidateObjectElements.length > 0) {
+        i = 0;
+        do {
+          i += 1;
+          this.getSvg('object:nth-of-type(' + i + ')', function(err, candidateSvg) { // linter says "Don't make functions within a loop." Can this be done better?
+            if (!!candidateSvg) {
+              foundSvg = candidateSvg;
+            }
+          });
+        } while (i < candidateObjectElements.length && !foundSvg);
+      }
+      else {
+        var candidateEmbedElements = document.querySelectorAll('embed');
+        i = 0;
+        do {
+          i += 1;
+          this.getSvg('embed:nth-of-type(' + i + ')', function(err, candidateSvg) {
+            if (!!candidateSvg) {
+              foundSvg = candidateSvg;
+            }
+          });
+        } while (i < candidateEmbedElements.length && !foundSvg);
+      }
+    }
+    callback(foundSvg);
 
     // TODO add a timeout
   },
 
   getSvg: function (selector, callback) {
     var target, err;
+    var svgPanZoomInstance = this;
     if (!selector) {
       if(typeof console !== "undefined") {
         console.warn('No selector specified for getSvg(). Using first svg element found.');
@@ -389,7 +352,7 @@ var svgPanZoom = {
           err = new Error('No SVG found in this document.');
         }
         if (!!callback) {
-          callback(err, svg, this);
+          callback(err, svg, svgPanZoomInstance);
         }
         else {
           if (!svg) {
@@ -429,7 +392,7 @@ var svgPanZoom = {
       }
 
       if (!!callback) {
-        callback(err, svg, this);
+        callback(err, svg, svgPanZoomInstance);
       }
       else {
         if (!svg) {

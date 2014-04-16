@@ -3,6 +3,7 @@
 
   <head>
     <script src="../svg-pan-zoom.js"></script>
+    <script src="../control-icons.js"></script>
   </head>
 
   <body>
@@ -13,8 +14,8 @@
       // Don't use window.onLoad like this in production, because it can only listen to one function.
       window.onload = function() {
         svgPanZoom.init({
-          //'selector': 'svg',
-          'zoomEnabled': true 
+          'zoomEnabled': true,
+          'controlIconsEnabled': true 
         });
       };
     </script>

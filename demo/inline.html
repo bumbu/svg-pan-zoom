@@ -740,9 +740,8 @@
       // Don't use window.onLoad like this in production, because it can only listen to one function.
       window.onload = function() {
         svgPanZoom.init({
-          //'selector': '#my-svg',
-          'zoomEnabled': true//,
-          //'zoomControlIconsEnabled': false 
+          'zoomEnabled': true,
+          'controlIconsEnabled': true 
         });
       };
     </script>

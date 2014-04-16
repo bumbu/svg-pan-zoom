@@ -8,9 +8,14 @@ Capabilities:
   * Zoom with mouse events (wheel or double-click) or custom JavaScript hooks
   * Element dragging with mouse events (custom JavaScript hooks not provided, but if you need them, check out [D3.js](http://d3js.org/))
 
-Demo
-----
- Pan and zoom the SVG tiger on [github pages](http://ariutta.github.io/svg-pan-zoom/).
+Demos
+-----
+ Pan and zoom the SVG tiger on github pages:
+ * [Single Inline SVG](http://ariutta.github.io/svg-pan-zoom/demo/inline.html)
+ * [Multiple Inline SVGs](http://ariutta.github.io/svg-pan-zoom/demo/multi-instance.html)
+ * [SVG Inserted with 'Embed' Element](http://ariutta.github.io/svg-pan-zoom/demo/embed.html)
+ * [SVG Inserted with 'Object' Element](http://ariutta.github.io/svg-pan-zoom/demo/object.html)
+ * [SVG Inserted with 'Img' Element](http://ariutta.github.io/svg-pan-zoom/demo/img.html) (These cannot be panned/zoomed.)
 
 How To Use
 ----------
