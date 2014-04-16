@@ -19,6 +19,11 @@ var svgPanZoom = {
   init: function(args) {
     args = args || {};
     var selector = args.selector;
+    this.selector = selector;
+    this.svg = args.svg;
+    this.svgWidth = args.svgWidth;
+    this.svgHeight = args.svgHeight;
+    this.viewport = args.viewport;
     this.getSvg(selector, function(err, svg, svgPanZoomInstance) {
       svg.__svgPanZoom = {};
       svg.__svgPanZoom.state = 'none';
@@ -52,30 +57,23 @@ var svgPanZoom = {
       else {
         svgPanZoomInstance.initialCTM = viewport.getCTM();
       }
+      svgPanZoomInstance.svg = svg;
+      svgPanZoomInstance.svgWidth = svgWidth;
+      svgPanZoomInstance.svgHeight = svgHeight;
+      svgPanZoomInstance.viewport = viewport;
       
-
       if (args.hasOwnProperty('panEnabled')) {
         svgPanZoomInstance.panEnabled = args.panEnabled;
       }
       if (args.hasOwnProperty('controlIconsEnabled')) {
         svgPanZoomInstance.controlIconsEnabled = args.controlIconsEnabled;
       }
+
       if (args.hasOwnProperty('zoomEnabled')) {
         svgPanZoomInstance.zoomEnabled = args.zoomEnabled;
-        /*
-        if (svgPanZoomInstance.zoomEnabled && args.hasOwnProperty('controlIconsEnabled')) {
-          svgPanZoomInstance.controlIconsEnabled = args.controlIconsEnabled;
+        if (svgPanZoomInstance.zoomEnabled && svgPanZoomInstance.controlIconsEnabled) {
+          svgPanZoomInstance.enableZoom();
         }
-        //*/
-      }
-      //if (svgPanZoomInstance.zoomEnabled && svgPanZoomInstance.controlIconsEnabled) {
-      if (svgPanZoomInstance.controlIconsEnabled) {
-        args.svg = svg;
-        args.svgWidth = svgWidth;
-        args.svgHeight = svgHeight;
-        args.viewport = viewport;
-        args.svgPanZoomInstance = svgPanZoomInstance;
-        svgPanZoomInstance.controlIcons.add(args);
       }
 
       if (args.hasOwnProperty('dragEnabled')) {
@@ -117,6 +115,9 @@ var svgPanZoom = {
 
   enableZoom: function () {
     this.zoomEnabled = true;
+    if (this.controlIconsEnabled) {
+      this.controlIcons.add(this, '[ zoom ]');
+    }
   },
 
   disableZoom: function () {
