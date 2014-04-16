@@ -40,9 +40,9 @@ If you want to override the defaults, you can optionally specify one or more arg
 ```js
 svgPanZoom.init({
   'selector': '#my-svg',
+  'controlIconsEnabled': true,
   'panEnabled': true, 
   'zoomEnabled': true,
-  'controlIconsEnabled': true,
   'dragEnabled': false,
   'zoomScaleSensitivity': 0.2,
   'minZoom': 0.5,
@@ -53,6 +53,7 @@ svgPanZoom.init({
 
 If any arguments are specified, they must have the following value types:
 * 'selector' must be a [CSS selector](http://www.w3.org/TR/CSS2/selector.html). If left blank, svg-pan-zoom will look for the first SVG document in your HTML document.
+* 'controlIconsEnabled' must be true or false. Default is false.
 * 'panEnabled' must be true or false. Default is true.
 * 'zoomEnabled' must be true or false. Default is true.
 * 'dragEnabled' must be true or false. Default is false.
