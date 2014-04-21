@@ -1,16 +1,11 @@
 svg-pan-zoom library
 ==========================
 
-Drop-in pan/zoom solution for SVGs in HTML.
+Simple pan/zoom solution for SVGs in HTML. It adds events listeners for mouse scroll, double-click and drag, plus it optionally offers:
+  * JavaScript API for control of pan and zoom behavior
+  * On-screen zoom controls
 
-Capabilities:
-  * Adds events listeners for mouse scroll, double-click and drag
-  * Optional JavaScript API for control of pan and zoom behavior
-  * Optional on-screen zoom controls
-
-Benefits
- * Cross-browser
- * Works with inline SVGs as well as SVGs in HTML 'object' or 'embed' elements
+It works cross-browser and supports both inline SVGs and SVGs in HTML 'object' or 'embed' elements.
 
 Demos
 -----
