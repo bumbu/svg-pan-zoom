@@ -1,4 +1,4 @@
-var svgPanZoom = {
+window.svgPanZoom = {
   /// CONFIGURATION
   /// ====>
 
