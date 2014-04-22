@@ -1,4 +1,4 @@
-svgPanZoom.controlIcons = {
+window.svgPanZoom.controlIcons = {
   add: function(svgPanZoomInstance, controls) {
     var svgWidth = svgPanZoomInstance.svgWidth,
       svgHeight = svgPanZoomInstance.svgHeight,
