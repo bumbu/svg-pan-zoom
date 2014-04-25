@@ -1,3 +1,6 @@
+var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is initialised
+  , ControlIcons = require('./control-icons')
+
 ;(function(window, document){
   'use strict';
 
