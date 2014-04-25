@@ -583,6 +583,51 @@
   }
 
   /**
+   * Attach a given context to a function
+   * @param  {Function} fn      Function
+   * @param  {object}   context Context
+   * @return {Function}           Function with certain context
+   */
+  function proxy(fn, context) {
+    return function() {
+      fn.apply(context, arguments)
+    }
+  }
+
+  SvgPanZoom.prototype.getPublicInstance = function() {
+    var that = this
+
+    // Create cache
+    if (!this.publicInstance) {
+      this.publicInstance = {
+        // Pan
+        enablePan: function() {that.options.panEnabled = true}
+      , disablePan: function() {that.options.panEnabled = false}
+      , isPanEnabled: function() {return !!that.options.panEnabled}
+        // Drag
+      , enableDrag: function() {that.options.dragEnabled = true}
+      , disableDrag: function() {that.options.dragEnabled = false}
+      , isDragEnabled: function() {return !!that.options.dragEnabled}
+        // Zoom and Control Icons
+      , enableZoom: function() {that.options.zoomEnabled = true} // TODO enable contro icons
+      , disableZoom: function() {that.options.zoomEnabled = false} // TODO
+      , isZoomEnabled: function() {return !!that.options.zoomEnabled}
+      , enableControlIcons: function() {that.options.controlIconsEnabled = true} // TODO
+      , disableControlIcons: function() {that.options.controlIconsEnabled = false} // TODO
+      , isControlIconsEnabled: function() {return !!that.options.controlIconsEnabled}
+        // Zoom scale and bounds
+      , setZoomScaleSensitivity: function(scale) {that.options.zoomScaleSensitivity = scale}
+      , setMinZoom: function(zoom) {that.options.minZoom = zoom}
+      , setMaxZoom: function(zoom) {that.options.maxZoom = zoom}
+        // Zoom event
+      , setOnZoom: function(fn) {that.options.onZoom = fn}
+      }
+    }
+
+    return this.publicInstance
+  }
+
+  /**
    * Stores pairs of instances of SvgPanZoom and SVG
    * Each pair is represented by an object {svg: SVG, instance: SvgPanZoom}
    *
@@ -599,7 +644,7 @@
       // Look for existent instance
       for(var i = instancesStore.length - 1; i >= 0; i--) {
         if (instancesStore[i].svg === svg) {
-          return instancesStore[i].instance
+          return instancesStore[i].instance.getPublicInstance()
         }
       }
 
@@ -609,7 +654,7 @@
       , instance: new SvgPanZoom(svg, options)
       })
 
-      return instancesStore[instancesStore.length - 1].instance
+      return instancesStore[instancesStore.length - 1].instance.getPublicInstance()
     }
   }
 })(window, document)
