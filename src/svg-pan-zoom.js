@@ -502,7 +502,6 @@
    * @return {object}     SVG Point
    */
   function getSvgCenterPoint(svg) {
-    // TODO get sizes from instance cache (this.width, this.height)
     var boundingClientRect = svg.getBoundingClientRect()
       , width = boundingClientRect.width
       , height = boundingClientRect.height
@@ -594,6 +593,18 @@
     }
   }
 
+  /**
+   * Returns object type
+   * Uses toString that returns [object SVGPoint]
+   * And than parses object type from string
+   *
+   * @param  {object} o Any object
+   * @return {string}   Object type
+   */
+  function getType(o) {
+    return Object.prototype.toString.apply(o).replace(/^\[object\s/, '').replace(/\]$/, '')
+  }
+
   SvgPanZoom.prototype.getPublicInstance = function() {
     var that = this
 
@@ -609,7 +620,7 @@
       , disableDrag: function() {that.options.dragEnabled = false}
       , isDragEnabled: function() {return !!that.options.dragEnabled}
         // Zoom and Control Icons
-      , enableZoom: function() {that.options.zoomEnabled = true} // TODO enable contro icons
+      , enableZoom: function() {that.options.zoomEnabled = true} // TODO enable control icons
       , disableZoom: function() {that.options.zoomEnabled = false} // TODO
       , isZoomEnabled: function() {return !!that.options.zoomEnabled}
       , enableControlIcons: function() {that.options.controlIconsEnabled = true} // TODO
@@ -620,7 +631,36 @@
       , setMinZoom: function(zoom) {that.options.minZoom = zoom}
       , setMaxZoom: function(zoom) {that.options.maxZoom = zoom}
         // Zoom event
-      , setOnZoom: function(fn) {that.options.onZoom = fn}
+      , setOnZoom: function(fn) {that.options.onZoom = proxy(fn, that.publicInstance)}
+        // Zooming
+      , zoom: function(scale, absolute) {
+          that.zoomAtPoint(that.svg, getSvgCenterPoint(that.svg), scale, absolute)
+        }
+      , zoomAtPoint: function(scale, point, absolute) {
+          // If not a SVGPoint but has x and y than create new point
+          if (getType(point) !== 'SVGPoint' && 'x' in point && 'y' in point) {
+            var _point = that.svg.createSVGPoint()
+            _point.x = point.x
+            _point.y = point.y
+            point = _point
+          } else {
+            throw new Error('Given point is invalid')
+            return
+          }
+
+          that.zoomAtPoint(that.svg, point, scale, absolute)
+        }
+      , zoomIn: function() {
+          this.zoom(1 + that.options.zoomScaleSensitivity)
+        }
+      , zoomOut: function() {
+          this.zoom(1 / (1 + that.options.zoomScaleSensitivity))
+        }
+      , resetZoom: function() {
+          setCTM(that.viewport, that.initialCTM)
+          // Trigger onZoom
+          that.options.onZoom(that.initialCTM.a)
+        }
       }
     }
 
