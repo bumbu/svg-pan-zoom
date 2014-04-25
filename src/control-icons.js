@@ -1,4 +1,4 @@
-window.svgPanZoom.controlIcons = {
+module.exports = {
   add: function(svgPanZoomInstance, controls) {
     var svgWidth = svgPanZoomInstance.svgWidth,
       svgHeight = svgPanZoomInstance.svgHeight,
@@ -119,7 +119,7 @@ window.svgPanZoom.controlIcons = {
         var doc = newwin.document;
         doc.open();
         doc.write(pvjs);
-        doc.close();	
+        doc.close();
       });
       //*/
   }

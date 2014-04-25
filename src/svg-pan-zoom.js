@@ -1,5 +1,7 @@
 var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is initialised
   , ControlIcons = require('./control-icons')
+  , Utils = require('./utilities')
+  , SvgUtils = require('./svg-utilities')
 
 ;(function(window, document){
   'use strict';
@@ -23,18 +25,18 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
     this.svg = svg
 
     // Set options
-    this.options = extend(extend({}, optionsDefaults), options)
+    this.options = Utils.extend(Utils.extend({}, optionsDefaults), options)
 
     // Set default state
     this.state = 'none'
 
     // Get dimensions
-    var dimensions = getSvgDimensions(svg)
+    var dimensions = SvgUtils.getSvgDimensions(svg)
     this.width = dimensions.width
     this.height = dimensions.height
 
     // Get viewport
-    this.viewport = getOrCreateViewport(svg)
+    this.viewport = SvgUtils.getOrCreateViewport(svg)
 
     // Sets initialCTM
     this.processCTM()
@@ -45,7 +47,10 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
     }
     */
 
-    this.setupSvgAttributes()
+    // Add default attributes to SVG
+    SvgUtils.setupSvgAttributes(this.svg)
+
+    // Init events handlers
     this.setupHandlers()
 
     // TODO what for do we need this?
@@ -54,81 +59,6 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
     // if (this.svg.ownerDocument.documentElement.tagName.toLowerCase() !== 'svg') {
     //   this.svg.ownerDocument.defaultView.svgPanZoom = this
     // }
-  }
-
-  /**
-   * Extends an object
-   *
-   * @param  {object} target object to extend
-   * @param  {object} source object to take properties from
-   * @return {object}        extended object
-   */
-  function extend (target, source) {
-    target = target || {};
-    for (var prop in source) {
-      if (typeof source[prop] === 'object') {
-        target[prop] = extend(target[prop], source[prop])
-      } else {
-        target[prop] = source[prop]
-      }
-    }
-    return target;
-  }
-
-  /**
-   * Get svg dimensions: width and height
-   *
-   * @param  {object} svg
-   * @return {object}     {width: 0, height: 0}
-   */
-  function getSvgDimensions(svg) {
-    var width = 0
-      , height = 0
-      , svgClientRects = svg.getClientRects()
-
-    if (typeof svgClientRects !== 'undefined' && svgClientRects.length > 0) {
-      var svgClientRect = svgClientRects[0];
-
-      width = parseFloat(svgClientRect.width);
-      height = parseFloat(svgClientRect.height);
-    } else {
-      var svgBoundingClientRect = svg.getBoundingClientRect();
-
-      if (!!svgBoundingClientRect) {
-        width = parseFloat(svgBoundingClientRect.width);
-        height = parseFloat(svgBoundingClientRect.height);
-      } else {
-        throw new Error('Cannot determine SVG width and height.');
-      }
-    }
-
-    return {
-      width: width
-    , height: height
-    }
-  }
-
-  /**
-   * Gets g.viewport element or creates it if it doesn't exist
-   * @param  {object} svg
-   * @return {object}     g element
-   */
-  function getOrCreateViewport(svg) {
-    var viewport = svg.querySelector('g.viewport')
-
-    // If no g container with id 'viewport' exists, create one
-    if (!viewport) {
-      var viewport = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-      viewport.setAttribute('class', 'viewport');
-
-      var svgChildren = svg.childNodes || svg.children;
-      do {
-        viewport.appendChild(svgChildren[0]);
-      } while (svgChildren.length > 0);
-      svg.appendChild(viewport);
-    }
-
-    return viewport
   }
 
   /**
@@ -156,35 +86,10 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
       this.initialCTM = newCTM;
 
       // Update viewport CTM
-      setCTM(this.viewport, this.initialCTM);
+      SvgUtils.setCTM(this.viewport, this.initialCTM);
     }
     else {
       this.initialCTM = this.viewport.getCTM();
-    }
-  }
-
-  /**
-   * Sets the current transform matrix of an element
-   * @param {object} element SVG Element
-   * @param {object} matrix  CTM
-   */
-  function setCTM(element, matrix) {
-    var s = 'matrix(' + matrix.a + ',' + matrix.b + ',' + matrix.c + ',' + matrix.d + ',' + matrix.e + ',' + matrix.f + ')';
-    element.setAttribute('transform', s);
-  }
-
-  SvgPanZoom.prototype.setupSvgAttributes = function() {
-    // Setting default attributes
-    this.svg.setAttribute('xmlns', 'http://www.w3.org/1999/xlink');
-    this.svg.setAttributeNS('xmlns', 'xlink', 'http://www.w3.org/1999/xlink');
-    this.svg.setAttributeNS('xmlns', 'ev', 'http://www.w3.org/2001/xml-events');
-
-    //Needed for Internet Explorer, otherwise the viewport overflows.
-    if (this.svg.parentNode !== null) {
-      var style = this.svg.getAttribute('style') || '';
-      if (style.toLowerCase().indexOf('overflow') === -1) {
-        this.svg.setAttribute('style', 'overflow: hidden; ' + style);
-      }
     }
   }
 
@@ -273,70 +178,10 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
     }
 
     var svg = (evt.target.tagName === 'svg' || evt.target.tagName === 'SVG') ? evt.target : evt.target.ownerSVGElement || evt.target.correspondingElement.ownerSVGElement
-      , relativeMousePoint = getRelativeMousePoint(svg, evt)
+      , relativeMousePoint = SvgUtils.getRelativeMousePoint(svg, evt)
       , zoom = Math.pow(1 + this.options.zoomScaleSensitivity, (-1) * delta); // multiplying by neg. 1 so as to make zoom in/out behavior match Google maps behavior
 
     this.zoomAtPoint(svg, relativeMousePoint, zoom)
-  }
-
-  /**
-   * Time-based cache for svg.getScreenCTM().
-   * Needed because getScreenCTM() is very slow on Firefox (FF 28 at time of writing).
-   * The cache expires every 300ms... this is a pretty safe time because it's only called
-   * when we're zooming, when the screenCTM is unlikely/impossible to change.
-   *
-   * @param {object} svg SVG Element
-   * @return {[type]} [description]
-   */
-  var getScreenCTMCached = (function() {
-    var svgs = {};
-    return function(svg) {
-      var cur = Date.now();
-      if (svgs.hasOwnProperty(svg)) {
-        var cached = svgs[svg];
-        if (cur - cached.time > 300) {
-          // Cache expired
-          cached.time = cur;
-          cached.ctm = svg.getScreenCTM();
-        }
-        return cached.ctm;
-      } else {
-        var ctm = svg.getScreenCTM();
-        svgs[svg] = {time: cur, ctm: ctm};
-        return ctm;
-      }
-    };
-  })()
-
-  /**
-   * Get an SVGPoint of the mouse co-ordinates of the event, relative to the SVG element
-   *
-   * @param  {object} svg SVG Element
-   * @param  {object} evt Event
-   * @return {object}     point
-   */
-  function getRelativeMousePoint(svg, evt) {
-    var point = svg.createSVGPoint()
-
-    point.x = evt.clientX
-    point.y = evt.clientY
-
-    return point.matrixTransform(getScreenCTMCached(svg).inverse())
-  }
-
-  /**
-   * Instantiate an SVGPoint object with given event coordinates
-   *
-   * @param {object} evt Event
-   */
-  function getEventPoint(evt) {
-    var svg = (evt.target.tagName === 'svg' || evt.target.tagName === 'SVG') ? evt.target : evt.target.ownerSVGElement || evt.target.correspondingElement.ownerSVGElement
-      , point = svg.createSVGPoint()
-
-    point.x = evt.clientX
-    point.y = evt.clientY
-
-    return point
   }
 
   /**
@@ -364,7 +209,7 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
 
     if (setZoom.a < this.options.minZoom * this.initialCTM.a) {setZoom.a = setZoom.d = wasZoom.a}
     if (setZoom.a > this.options.maxZoom * this.initialCTM.a) {setZoom.a = setZoom.d = wasZoom.a}
-    if (setZoom.a !== wasZoom.a) {setCTM(this.viewport, setZoom)}
+    if (setZoom.a !== wasZoom.a) {SvgUtils.setCTM(this.viewport, setZoom)}
 
     if (!this.stateTf) {
       this.stateTf = setZoom.inverse()
@@ -394,14 +239,14 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
     var point;
     if (this.state === 'pan' && this.options.panEnabled) {
       // Pan mode
-      point = getEventPoint(evt).matrixTransform(this.stateTf)
+      point = SvgUtils.getEventPoint(evt).matrixTransform(this.stateTf)
 
-      setCTM(this.viewport, this.stateTf.inverse().translate(point.x - this.stateOrigin.x, point.y - this.stateOrigin.y))
+      SvgUtils.setCTM(this.viewport, this.stateTf.inverse().translate(point.x - this.stateOrigin.x, point.y - this.stateOrigin.y))
     } else if (this.state === 'drag' && this.options.dragEnabled) {
       // Drag mode
-      point = getEventPoint(evt).matrixTransform(this.viewport.getCTM().inverse())
+      point = SvgUtils.getEventPoint(evt).matrixTransform(this.viewport.getCTM().inverse())
 
-      setCTM(this.stateTarget, svg.createSVGMatrix().translate(point.x - this.stateOrigin.x, point.y - this.stateOrigin.y).multiply(this.viewport.getCTM().inverse()).multiply(this.stateTarget.getCTM()))
+      SvgUtils.setCTM(this.stateTarget, svg.createSVGMatrix().translate(point.x - this.stateOrigin.x, point.y - this.stateOrigin.y).multiply(this.viewport.getCTM().inverse()).multiply(this.stateTarget.getCTM()))
 
       this.stateOrigin = point;
     }
@@ -440,7 +285,7 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
       zoomFactor = (1 + this.zoomScaleSensitivity) * 2
     }
 
-    var point = getRelativeMousePoint(svg, evt)
+    var point = SvgUtils.getRelativeMousePoint(svg, evt)
     this.zoomAtPoint(svg, point, zoomFactor)
   }
 
@@ -467,13 +312,13 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
       // Pan mode
       this.state = 'pan'
       this.stateTf = this.viewport.getCTM().inverse()
-      this.stateOrigin = getEventPoint(evt).matrixTransform(this.stateTf)
+      this.stateOrigin = SvgUtils.getEventPoint(evt).matrixTransform(this.stateTf)
     } else {
       // Drag mode
       this.state = 'drag'
       this.stateTarget = evt.target
       this.stateTf = this.viewport.getCTM().inverse()
-      this.stateOrigin = getEventPoint(evt).matrixTransform(this.stateTf)
+      this.stateOrigin = SvgUtils.getEventPoint(evt).matrixTransform(this.stateTf)
     }
   }
 
@@ -497,117 +342,10 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
     }
   }
 
-
   /**
-   * Get SVG center point
-   *
-   * @param  {object} svg SVG Element
-   * @return {object}     SVG Point
+   * Returns a public instance object
+   * @return {object} Public instance object
    */
-  function getSvgCenterPoint(svg) {
-    var boundingClientRect = svg.getBoundingClientRect()
-      , width = boundingClientRect.width
-      , height = boundingClientRect.height
-      , point = svg.createSVGPoint()
-
-    point.x = width / 2
-    point.y = height / 2
-
-    return point
-  }
-
-  ///////////////////////////////////////////
-  // Functions used for plugin entry point //
-  ///////////////////////////////////////////
-
-  /**
-   * Checks if an object is a DOM element
-   *
-   * @param  {object}  o HTML element or String
-   * @return {Boolean}   returns true if object is a DOM element
-   */
-  function isElement(o){
-    return (
-      typeof HTMLElement === "object" ? o instanceof HTMLElement : //DOM2
-      o && typeof o === "object" && o !== null && o.nodeType === 1 && typeof o.nodeName==="string"
-    );
-  }
-
-  /**
-   * Search for an SVG element
-   *
-   * @param  {object|string} elementOrSelector DOM Element or selector String
-   * @return {object|null}                   SVG or null
-   */
-  function getSvg(elementOrSelector) {
-    var element
-      , svg;
-
-    if (!isElement(elementOrSelector)) {
-      // If selector provided
-      if (typeof elementOrSelector == 'string' || elementOrSelector instanceof String) {
-        // Try to find the element
-        element = document.querySelector(elementOrSelector)
-
-        if (!element) {
-          throw new Error('Provided selector did not find any elements')
-          return null
-        }
-
-      } else {
-        throw new Error('Provided selector is not an HTML object nor String')
-        return null
-      }
-    } else {
-      element = elementOrSelector
-    }
-
-    if (element.tagName.toLowerCase() === 'svg') {
-      svg = element;
-    } else {
-      if (element.tagName.toLowerCase() === 'object') {
-        svg = element.contentDocument.documentElement;
-      } else {
-        if (element.tagName.toLowerCase() === 'embed') {
-          svg = element.getSVGDocument().documentElement;
-        } else {
-          if (element.tagName.toLowerCase() === 'img') {
-            throw new Error('Cannot script an SVG in an "img" element. Please use an "object" element or an in-line SVG.');
-          } else {
-            throw new Error('Cannot get SVG.');
-          }
-          return null
-        }
-      }
-    }
-
-    return svg
-  }
-
-  /**
-   * Attach a given context to a function
-   * @param  {Function} fn      Function
-   * @param  {object}   context Context
-   * @return {Function}           Function with certain context
-   */
-  function proxy(fn, context) {
-    return function() {
-      fn.apply(context, arguments)
-    }
-  }
-
-  /**
-   * Returns object type
-   * Uses toString that returns [object SVGPoint]
-   * And than parses object type from string
-   *
-   * @param  {object} o Any object
-   * @return {string}   Object type
-   */
-  function getType(o) {
-    return Object.prototype.toString.apply(o).replace(/^\[object\s/, '').replace(/\]$/, '')
-  }
-
   SvgPanZoom.prototype.getPublicInstance = function() {
     var that = this
 
@@ -634,14 +372,14 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
       , setMinZoom: function(zoom) {that.options.minZoom = zoom}
       , setMaxZoom: function(zoom) {that.options.maxZoom = zoom}
         // Zoom event
-      , setOnZoom: function(fn) {that.options.onZoom = proxy(fn, that.publicInstance)}
+      , setOnZoom: function(fn) {that.options.onZoom = Utils.proxy(fn, that.publicInstance)}
         // Zooming
       , zoom: function(scale, absolute) {
-          that.zoomAtPoint(that.svg, getSvgCenterPoint(that.svg), scale, absolute)
+          that.zoomAtPoint(that.svg, SvgUtils.getSvgCenterPoint(that.svg), scale, absolute)
         }
       , zoomAtPoint: function(scale, point, absolute) {
           // If not a SVGPoint but has x and y than create new point
-          if (getType(point) !== 'SVGPoint' && 'x' in point && 'y' in point) {
+          if (Utils.getType(point) !== 'SVGPoint' && 'x' in point && 'y' in point) {
             var _point = that.svg.createSVGPoint()
             _point.x = point.x
             _point.y = point.y
@@ -660,7 +398,7 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
           this.zoom(1 / (1 + that.options.zoomScaleSensitivity))
         }
       , resetZoom: function() {
-          setCTM(that.viewport, that.initialCTM)
+          SvgUtils.setCTM(that.viewport, that.initialCTM)
           // Trigger onZoom
           that.options.onZoom(that.initialCTM.a)
         }
@@ -679,7 +417,7 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
   var instancesStore = []
 
   window.svgPanZoom = function(elementOrSelector, options){
-    var svg = getSvg(elementOrSelector)
+    var svg = Utils.getSvg(elementOrSelector)
 
     if (svg === null) {
       return null
@@ -697,6 +435,7 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
       , instance: new SvgPanZoom(svg, options)
       })
 
+      // Return just pushed instance
       return instancesStore[instancesStore.length - 1].instance.getPublicInstance()
     }
   }
