@@ -237,6 +237,21 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
     }
   }
 
+  SvgPanZoom.prototype.publicZoomAtPoint = function(scale, point, absolute) {
+    // If not a SVGPoint but has x and y than create new point
+    if (Utils.getType(point) !== 'SVGPoint' && 'x' in point && 'y' in point) {
+      var _point = this.svg.createSVGPoint()
+      _point.x = point.x
+      _point.y = point.y
+      point = _point
+    } else {
+      throw new Error('Given point is invalid')
+      return
+    }
+
+    this.zoomAtPoint(this.svg, point, scale, absolute)
+  }
+
   /**
    * Get zoom scale/level
    *
@@ -454,6 +469,7 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
       , isPanEnabled: function() {return !!that.options.panEnabled}
       , pan: function(point) {that.pan(point)}
       , panBy: function(point) {that.panBy(point)}
+      , getPan: function() {return that.getPan()}
         // Pan event
       , setOnPan: function(fn) {that.options.onPan = Utils.proxy(fn, that.publicInstance)}
         // Drag
@@ -494,22 +510,17 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
         // Zoom event
       , setOnZoom: function(fn) {that.options.onZoom = Utils.proxy(fn, that.publicInstance)}
         // Zooming
-      , zoom: function(scale, absolute) {
-          that.zoomAtPoint(that.svg, SvgUtils.getSvgCenterPoint(that.svg), scale, absolute)
+      , zoom: function(scale) {
+          that.zoomAtPoint(that.svg, SvgUtils.getSvgCenterPoint(that.svg), scale, true)
         }
-      , zoomAtPoint: function(scale, point, absolute) {
-          // If not a SVGPoint but has x and y than create new point
-          if (Utils.getType(point) !== 'SVGPoint' && 'x' in point && 'y' in point) {
-            var _point = that.svg.createSVGPoint()
-            _point.x = point.x
-            _point.y = point.y
-            point = _point
-          } else {
-            throw new Error('Given point is invalid')
-            return
-          }
-
-          that.zoomAtPoint(that.svg, point, scale, absolute)
+      , zoomBy: function(scale) {
+          that.zoomAtPoint(that.svg, SvgUtils.getSvgCenterPoint(that.svg), scale, false)
+        }
+      , zoomAtPoint: function(scale, point) {
+          that.publicZoomAtPoint(scale, point, true)
+        }
+      , zoomAtPointBy: function(scale, point) {
+          that.publicZoomAtPoint(scale, point, false)
         }
       , zoomIn: function() {
           this.zoom(1 + that.options.zoomScaleSensitivity)
@@ -518,6 +529,7 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
           this.zoom(1 / (1 + that.options.zoomScaleSensitivity))
         }
       , resetZoom: function() {that.resetZoom()}
+      , getZoom: function() {return that.getZoom()}
       }
     }
 

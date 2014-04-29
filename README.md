@@ -32,7 +32,7 @@ If the target SVG does not have this element, the library will create it.
 
 ```js
 var panZoomTiger = svgPanZoom('#demo-tiger');
-// or 
+// or
 var svgElement = document.querySelector('#demo-tiger')
 var panZoomTiger = svgPanZoom(svgElement)
 ```
@@ -75,6 +75,7 @@ When you call `svgPanZoom` method it returns an object with following methods:
 * isPanEnabled
 * pan
 * panBy
+* getPan
 * setOnPan
 * enableDrag
 * disableDrag
@@ -90,10 +91,13 @@ When you call `svgPanZoom` method it returns an object with following methods:
 * setMaxZoom
 * setOnZoom
 * zoom
+* zoomBy
 * zoomAtPoint
+* zoomAtPointBy
 * zoomIn
 * zoomOut
 * resetZoom
+* getZoom
 
 To programmatically pan, call the pan method with vector as first argument:
 
