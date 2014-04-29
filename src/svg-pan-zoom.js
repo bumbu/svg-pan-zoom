@@ -256,7 +256,7 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
    *
    * @param {object} evt Event
    */
-  SvgPanZoom.prototype.handleDblClick = function (evt) {
+  SvgPanZoom.prototype.handleDblClick = function(evt) {
     var target = evt.target
       , svg = (target.tagName === 'svg' || target.tagName === 'SVG') ? target : target.ownerSVGElement || target.correspondingElement.ownerSVGElement
 
@@ -292,7 +292,7 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
    *
    * @param {object} evt Event
    */
-  SvgPanZoom.prototype.handleMouseDown = function (evt) {
+  SvgPanZoom.prototype.handleMouseDown = function(evt) {
     // Double click detection; more consistent than ondblclick
     if (evt.detail === 2){
       this.handleDblClick(evt)
@@ -325,7 +325,7 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
    *
    * @param {object} evt Event
    */
-  SvgPanZoom.prototype.handleMouseUp = function (evt) {
+  SvgPanZoom.prototype.handleMouseUp = function(evt) {
     if (evt.preventDefault) {
       evt.preventDefault()
     } else {
@@ -338,6 +338,30 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
       // Quit pan mode
       this.state = 'none'
     }
+  }
+
+  /**
+   * Pan to a rendered position
+   *
+   * @param  {object} point {x: 0, y: 0}
+   */
+  SvgPanZoom.prototype.pan = function(point) {
+    var viewportCTM = this.viewport.getCTM()
+    viewportCTM.e = point.x
+    viewportCTM.f = point.y
+    SvgUtils.setCTM(this.viewport, viewportCTM)
+  }
+
+  /**
+   * Relatively pan the graph by a specified rendered position vector
+   *
+   * @param  {object} point {x: 0, y: 0}
+   */
+  SvgPanZoom.prototype.panBy = function(point) {
+    var viewportCTM = this.viewport.getCTM()
+    viewportCTM.e += point.x
+    viewportCTM.f += point.y
+    SvgUtils.setCTM(this.viewport, viewportCTM)
   }
 
   /**
@@ -354,6 +378,8 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
         enablePan: function() {that.options.panEnabled = true}
       , disablePan: function() {that.options.panEnabled = false}
       , isPanEnabled: function() {return !!that.options.panEnabled}
+      , pan: function(point) {that.pan(point)}
+      , panBy: function(point) {that.panBy(point)}
         // Drag
       , enableDrag: function() {that.options.dragEnabled = true}
       , disableDrag: function() {that.options.dragEnabled = false}
