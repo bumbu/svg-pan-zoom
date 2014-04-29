@@ -39,6 +39,10 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
     // Get viewport
     this.viewport = SvgUtils.getOrCreateViewport(svg)
 
+    // Create zoom and pan cache
+    this._zoom = 1
+    this._pan = {x: 0, y: 0}
+
     // Sets initialCTM
     this.processCTM()
 
@@ -90,6 +94,13 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
     else {
       this.initialCTM = this.viewport.getCTM();
     }
+
+    // Cache zoom level
+    this._zoom = this.initialCTM.a
+
+    // Cache pan level
+    this._pan.x = this.initialCTM.e
+    this._pan.y = this.initialCTM.f
   }
 
   /**
@@ -208,7 +219,12 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
 
     if (setZoom.a < this.options.minZoom * this.initialCTM.a) {setZoom.a = setZoom.d = wasZoom.a}
     if (setZoom.a > this.options.maxZoom * this.initialCTM.a) {setZoom.a = setZoom.d = wasZoom.a}
-    if (setZoom.a !== wasZoom.a) {SvgUtils.setCTM(this.viewport, setZoom)}
+    if (setZoom.a !== wasZoom.a) {
+      SvgUtils.setCTM(this.viewport, setZoom)
+
+      // Cache zoom level
+      this._zoom = this.initialCTM.a
+    }
 
     if (!this.stateTf) {
       this.stateTf = setZoom.inverse()
@@ -219,6 +235,31 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
     if (this.options.onZoom) {
       this.options.onZoom(setZoom.a)
     }
+  }
+
+  /**
+   * Get zoom scale/level
+   *
+   * @return {float} zoom scale
+   */
+  SvgPanZoom.prototype.getZoom = function() {
+    return this._zoom
+  }
+
+  SvgPanZoom.prototype.resetZoom = function() {
+    SvgUtils.setCTM(this.viewport, this.initialCTM)
+
+    // Trigger onZoom
+    this.options.onZoom(this.initialCTM.a)
+    // Trigger onPan
+    this.options.onPan(this._pan.x, this._pan.y)
+
+    // Cache zoom level
+    this._zoom = this.initialCTM.a
+
+    // Cache pan level
+    this._pan.x = this.initialCTM.e
+    this._pan.y = this.initialCTM.f
   }
 
   /**
@@ -239,11 +280,16 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
     if (this.state === 'pan' && this.options.panEnabled) {
       // Pan mode
       point = SvgUtils.getEventPoint(evt).matrixTransform(this.stateTf)
+      var viewportCTM = this.stateTf.inverse().translate(point.x - this.stateOrigin.x, point.y - this.stateOrigin.y)
 
-      SvgUtils.setCTM(this.viewport, this.stateTf.inverse().translate(point.x - this.stateOrigin.x, point.y - this.stateOrigin.y))
+      SvgUtils.setCTM(this.viewport, viewportCTM)
+
+      // Cache pan level
+      this._pan.x = viewportCTM.e
+      this._pan.y = viewportCTM.f
 
       // Trigger onPan
-      this.options.onPan()
+      this.options.onPan(this._pan.x, this._pan.y)
     } else if (this.state === 'drag' && this.options.dragEnabled) {
       // Drag mode
       point = SvgUtils.getEventPoint(evt).matrixTransform(this.viewport.getCTM().inverse())
@@ -355,8 +401,12 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
     viewportCTM.f = point.y
     SvgUtils.setCTM(this.viewport, viewportCTM)
 
+    // Cache pan level
+    this._pan.x = viewportCTM.e
+    this._pan.y = viewportCTM.f
+
     // Trigger onPan
-    this.options.onPan()
+    this.options.onPan(this._pan.x, this._pan.y)
   }
 
   /**
@@ -370,8 +420,22 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
     viewportCTM.f += point.y
     SvgUtils.setCTM(this.viewport, viewportCTM)
 
+    // Cache pan level
+    this._pan.x = viewportCTM.e
+    this._pan.y = viewportCTM.f
+
     // Trigger onPan
-    this.options.onPan()
+    this.options.onPan(this._pan.x, this._pan.y)
+  }
+
+  /**
+   * Get pan vector
+   *
+   * @return {object} {x: 0, y: 0}
+   */
+  SvgPanZoom.prototype.getPan = function() {
+    // Do not return object directly because it will be possible to modify it using the reference
+    return {x: this._pan.x, y: this._pan.y}
   }
 
   /**
@@ -453,11 +517,7 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
       , zoomOut: function() {
           this.zoom(1 / (1 + that.options.zoomScaleSensitivity))
         }
-      , resetZoom: function() {
-          SvgUtils.setCTM(that.viewport, that.initialCTM)
-          // Trigger onZoom
-          that.options.onZoom(that.initialCTM.a)
-        }
+      , resetZoom: function() {that.resetZoom()}
       }
     }
 
