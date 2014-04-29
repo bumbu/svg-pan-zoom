@@ -41,11 +41,9 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
     // Sets initialCTM
     this.processCTM()
 
-    /*
-    if (svgPanZoomInstance.zoomEnabled && svgPanZoomInstance.controlIconsEnabled) {
-      svgPanZoomInstance.enableZoom();
+    if (this.options.controlIconsEnabled && this.options.zoomEnabled) {
+      ControlIcons.enable(this)
     }
-    */
 
     // Add default attributes to SVG
     SvgUtils.setupSvgAttributes(this.svg)
@@ -361,11 +359,31 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
       , disableDrag: function() {that.options.dragEnabled = false}
       , isDragEnabled: function() {return !!that.options.dragEnabled}
         // Zoom and Control Icons
-      , enableZoom: function() {that.options.zoomEnabled = true} // TODO enable control icons
-      , disableZoom: function() {that.options.zoomEnabled = false} // TODO
+      , enableZoom: function() {
+          if (that.options.controlIconsEnabled && !that.options.zoomEnabled) {
+            ControlIcons.enable(that)
+          }
+          that.options.zoomEnabled = true;
+        }
+      , disableZoom: function() {
+          if (that.options.controlIconsEnabled && that.options.zoomEnabled) {
+            ControlIcons.disable(that)
+          }
+          that.options.zoomEnabled = false;
+        }
       , isZoomEnabled: function() {return !!that.options.zoomEnabled}
-      , enableControlIcons: function() {that.options.controlIconsEnabled = true} // TODO
-      , disableControlIcons: function() {that.options.controlIconsEnabled = false} // TODO
+      , enableControlIcons: function() {
+          if (that.options.zoomEnabled && !that.options.controlIconsEnabled) {
+            that.options.controlIconsEnabled = true
+            ControlIcons.enable(that)
+          }
+        }
+      , disableControlIcons: function() {
+          if (that.options.controlIconsEnabled) {
+            that.options.controlIconsEnabled = false;
+            ControlIcons.disable(that)
+          }
+        }
       , isControlIconsEnabled: function() {return !!that.options.controlIconsEnabled}
         // Zoom scale and bounds
       , setZoomScaleSensitivity: function(scale) {that.options.zoomScaleSensitivity = scale}
