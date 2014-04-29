@@ -12,13 +12,14 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
 
   var optionsDefaults = {
     panEnabled: true // enable or disable panning (default enabled)
-  , zoomEnabled: true // enable or disable zooming (default enabled)
-  , controlIconsEnabled: false // insert icons to give user an option in addition to mouse events to control pan/zoom (default disabled)
   , dragEnabled: false // enable or disable dragging (default disabled)
+  , controlIconsEnabled: false // insert icons to give user an option in addition to mouse events to control pan/zoom (default disabled)
+  , zoomEnabled: true // enable or disable zooming (default enabled)
   , zoomScaleSensitivity: 0.2 // Zoom sensitivity
   , minZoom: 0.5 // Minimum Zoom level
   , maxZoom: 10 // Maximum Zoom level
   , onZoom: function(){}
+  , onPan: function(){}
   }
 
   SvgPanZoom.prototype.init = function(svg, options) {
@@ -240,6 +241,9 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
       point = SvgUtils.getEventPoint(evt).matrixTransform(this.stateTf)
 
       SvgUtils.setCTM(this.viewport, this.stateTf.inverse().translate(point.x - this.stateOrigin.x, point.y - this.stateOrigin.y))
+
+      // Trigger onPan
+      this.options.onPan()
     } else if (this.state === 'drag' && this.options.dragEnabled) {
       // Drag mode
       point = SvgUtils.getEventPoint(evt).matrixTransform(this.viewport.getCTM().inverse())
@@ -350,6 +354,9 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
     viewportCTM.e = point.x
     viewportCTM.f = point.y
     SvgUtils.setCTM(this.viewport, viewportCTM)
+
+    // Trigger onPan
+    this.options.onPan()
   }
 
   /**
@@ -362,6 +369,9 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
     viewportCTM.e += point.x
     viewportCTM.f += point.y
     SvgUtils.setCTM(this.viewport, viewportCTM)
+
+    // Trigger onPan
+    this.options.onPan()
   }
 
   /**
@@ -380,6 +390,8 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
       , isPanEnabled: function() {return !!that.options.panEnabled}
       , pan: function(point) {that.pan(point)}
       , panBy: function(point) {that.panBy(point)}
+        // Pan event
+      , setOnPan: function(fn) {that.options.onPan = Utils.proxy(fn, that.publicInstance)}
         // Drag
       , enableDrag: function() {that.options.dragEnabled = true}
       , disableDrag: function() {that.options.dragEnabled = false}
