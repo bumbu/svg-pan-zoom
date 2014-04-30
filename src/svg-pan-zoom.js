@@ -523,10 +523,10 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
           that.publicZoomAtPoint(scale, point, false)
         }
       , zoomIn: function() {
-          this.zoom(1 + that.options.zoomScaleSensitivity)
+          this.zoomBy(1 + that.options.zoomScaleSensitivity)
         }
       , zoomOut: function() {
-          this.zoom(1 / (1 + that.options.zoomScaleSensitivity))
+          this.zoomBy(1 / (1 + that.options.zoomScaleSensitivity))
         }
       , resetZoom: function() {that.resetZoom()}
       , getZoom: function() {return that.getZoom()}
