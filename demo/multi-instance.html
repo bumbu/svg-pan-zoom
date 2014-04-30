@@ -3,8 +3,7 @@
 
   <head>
     <title>Multi-instance</title>
-    <script src="../svg-pan-zoom.js"></script>
-    <script src="../control-icons.js"></script>
+    <script src="../dist/svg-pan-zoom.js"></script>
   </head>
 
   <body>
@@ -1642,20 +1641,18 @@
     <script>
       // Don't use window.onLoad like this in production, because it can only listen to one function.
       window.onload = function() {
-        var panZoomTiger = Object.create(svgPanZoom);
-        panZoomTiger.init({
-          'selector': '#demo-tiger',
-          'zoomEnabled': true,
-          'controlIconsEnabled': true 
+        // Expose variable for testing purposes
+        window.panZoomTiger = svgPanZoom('#demo-tiger', {
+          zoomEnabled: true,
+          controlIconsEnabled: true
         });
-        var panZoomPenguin = Object.create(svgPanZoom);
-        panZoomPenguin.init({
-          'selector': '#demo-penguin',
-          'zoomEnabled': true
+
+        // Expose variable for testing purposes
+        window.panZoomPenguin = svgPanZoom('#demo-penguin', {
+          zoomEnabled: true,
+          controlIconsEnabled: true
         });
       };
     </script>
-
   </body>
-
 </html>

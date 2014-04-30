@@ -2,9 +2,7 @@
 <html>
 
   <head>
-    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-    <script src="../svg-pan-zoom.js"></script>
-    <script src="../control-icons.js"></script>
+    <script src="../dist/svg-pan-zoom.min.js"></script>
   </head>
 
   <body>
@@ -739,9 +737,9 @@
     <script>
       // Don't use window.onLoad like this in production, because it can only listen to one function.
       window.onload = function() {
-        svgPanZoom.init({
-          'zoomEnabled': true,
-          'controlIconsEnabled': true 
+        svgPanZoom('#demo-tiger', {
+          zoomEnabled: true,
+          controlIconsEnabled: true
         });
       };
     </script>

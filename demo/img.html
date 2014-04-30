@@ -5,19 +5,19 @@
     <!--
     <link rel="stylesheet" href="style.css">
     -->
-    <script src="../svg-pan-zoom.js"></script>
+    <script src="../dist/svg-pan-zoom.min.js"></script>
   </head>
 
   <body>
     <h1>Demo for svg-pan-zoom: SVG in HTML 'img' element</h1>
-    <img src="tiger.svg" alt="svg image of a tiger" style="width: 500px; height: 500px; border:1px solid black; "/>
+    <img id="demo-tiger" src="tiger.svg" alt="svg image of a tiger" style="width: 500px; height: 500px; border:1px solid black; "/>
 
     <script>
       // Don't use window.onLoad like this in production, because it can only listen to one function.
       window.onload = function() {
-        svgPanZoom.init({
-          //'selector': 'svg',
-          'zoomEnabled': true 
+        svgPanZoom('#demo-tiger', {
+          zoomEnabled: true,
+          controlIconsEnabled: true
         });
       };
     </script>
