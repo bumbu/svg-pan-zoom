@@ -1,6 +1,6 @@
 {
   "name": "svg-pan-zoom",
-  "version": "1.3.2",
+  "version": "2.0.0",
   "main": "svg-pan-zoom.js",
   "license": "BSD",
   "devDependencies": {

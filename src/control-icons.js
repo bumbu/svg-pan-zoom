@@ -108,7 +108,6 @@ module.exports = {
   }
 
 , disable: function(instance) {
-    console.log('control disabled')
     if (instance.controlIcons) {
       instance.controlIcons.parentNode.removeChild(instance.controlIcons)
       instance.controlIcons = null
