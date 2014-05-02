@@ -345,7 +345,7 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
       zoomFactor = 1/((1 + this.options.zoomScaleSensitivity) * 2) // zoom out when shift key pressed
     }
     else {
-      zoomFactor = (1 + this.zoomScaleSensitivity) * 2
+      zoomFactor = (1 + this.options.zoomScaleSensitivity) * 2
     }
 
     var point = SvgUtils.getRelativeMousePoint(svg, evt)
