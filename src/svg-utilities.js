@@ -10,19 +10,41 @@ module.exports = {
       , height = 0
       , svgClientRects = svg.getClientRects()
 
-    if (typeof svgClientRects !== 'undefined' && svgClientRects.length > 0) {
-      var svgClientRect = svgClientRects[0];
+    // thanks to http://stackoverflow.com/questions/9847580/how-to-detect-safari-chrome-ie-firefox-and-opera-browser
+    var isFirefox = typeof InstallTrigger !== 'undefined';
 
-      width = parseFloat(svgClientRect.width);
-      height = parseFloat(svgClientRect.height);
+    // Firefox has no nice way of detecting SVG size, so we'll check for
+    // width/height attributes, specified in pixels,
+    // and if they don't exist, we'll use the parent dimensions.
+    if (isFirefox) {
+      var svgComputedStyle = window.getComputedStyle(svg, null);
+      console.log(svgComputedStyle);
+      width = parseFloat(svgComputedStyle.width) - (parseFloat(svgComputedStyle.borderLeftWidth) + parseFloat(svgComputedStyle.paddingLeft) + parseFloat(svgComputedStyle.borderRightWidth) + parseFloat(svgComputedStyle.paddingRight));
+      console.log('svgComputedStyle.width');
+      console.log(svgComputedStyle.width);
+      console.log(width);
+      height = parseFloat(svgComputedStyle.height) - (parseFloat(svgComputedStyle.borderTopWidth) + parseFloat(svgComputedStyle.paddingTop) + parseFloat(svgComputedStyle.borderBottomWidth) + parseFloat(svgComputedStyle.paddingBottom));
+      if (!width || !height) {
+        var parentStyle = window.getComputedStyle(svg.parentElement, null);
+        var parentDimensions = svg.parentElement.getBoundingClientRect();
+        width = parentDimensions.width - (parseFloat(parentStyle.borderLeftWidth) + parseFloat(parentStyle.paddingLeft) + parseFloat(parentStyle.borderRightWidth) + parseFloat(parentStyle.paddingRight));
+        height = parentDimensions.height - (parseFloat(parentStyle.borderTopWidth) + parseFloat(parentStyle.paddingTop) + parseFloat(parentStyle.borderBottomWidth) + parseFloat(parentStyle.paddingBottom));
+      }
     } else {
-      var svgBoundingClientRect = svg.getBoundingClientRect();
+      if (typeof svgClientRects !== 'undefined' && svgClientRects.length > 0) {
+        var svgClientRect = svgClientRects[0];
 
-      if (!!svgBoundingClientRect) {
-        width = parseFloat(svgBoundingClientRect.width);
-        height = parseFloat(svgBoundingClientRect.height);
+        width = parseFloat(svgClientRect.width);
+        height = parseFloat(svgClientRect.height);
       } else {
-        throw new Error('Cannot determine SVG width and height.');
+        var svgBoundingClientRect = svg.getBoundingClientRect();
+
+        if (!!svgBoundingClientRect) {
+          width = parseFloat(svgBoundingClientRect.width);
+          height = parseFloat(svgBoundingClientRect.height);
+        } else {
+          throw new Error('Cannot determine SVG width and height.');
+        }
       }
     }
 
