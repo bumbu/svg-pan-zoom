@@ -777,15 +777,12 @@ module.exports = {
     var isFirefox = typeof InstallTrigger !== 'undefined';
 
     // Firefox has no nice way of detecting SVG size, so we'll check for
-    // width/height attributes, specified in pixels,
+    // width/height from getComputedStyle, specified in pixels,
     // and if they don't exist, we'll use the parent dimensions.
+    // TODO: check whether this method would be a better method for other browsers too.
     if (isFirefox) {
       var svgComputedStyle = window.getComputedStyle(svg, null);
-      console.log(svgComputedStyle);
       width = parseFloat(svgComputedStyle.width) - (parseFloat(svgComputedStyle.borderLeftWidth) + parseFloat(svgComputedStyle.paddingLeft) + parseFloat(svgComputedStyle.borderRightWidth) + parseFloat(svgComputedStyle.paddingRight));
-      console.log('svgComputedStyle.width');
-      console.log(svgComputedStyle.width);
-      console.log(width);
       height = parseFloat(svgComputedStyle.height) - (parseFloat(svgComputedStyle.borderTopWidth) + parseFloat(svgComputedStyle.paddingTop) + parseFloat(svgComputedStyle.borderBottomWidth) + parseFloat(svgComputedStyle.paddingBottom));
       if (!width || !height) {
         var parentStyle = window.getComputedStyle(svg.parentElement, null);
