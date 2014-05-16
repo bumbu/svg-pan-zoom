@@ -18,6 +18,7 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
   , zoomScaleSensitivity: 0.2 // Zoom sensitivity
   , minZoom: 0.5 // Minimum Zoom level
   , maxZoom: 10 // Maximum Zoom level
+  , fit: true // enable or disable image fit into containig element (default true)
   , onZoom: function(){}
   , onPan: function(){}
   }
@@ -71,16 +72,28 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
   SvgPanZoom.prototype.processCTM = function() {
     var svgViewBox = this.svg.getAttribute('viewBox')
 
-    if (svgViewBox) {
-      var boundingClientRect = this.svg.getBoundingClientRect()
-        , viewBoxValues = svgViewBox.split(' ').map(parseFloat)
-        , viewBoxWidth = viewBoxValues[2]
-        , viewBoxHeight = viewBoxValues[3]
+    if (this.options.fit) {
+      if (svgViewBox) {
+        // Fit using viewBox dimensions
+        console.log(svgViewBox)
+        var boundingClientRect = this.svg.getBoundingClientRect()
+          , viewBoxValues = svgViewBox.split(' ').map(parseFloat)
+          , viewBoxWidth = viewBoxValues[2]
+          , viewBoxHeight = viewBoxValues[3]
 
-      this.svg.removeAttribute('viewBox');
+        this.svg.removeAttribute('viewBox')
+      } else {
+        console.log('viewport')
+        // Fit using viewport dimensions
+        var boundingClientRect = this.viewport.getBoundingClientRect()
+          , viewBoxWidth = boundingClientRect.width
+          , viewBoxHeight = boundingClientRect.height
+      }
 
       var newCTM = this.viewport.getCTM()
         , newScale = Math.min(this.width/viewBoxWidth, this.height/viewBoxHeight);
+
+      console.log(newCTM.a, newCTM.d)
 
       newCTM.a = newCTM.a * newScale; //x-scale
       newCTM.d = newCTM.d * newScale; //y-scale
@@ -90,10 +103,12 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
 
       // Update viewport CTM
       SvgUtils.setCTM(this.viewport, this.initialCTM);
-    }
-    else {
+    } else {
+      // Leave sizes as they are
+      this.svg.removeAttribute('viewBox')
       this.initialCTM = this.viewport.getCTM();
     }
+
 
     // Cache zoom level
     this._zoom = this.initialCTM.a
