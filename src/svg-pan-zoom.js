@@ -72,18 +72,18 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
   SvgPanZoom.prototype.processCTM = function() {
     var svgViewBox = this.svg.getAttribute('viewBox')
 
+    this.cacheViewBox()
+
     if (this.options.fit) {
       if (svgViewBox) {
         // Fit using viewBox dimensions
-        console.log(svgViewBox)
-        var boundingClientRect = this.svg.getBoundingClientRect()
-          , viewBoxValues = svgViewBox.split(' ').map(parseFloat)
+        // TODO take in account possible offset (value 0 and 1)
+        var viewBoxValues = svgViewBox.split(' ').map(parseFloat)
           , viewBoxWidth = viewBoxValues[2]
           , viewBoxHeight = viewBoxValues[3]
 
         this.svg.removeAttribute('viewBox')
       } else {
-        console.log('viewport')
         // Fit using viewport dimensions
         var boundingClientRect = this.viewport.getBoundingClientRect()
           , viewBoxWidth = boundingClientRect.width
@@ -92,8 +92,6 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
 
       var newCTM = this.viewport.getCTM()
         , newScale = Math.min(this.width/viewBoxWidth, this.height/viewBoxHeight);
-
-      console.log(newCTM.a, newCTM.d)
 
       newCTM.a = newCTM.a * newScale; //x-scale
       newCTM.d = newCTM.d * newScale; //y-scale
@@ -116,6 +114,33 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
     // Cache pan level
     this._pan.x = this.initialCTM.e
     this._pan.y = this.initialCTM.f
+  }
+
+  /**
+   * Cache initial viewBox value
+   * If nok viewBox is defined than use viewport sizes as viewBox values
+   */
+  SvgPanZoom.prototype.cacheViewBox = function() {
+    // ViewBox cache
+    this._viewBox = {x: 0, y: 0, width: 0, height: 0}
+
+    var svgViewBox = this.svg.getAttribute('viewBox')
+
+    if (svgViewBox) {
+      var viewBoxValues = svgViewBox.split(' ').map(parseFloat)
+
+      // Cache viewbox x and y offset
+      this._viewBox.x = viewBoxValues[0]
+      this._viewBox.y = viewBoxValues[1]
+      this._viewBox.width = viewBoxValues[2]
+      this._viewBox.height = viewBoxValues[3]
+    } else {
+      var boundingClientRect = this.viewport.getBoundingClientRect()
+
+      // Cache viewbox sizes
+      this._viewBox.width = boundingClientRect.width
+      this._viewBox.height = boundingClientRect.height
+    }
   }
 
   /**
@@ -421,6 +446,32 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
   }
 
   /**
+   * Adjust size (only) so it will fit into visible part of SVG
+   * Does not center image
+   *
+   * @param  {bool} dropCache drop viewBox cache and recalculate SVG sizes
+   */
+  SvgPanZoom.prototype.fit = function(dropCache) {
+    dropCache = dropCache || false // default is false
+
+    if (dropCache) {
+      var boundingClientRect = this.viewport.getBoundingClientRect()
+        , viewBoxWidth = boundingClientRect.width
+        , viewBoxHeight = boundingClientRect.height
+
+      // Cache viewbox
+      this._viewBox.x = 0
+      this._viewBox.y = 0
+      this._viewBox.width = viewBoxWidth
+      this._viewBox.height = viewBoxHeight
+    }
+
+    var newScale = Math.min(this.width/this._viewBox.width, this.height/this._viewBox.height)
+
+    this.zoomAtPoint(this.svg, SvgUtils.getSvgCenterPoint(this.svg), newScale, true)
+  }
+
+  /**
    * Pan to a rendered position
    *
    * @param  {object} point {x: 0, y: 0}
@@ -545,6 +596,7 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
         }
       , resetZoom: function() {that.resetZoom()}
       , getZoom: function() {return that.getZoom()}
+      , fit: function() {return that.fit()}
       }
     }
 
