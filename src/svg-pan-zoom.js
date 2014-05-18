@@ -74,30 +74,16 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
     var svgViewBox = this.svg.getAttribute('viewBox')
 
     this.cacheViewBox()
+    this.svg.removeAttribute('viewBox')
 
     if (this.options.fit) {
-      if (svgViewBox) {
-        // Fit using viewBox dimensions
-        // TODO take in account possible offset (value 0 and 1)
-        var viewBoxValues = svgViewBox.split(' ').map(parseFloat)
-          , viewBoxWidth = viewBoxValues[2]
-          , viewBoxHeight = viewBoxValues[3]
-
-        this.svg.removeAttribute('viewBox')
-      } else {
-        // Fit using viewport dimensions
-        var boundingClientRect = this.viewport.getBoundingClientRect()
-          , viewBoxWidth = boundingClientRect.width
-          , viewBoxHeight = boundingClientRect.height
-      }
-
       var newCTM = this.viewport.getCTM()
-        , newScale = Math.min(this.width/viewBoxWidth, this.height/viewBoxHeight);
+        , newScale = Math.min(this.width/(this._viewBox.width - this._viewBox.x), this.height/(this._viewBox.height - this._viewBox.y));
 
       newCTM.a = newCTM.a * newScale; //x-scale
       newCTM.d = newCTM.d * newScale; //y-scale
-      newCTM.e = newCTM.e * newScale; //x-transform
-      newCTM.f = newCTM.f * newScale; //y-transform
+      newCTM.e = (newCTM.e - this._viewBox.x) * newScale; //x-transform
+      newCTM.f = (newCTM.f - this._viewBox.y) * newScale; //y-transform
       this.initialCTM = newCTM;
 
       // Update viewport CTM
@@ -152,8 +138,8 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
    */
   SvgPanZoom.prototype.recacheViewBox = function() {
     var boundingClientRect = this.viewport.getBoundingClientRect()
-      , viewBoxWidth = boundingClientRect.width
-      , viewBoxHeight = boundingClientRect.height
+      , viewBoxWidth = boundingClientRect.width / this.getZoom()
+      , viewBoxHeight = boundingClientRect.height / this.getZoom()
 
     // Cache viewbox
     this._viewBox.x = 0
@@ -475,7 +461,7 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
       this.recacheViewBox()
     }
 
-    var newScale = Math.min(this.width/this._viewBox.width, this.height/this._viewBox.height)
+    var newScale = Math.min(this.width/(this._viewBox.width - this._viewBox.x), this.height/(this._viewBox.height - this._viewBox.y))
 
     this.getPublicInstance().zoom(newScale)
   }
@@ -491,8 +477,8 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
       this.recacheViewBox()
     }
 
-    var offsetX = (this.width - this._viewBox.width * this.getZoom()) * 0.5
-      , offsetY = (this.height - this._viewBox.height * this.getZoom()) * 0.5
+    var offsetX = (this.width - (this._viewBox.width + this._viewBox.x) * this.getZoom()) * 0.5
+      , offsetY = (this.height - (this._viewBox.height + this._viewBox.y) * this.getZoom()) * 0.5
 
     this.getPublicInstance().pan({x: offsetX, y: offsetY})
   }
