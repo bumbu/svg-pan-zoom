@@ -50,6 +50,8 @@ svgPanZoom.init('#demo-tiger', {
 , zoomScaleSensitivity: 0.2
 , minZoom: 0.5
 , maxZoom: 10
+, fit: true
+, center: true
 , onZoom: function(){}
 , onPan: function(){}
 });
@@ -63,6 +65,8 @@ If any arguments are specified, they must have the following value types:
 * 'zoomScaleSensitivity' must be a scalar. Default is 0.2.
 * 'minZoom' must be a scalar. Default is 0.5.
 * 'maxZoom' must be a scalar. Default is 10.
+* 'fit' must be true or false. Default is true.
+* 'center' must be true or false. Default is true.
 * 'onZoom' must be a callback function to be called when zoom changes.
 * 'onPan' must be a callback function to be called when pan changes.
 
@@ -98,6 +102,8 @@ When you call `svgPanZoom` method it returns an object with following methods:
 * zoomOut
 * resetZoom
 * getZoom
+* fit
+* center
 
 To programmatically pan, call the pan method with vector as first argument:
 
@@ -158,6 +164,16 @@ panZoomTiger.disableZoom();
 
 panZoomTiger.enableDrag();
 panZoomTiger.disableDrag();
+```
+
+To fit and center:
+
+```js
+// Get instance
+var panZoomTiger = svgPanZoom('#demo-tiger');
+
+panZoomTiger.fit();
+panZoomTiger.center();
 ```
 
 Related Work
