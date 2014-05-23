@@ -211,6 +211,7 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
   , maxZoom: 10 // Maximum Zoom level
   , fit: true // enable or disable viewport fit in SVG (default true)
   , center: true // enable or disable viewport centering in SVG (default true)
+  , beforeZoom: function(){}
   , onZoom: function(){}
   , onPan: function(){}
   }
@@ -441,6 +442,10 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
    *                               Otherwise, zoomScale is treated as a multiplied (e.g. 1.10 would zoom in 10%)
    */
   SvgPanZoom.prototype.zoomAtPoint = function(svg, point, zoomScale, zoomAbsolute) {
+    if (this.options.beforeZoom) {
+      this.options.beforeZoom()
+    }
+
     var viewportCTM = this.viewport.getCTM()
 
     point = point.matrixTransform(viewportCTM.inverse())
@@ -498,12 +503,8 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
   }
 
   SvgPanZoom.prototype.resetZoom = function() {
-    SvgUtils.setCTM(this.viewport, this.initialCTM)
-
-    // Trigger onZoom
-    this.options.onZoom(this.initialCTM.a)
-    // Trigger onPan
-    this.options.onPan(this._pan.x, this._pan.y)
+    this.getPublicInstance().zoom(this.initialCTM.a)
+    this.getPublicInstance().pan({x: this.initialCTM.e, y: this.initialCTM.f})
 
     // Cache zoom level
     this._zoom = this.initialCTM.a
@@ -777,6 +778,7 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
       , setMinZoom: function(zoom) {that.options.minZoom = zoom}
       , setMaxZoom: function(zoom) {that.options.maxZoom = zoom}
         // Zoom event
+      , setBeforeZoom: function(fn) {that.options.beforeZoom = Utils.proxy(fn, that.publicInstance)}
       , setOnZoom: function(fn) {that.options.onZoom = Utils.proxy(fn, that.publicInstance)}
         // Zooming
       , zoom: function(scale) {
