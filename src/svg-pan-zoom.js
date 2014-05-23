@@ -307,12 +307,8 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
   }
 
   SvgPanZoom.prototype.resetZoom = function() {
-    SvgUtils.setCTM(this.viewport, this.initialCTM)
-
-    // Trigger onZoom
-    this.options.onZoom(this.initialCTM.a)
-    // Trigger onPan
-    this.options.onPan(this._pan.x, this._pan.y)
+    this.getPublicInstance().zoom(this.initialCTM.a)
+    this.getPublicInstance().pan({x: this.initialCTM.e, y: this.initialCTM.f})
 
     // Cache zoom level
     this._zoom = this.initialCTM.a
