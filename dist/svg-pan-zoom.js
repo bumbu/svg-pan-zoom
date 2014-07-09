@@ -211,8 +211,9 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
   , maxZoom: 10 // Maximum Zoom level
   , fit: true // enable or disable viewport fit in SVG (default true)
   , center: true // enable or disable viewport centering in SVG (default true)
-  , beforeZoom: function(){}
+  , beforeZoom: null
   , onZoom: function(){}
+  , beforePan: null
   , onPan: function(){}
   }
 
@@ -442,7 +443,7 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
    *                               Otherwise, zoomScale is treated as a multiplied (e.g. 1.10 would zoom in 10%)
    */
   SvgPanZoom.prototype.zoomAtPoint = function(svg, point, zoomScale, zoomAbsolute) {
-    if (this.options.beforeZoom) {
+    if (Utils.isFunction(this.options.beforeZoom)) {
       this.options.beforeZoom()
     }
 
@@ -530,6 +531,11 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
 
     var point;
     if (this.state === 'pan' && this.options.panEnabled) {
+      // Trigger beforePan
+      if (Utils.isFunction(this.options.beforePan)) {
+        this.options.beforePan()
+      }
+
       // Pan mode
       point = SvgUtils.getEventPoint(evt).matrixTransform(this.stateTf)
       var viewportCTM = this.stateTf.inverse().translate(point.x - this.stateOrigin.x, point.y - this.stateOrigin.y)
@@ -681,6 +687,11 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
    * @param  {object} point {x: 0, y: 0}
    */
   SvgPanZoom.prototype.pan = function(point) {
+    // Trigger beforePan
+    if (Utils.isFunction(this.options.beforePan)) {
+      this.options.beforePan()
+    }
+
     var viewportCTM = this.viewport.getCTM()
     viewportCTM.e = point.x
     viewportCTM.f = point.y
@@ -700,6 +711,11 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
    * @param  {object} point {x: 0, y: 0}
    */
   SvgPanZoom.prototype.panBy = function(point) {
+    // Trigger beforePan
+    if (Utils.isFunction(this.options.beforePan)) {
+      this.options.beforePan()
+    }
+
     var viewportCTM = this.viewport.getCTM()
     viewportCTM.e += point.x
     viewportCTM.f += point.y
@@ -741,6 +757,7 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
       , panBy: function(point) {that.panBy(point)}
       , getPan: function() {return that.getPan()}
         // Pan event
+      , setBeforePan: function(fn) {that.options.beforePan = Utils.proxy(fn, that.publicInstance)}
       , setOnPan: function(fn) {that.options.onPan = Utils.proxy(fn, that.publicInstance)}
         // Drag
       , enableDrag: function() {that.options.dragEnabled = true}
@@ -1035,8 +1052,9 @@ module.exports = {
   extend: function(target, source) {
     target = target || {};
     for (var prop in source) {
-      if (typeof source[prop] === 'object') {
-        target[prop] = extend(target[prop], source[prop])
+      // Go recursively
+      if (this.isObject(source[prop])) {
+        target[prop] = this.extend(target[prop], source[prop])
       } else {
         target[prop] = source[prop]
       }
@@ -1055,6 +1073,26 @@ module.exports = {
       typeof HTMLElement === "object" ? (o instanceof HTMLElement || o instanceof SVGElement || o instanceof SVGSVGElement) : //DOM2
       o && typeof o === "object" && o !== null && o.nodeType === 1 && typeof o.nodeName==="string"
     );
+  }
+
+  /**
+   * Checks if an object is an Object
+   *
+   * @param  {object}  o Object
+   * @return {Boolean}   returns true if object is an Object
+   */
+, isObject: function(o){
+    return Object.prototype.toString.call(o) === '[object Object]';
+  }
+
+  /**
+   * Checks if an object is a Function
+   *
+   * @param  {object}  f Function
+   * @return {Boolean}   returns true if object is a Function
+   */
+, isFunction: function(f){
+    return Object.prototype.toString.call(f) === '[object Function]';
   }
 
   /**
