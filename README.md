@@ -54,6 +54,7 @@ svgPanZoom.init('#demo-tiger', {
 , center: true
 , beforeZoom: function(){}
 , onZoom: function(){}
+, beforePan: function(){}
 , onPan: function(){}
 });
 ```
@@ -70,6 +71,7 @@ If any arguments are specified, they must have the following value types:
 * 'center' must be true or false. Default is true.
 * 'beforeZoom' must be a callback function to be called before zoom changes.
 * 'onZoom' must be a callback function to be called when zoom changes.
+* 'beforePan' must be a callback function to be called before pan changes.
 * 'onPan' must be a callback function to be called when pan changes.
 
 Public API
@@ -82,6 +84,7 @@ When you call `svgPanZoom` method it returns an object with following methods:
 * pan
 * panBy
 * getPan
+* setBeforePan
 * setOnPan
 * enableDrag
 * disableDrag
