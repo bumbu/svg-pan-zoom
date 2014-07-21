@@ -16,6 +16,7 @@ Demos
  * [SVG Inserted with 'Embed' Element](http://ariutta.github.io/svg-pan-zoom/demo/embed.html)
  * [SVG Inserted with 'Object' Element](http://ariutta.github.io/svg-pan-zoom/demo/object.html)
  * [SVG Inserted with 'Img' Element](http://ariutta.github.io/svg-pan-zoom/demo/img.html) (These cannot be panned/zoomed.)
+ * [SVG With custom controls](http://ariutta.github.io/svg-pan-zoom/demo/custom-controls.html)
 
 How To Use
 ----------
