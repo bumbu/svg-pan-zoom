@@ -12,6 +12,7 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
 
   var optionsDefaults = {
     panEnabled: true // enable or disable panning (default enabled)
+  , enableDblClickZoom: true
   , dragEnabled: false // enable or disable dragging (default disabled)
   , controlIconsEnabled: false // insert icons to give user an option in addition to mouse events to control pan/zoom (default disabled)
   , zoomEnabled: true // enable or disable zooming (default enabled)
@@ -381,6 +382,10 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
       evt.preventDefault()
     } else {
       evt.returnValue = false
+    }
+
+    if(!this.options.enableDblClickZoom){
+      return false;
     }
 
     // Check if target was a control button

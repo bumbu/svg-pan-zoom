@@ -203,6 +203,7 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
 
   var optionsDefaults = {
     panEnabled: true // enable or disable panning (default enabled)
+  , enableDblClickZoom: true
   , dragEnabled: false // enable or disable dragging (default disabled)
   , controlIconsEnabled: false // insert icons to give user an option in addition to mouse events to control pan/zoom (default disabled)
   , zoomEnabled: true // enable or disable zooming (default enabled)
@@ -444,7 +445,7 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
    */
   SvgPanZoom.prototype.zoomAtPoint = function(svg, point, zoomScale, zoomAbsolute) {
     if (Utils.isFunction(this.options.beforeZoom)) {
-      this.options.beforeZoom()
+      this.options.beforeZoom(arguments)
     }
 
     var viewportCTM = this.viewport.getCTM()
@@ -530,10 +531,12 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
     var svg = (evt.target.tagName === 'svg' || evt.target.tagName === 'SVG') ? evt.target : evt.target.ownerSVGElement || evt.target.correspondingElement.ownerSVGElement
 
     var point;
+
     if (this.state === 'pan' && this.options.panEnabled) {
-      // Trigger beforePan
+
+        // Trigger beforePan
       if (Utils.isFunction(this.options.beforePan)) {
-        this.options.beforePan()
+        this.options.beforePan(arguments)
       }
 
       // Pan mode
@@ -573,6 +576,10 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
     } else {
       evt.returnValue = false
     }
+
+      if(!this.options.enableDblClickZoom){
+          return false;
+        }
 
     // Check if target was a control button
     if (this.options.controlIconsEnabled) {
