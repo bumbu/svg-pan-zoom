@@ -1,7 +1,7 @@
 svg-pan-zoom library
 ==========================
 
-Simple pan/zoom solution for SVGs in HTML. It adds events listeners for mouse scroll, double-click and drag, plus it optionally offers:
+Simple pan/zoom solution for SVGs in HTML. It adds events listeners for mouse scroll, double-click and pan, plus it optionally offers:
   * JavaScript API for control of pan and zoom behavior
   * onPan and onZoom event handlers
   * On-screen zoom controls
@@ -45,7 +45,6 @@ If you want to override the defaults, you can optionally specify one or more arg
 ```js
 svgPanZoom.init('#demo-tiger', {
   panEnabled: true
-, dragEnabled: false
 , controlIconsEnabled: false
 , zoomEnabled: true
 , dblClickZoomEnabled: true
@@ -63,7 +62,6 @@ svgPanZoom.init('#demo-tiger', {
 
 If any arguments are specified, they must have the following value types:
 * 'panEnabled' must be true or false. Default is true.
-* 'dragEnabled' must be true or false. Default is false.
 * 'controlIconsEnabled' must be true or false. Default is false.
 * 'zoomEnabled' must be true or false. Default is true.
 * 'dblClickZoomEnabled' must be true or false. Default is true.
@@ -89,9 +87,6 @@ When you call `svgPanZoom` method it returns an object with following methods:
 * getPan
 * setBeforePan
 * setOnPan
-* enableDrag
-* disableDrag
-* isDragEnabled
 * enableZoom
 * disableZoom
 * isZoomEnabled
@@ -161,7 +156,7 @@ panZoomTiger.resetZoom()
 
 If you want faster or slower zooming, you can override the default zoom increment with the setZoomScaleSensitivity method.
 
-To programmatically enable/disable pan, zoom or drag:
+To programmatically enable/disable pan or zoom:
 
 ```js
 // Get instance
@@ -172,9 +167,6 @@ panZoomTiger.disablePan();
 
 panZoomTiger.enableZoom();
 panZoomTiger.disableZoom();
-
-panZoomTiger.enableDrag();
-panZoomTiger.disableDrag();
 ```
 
 To fit and center:

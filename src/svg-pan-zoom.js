@@ -12,7 +12,6 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
 
   var optionsDefaults = {
     panEnabled: true // enable or disable panning (default enabled)
-  , dragEnabled: false // enable or disable dragging (default disabled)
   , controlIconsEnabled: false // insert icons to give user an option in addition to mouse events to control pan/zoom (default disabled)
   , zoomEnabled: true // enable or disable zooming (default enabled)
   , dblClickZoomEnabled: true // enable or disable zooming by double clicking (default enabled)
@@ -337,9 +336,6 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
       evt.returnValue = false
     }
 
-    var svg = (evt.target.tagName === 'svg' || evt.target.tagName === 'SVG') ? evt.target : evt.target.ownerSVGElement || evt.target.correspondingElement.ownerSVGElement
-
-    var point;
     if (this.state === 'pan' && this.options.panEnabled) {
       // Trigger beforePan
       if (Utils.isFunction(this.options.beforePan)) {
@@ -347,8 +343,8 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
       }
 
       // Pan mode
-      point = SvgUtils.getEventPoint(evt).matrixTransform(this.stateTf)
-      var viewportCTM = this.stateTf.inverse().translate(point.x - this.stateOrigin.x, point.y - this.stateOrigin.y)
+      var point = SvgUtils.getEventPoint(evt).matrixTransform(this.stateTf)
+        , viewportCTM = this.stateTf.inverse().translate(point.x - this.stateOrigin.x, point.y - this.stateOrigin.y)
 
       SvgUtils.setCTM(this.viewport, viewportCTM)
 
@@ -358,13 +354,6 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
 
       // Trigger onPan
       this.options.onPan(this._pan.x, this._pan.y)
-    } else if (this.state === 'drag' && this.options.dragEnabled) {
-      // Drag mode
-      point = SvgUtils.getEventPoint(evt).matrixTransform(this.viewport.getCTM().inverse())
-
-      SvgUtils.setCTM(this.stateTarget, svg.createSVGMatrix().translate(point.x - this.stateOrigin.x, point.y - this.stateOrigin.y).multiply(this.viewport.getCTM().inverse()).multiply(this.stateTarget.getCTM()))
-
-      this.stateOrigin = point;
     }
   }
 
@@ -422,20 +411,10 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
       evt.returnValue = false
     }
 
-    var svg = (evt.target.tagName === 'svg' || evt.target.tagName === 'SVG') ? evt.target : evt.target.ownerSVGElement || evt.target.correspondingElement.ownerSVGElement
-
-    if (evt.target.tagName === 'svg' || !this.options.dragEnabled) { // Pan anyway when drag is disabled and the user clicked on an element
-      // Pan mode
-      this.state = 'pan'
-      this.stateTf = this.viewport.getCTM().inverse()
-      this.stateOrigin = SvgUtils.getEventPoint(evt).matrixTransform(this.stateTf)
-    } else {
-      // Drag mode
-      this.state = 'drag'
-      this.stateTarget = evt.target
-      this.stateTf = this.viewport.getCTM().inverse()
-      this.stateOrigin = SvgUtils.getEventPoint(evt).matrixTransform(this.stateTf)
-    }
+    // Pan mode
+    this.state = 'pan'
+    this.stateTf = this.viewport.getCTM().inverse()
+    this.stateOrigin = SvgUtils.getEventPoint(evt).matrixTransform(this.stateTf)
   }
 
   /**
@@ -450,9 +429,7 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
       evt.returnValue = false
     }
 
-    var svg = (evt.target.tagName === 'svg' || evt.target.tagName === 'SVG') ? evt.target : evt.target.ownerSVGElement || evt.target.correspondingElement.ownerSVGElement
-
-    if (this.state === 'pan' || this.state === 'drag') {
+    if (this.state === 'pan') {
       // Quit pan mode
       this.state = 'none'
     }
@@ -569,10 +546,6 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
         // Pan event
       , setBeforePan: function(fn) {that.options.beforePan = Utils.proxy(fn, that.publicInstance)}
       , setOnPan: function(fn) {that.options.onPan = Utils.proxy(fn, that.publicInstance)}
-        // Drag
-      , enableDrag: function() {that.options.dragEnabled = true}
-      , disableDrag: function() {that.options.dragEnabled = false}
-      , isDragEnabled: function() {return !!that.options.dragEnabled}
         // Zoom and Control Icons
       , enableZoom: function() {
           if (that.options.controlIconsEnabled && !that.options.zoomEnabled) {
