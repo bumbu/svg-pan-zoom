@@ -18,7 +18,11 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
   , zoomScaleSensitivity: 0.2 // Zoom sensitivity
   , minZoom: 0.5 // Minimum Zoom level
   , maxZoom: 10 // Maximum Zoom level
+  , fit: true // enable or disable viewport fit in SVG (default true)
+  , center: true // enable or disable viewport centering in SVG (default true)
+  , beforeZoom: null
   , onZoom: function(){}
+  , beforePan: null
   , onPan: function(){}
   }
 
@@ -71,27 +75,24 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
   SvgPanZoom.prototype.processCTM = function() {
     var svgViewBox = this.svg.getAttribute('viewBox')
 
-    if (svgViewBox) {
-      var boundingClientRect = this.svg.getBoundingClientRect()
-        , viewBoxValues = svgViewBox.split(' ').map(parseFloat)
-        , viewBoxWidth = viewBoxValues[2]
-        , viewBoxHeight = viewBoxValues[3]
+    this.cacheViewBox()
+    this.svg.removeAttribute('viewBox')
 
-      this.svg.removeAttribute('viewBox');
-
+    if (this.options.fit) {
       var newCTM = this.viewport.getCTM()
-        , newScale = Math.min(this.width/viewBoxWidth, this.height/viewBoxHeight);
+        , newScale = Math.min(this.width/(this._viewBox.width - this._viewBox.x), this.height/(this._viewBox.height - this._viewBox.y));
 
       newCTM.a = newCTM.a * newScale; //x-scale
       newCTM.d = newCTM.d * newScale; //y-scale
-      newCTM.e = newCTM.e * newScale; //x-transform
-      newCTM.f = newCTM.f * newScale; //y-transform
+      newCTM.e = (newCTM.e - this._viewBox.x) * newScale; //x-transform
+      newCTM.f = (newCTM.f - this._viewBox.y) * newScale; //y-transform
       this.initialCTM = newCTM;
 
       // Update viewport CTM
       SvgUtils.setCTM(this.viewport, this.initialCTM);
-    }
-    else {
+    } else {
+      // Leave sizes as they are
+      this.svg.removeAttribute('viewBox')
       this.initialCTM = this.viewport.getCTM();
     }
 
@@ -101,6 +102,52 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
     // Cache pan level
     this._pan.x = this.initialCTM.e
     this._pan.y = this.initialCTM.f
+
+    if (this.options.center) {
+      this.center()
+    }
+  }
+
+  /**
+   * Cache initial viewBox value
+   * If nok viewBox is defined than use viewport sizes as viewBox values
+   */
+  SvgPanZoom.prototype.cacheViewBox = function() {
+    // ViewBox cache
+    this._viewBox = {x: 0, y: 0, width: 0, height: 0}
+
+    var svgViewBox = this.svg.getAttribute('viewBox')
+
+    if (svgViewBox) {
+      var viewBoxValues = svgViewBox.split(' ').map(parseFloat)
+
+      // Cache viewbox x and y offset
+      this._viewBox.x = viewBoxValues[0]
+      this._viewBox.y = viewBoxValues[1]
+      this._viewBox.width = viewBoxValues[2]
+      this._viewBox.height = viewBoxValues[3]
+    } else {
+      var boundingClientRect = this.viewport.getBoundingClientRect()
+
+      // Cache viewbox sizes
+      this._viewBox.width = boundingClientRect.width
+      this._viewBox.height = boundingClientRect.height
+    }
+  }
+
+  /**
+   * Recalculate viewport sizes and update viewBox cache
+   */
+  SvgPanZoom.prototype.recacheViewBox = function() {
+    var boundingClientRect = this.viewport.getBoundingClientRect()
+      , viewBoxWidth = boundingClientRect.width / this.getZoom()
+      , viewBoxHeight = boundingClientRect.height / this.getZoom()
+
+    // Cache viewbox
+    this._viewBox.x = 0
+    this._viewBox.y = 0
+    this._viewBox.width = viewBoxWidth
+    this._viewBox.height = viewBoxHeight
   }
 
   /**
@@ -205,6 +252,10 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
    *                               Otherwise, zoomScale is treated as a multiplied (e.g. 1.10 would zoom in 10%)
    */
   SvgPanZoom.prototype.zoomAtPoint = function(svg, point, zoomScale, zoomAbsolute) {
+    if (Utils.isFunction(this.options.beforeZoom)) {
+      this.options.beforeZoom()
+    }
+
     var viewportCTM = this.viewport.getCTM()
 
     point = point.matrixTransform(viewportCTM.inverse())
@@ -223,7 +274,7 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
       SvgUtils.setCTM(this.viewport, setZoom)
 
       // Cache zoom level
-      this._zoom = this.initialCTM.a
+      this._zoom = setZoom.a
     }
 
     if (!this.stateTf) {
@@ -262,12 +313,8 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
   }
 
   SvgPanZoom.prototype.resetZoom = function() {
-    SvgUtils.setCTM(this.viewport, this.initialCTM)
-
-    // Trigger onZoom
-    this.options.onZoom(this.initialCTM.a)
-    // Trigger onPan
-    this.options.onPan(this._pan.x, this._pan.y)
+    this.getPublicInstance().zoom(this.initialCTM.a)
+    this.getPublicInstance().pan({x: this.initialCTM.e, y: this.initialCTM.f})
 
     // Cache zoom level
     this._zoom = this.initialCTM.a
@@ -293,6 +340,11 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
 
     var point;
     if (this.state === 'pan' && this.options.panEnabled) {
+      // Trigger beforePan
+      if (Utils.isFunction(this.options.beforePan)) {
+        this.options.beforePan()
+      }
+
       // Pan mode
       point = SvgUtils.getEventPoint(evt).matrixTransform(this.stateTf)
       var viewportCTM = this.stateTf.inverse().translate(point.x - this.stateOrigin.x, point.y - this.stateOrigin.y)
@@ -406,11 +458,49 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
   }
 
   /**
+   * Adjust viewport size (only) so it will fit in SVG
+   * Does not center image
+   *
+   * @param  {bool} dropCache drop viewBox cache and recalculate SVG's viewport sizes. Default false
+   */
+  SvgPanZoom.prototype.fit = function(dropCache) {
+    if (dropCache) {
+      this.recacheViewBox()
+    }
+
+    var newScale = Math.min(this.width/(this._viewBox.width - this._viewBox.x), this.height/(this._viewBox.height - this._viewBox.y))
+
+    this.getPublicInstance().zoom(newScale)
+  }
+
+  /**
+   * Adjust viewport pan (only) so it will be centered in SVG
+   * Does not zoom/fit image
+   *
+   * @param  {bool} dropCache drop viewBox cache and recalculate SVG's viewport sizes. Default false
+   */
+  SvgPanZoom.prototype.center = function(dropCache) {
+    if (dropCache) {
+      this.recacheViewBox()
+    }
+
+    var offsetX = (this.width - (this._viewBox.width + this._viewBox.x) * this.getZoom()) * 0.5
+      , offsetY = (this.height - (this._viewBox.height + this._viewBox.y) * this.getZoom()) * 0.5
+
+    this.getPublicInstance().pan({x: offsetX, y: offsetY})
+  }
+
+  /**
    * Pan to a rendered position
    *
    * @param  {object} point {x: 0, y: 0}
    */
   SvgPanZoom.prototype.pan = function(point) {
+    // Trigger beforePan
+    if (Utils.isFunction(this.options.beforePan)) {
+      this.options.beforePan()
+    }
+
     var viewportCTM = this.viewport.getCTM()
     viewportCTM.e = point.x
     viewportCTM.f = point.y
@@ -430,6 +520,11 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
    * @param  {object} point {x: 0, y: 0}
    */
   SvgPanZoom.prototype.panBy = function(point) {
+    // Trigger beforePan
+    if (Utils.isFunction(this.options.beforePan)) {
+      this.options.beforePan()
+    }
+
     var viewportCTM = this.viewport.getCTM()
     viewportCTM.e += point.x
     viewportCTM.f += point.y
@@ -471,6 +566,7 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
       , panBy: function(point) {that.panBy(point)}
       , getPan: function() {return that.getPan()}
         // Pan event
+      , setBeforePan: function(fn) {that.options.beforePan = Utils.proxy(fn, that.publicInstance)}
       , setOnPan: function(fn) {that.options.onPan = Utils.proxy(fn, that.publicInstance)}
         // Drag
       , enableDrag: function() {that.options.dragEnabled = true}
@@ -508,6 +604,7 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
       , setMinZoom: function(zoom) {that.options.minZoom = zoom}
       , setMaxZoom: function(zoom) {that.options.maxZoom = zoom}
         // Zoom event
+      , setBeforeZoom: function(fn) {that.options.beforeZoom = Utils.proxy(fn, that.publicInstance)}
       , setOnZoom: function(fn) {that.options.onZoom = Utils.proxy(fn, that.publicInstance)}
         // Zooming
       , zoom: function(scale) {
@@ -530,6 +627,8 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
         }
       , resetZoom: function() {that.resetZoom()}
       , getZoom: function() {return that.getZoom()}
+      , fit: function(dropCache) {return that.fit(dropCache)}
+      , center: function(dropCache) {return that.center(dropCache)}
       }
     }
 

@@ -9,8 +9,9 @@ module.exports = {
   extend: function(target, source) {
     target = target || {};
     for (var prop in source) {
-      if (typeof source[prop] === 'object') {
-        target[prop] = extend(target[prop], source[prop])
+      // Go recursively
+      if (this.isObject(source[prop])) {
+        target[prop] = this.extend(target[prop], source[prop])
       } else {
         target[prop] = source[prop]
       }
@@ -29,6 +30,26 @@ module.exports = {
       typeof HTMLElement === "object" ? (o instanceof HTMLElement || o instanceof SVGElement || o instanceof SVGSVGElement) : //DOM2
       o && typeof o === "object" && o !== null && o.nodeType === 1 && typeof o.nodeName==="string"
     );
+  }
+
+  /**
+   * Checks if an object is an Object
+   *
+   * @param  {object}  o Object
+   * @return {Boolean}   returns true if object is an Object
+   */
+, isObject: function(o){
+    return Object.prototype.toString.call(o) === '[object Object]';
+  }
+
+  /**
+   * Checks if an object is a Function
+   *
+   * @param  {object}  f Function
+   * @return {Boolean}   returns true if object is a Function
+   */
+, isFunction: function(f){
+    return Object.prototype.toString.call(f) === '[object Function]';
   }
 
   /**
