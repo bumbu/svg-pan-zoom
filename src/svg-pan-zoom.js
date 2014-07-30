@@ -400,21 +400,21 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
    * @param {object} evt Event
    */
   SvgPanZoom.prototype.handleMouseDown = function(evt) {
-    // Double click detection; more consistent than ondblclick
-    if (evt.detail === 2 && this.options.dblClickZoomEnabled){
-      this.handleDblClick(evt)
-    }
-
     if (evt.preventDefault) {
       evt.preventDefault()
     } else {
       evt.returnValue = false
     }
 
-    // Pan mode
-    this.state = 'pan'
-    this.stateTf = this.viewport.getCTM().inverse()
-    this.stateOrigin = SvgUtils.getEventPoint(evt).matrixTransform(this.stateTf)
+    // Double click detection; more consistent than ondblclick
+    if (evt.detail === 2 && this.options.dblClickZoomEnabled){
+      this.handleDblClick(evt)
+    } else {
+      // Pan mode
+      this.state = 'pan'
+      this.stateTf = this.viewport.getCTM().inverse()
+      this.stateOrigin = SvgUtils.getEventPoint(evt).matrixTransform(this.stateTf)
+    }
   }
 
   /**
