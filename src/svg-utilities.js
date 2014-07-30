@@ -138,7 +138,7 @@ module.exports = {
    * @return {object}     point
    */
 , getRelativeMousePoint: function(svg, evt) {
-    Utils.mouseAndTouchNormalize(evt)
+    Utils.mouseAndTouchNormalize(evt, svg)
 
     var point = svg.createSVGPoint()
 
@@ -154,10 +154,10 @@ module.exports = {
    * @param {object} evt Event
    */
 , getEventPoint: function(evt) {
-    Utils.mouseAndTouchNormalize(evt)
-
     var svg = (evt.target.tagName === 'svg' || evt.target.tagName === 'SVG') ? evt.target : evt.target.ownerSVGElement || evt.target.correspondingElement.ownerSVGElement
       , point = svg.createSVGPoint()
+
+    Utils.mouseAndTouchNormalize(evt, svg)
 
     point.x = evt.clientX
     point.y = evt.clientY

@@ -132,13 +132,28 @@ module.exports = {
    *
    * @param  {object} evt Event object
    */
-, mouseAndTouchNormalize: function(evt) {
+, mouseAndTouchNormalize: function(evt, svg) {
     // If no cilentX and but touch objects are available
-    if (evt.clientX === void 0 && evt.touches !== void 0 && evt.touches.length) {
-      evt.clientX = evt.touches[0].clientX
-    }
-    if (evt.clientY === void 0 && evt.touches !== void 0 && evt.touches.length) {
-      evt.clientY = evt.touches[0].clientY
+    if (evt.clientX === void 0 || evt.clientX === null) {
+      // If it is a touch event
+      if (evt.changedTouches !== void 0 && evt.changedTouches.length) {
+        // If touch event has changedTouches
+        if (evt.changedTouches[0].clientX !== void 0) {
+          evt.clientX = evt.changedTouches[0].clientX
+          evt.clientY = evt.changedTouches[0].clientY
+        }
+        // If changedTouches has pageX attribute
+        else if (evt.changedTouches[0].pageX !== void 0) {
+          var rect = svg.getBoundingClientRect();
+
+          evt.clientX = evt.changedTouches[0].pageX - rect.left
+          evt.clientY = evt.changedTouches[0].pageY - rect.top
+        }
+      } else {
+        // Fallback
+        evt.clientX = 0
+        evt.clientY = 0
+      }
     }
   }
 }
