@@ -48,6 +48,7 @@ svgPanZoom.init('#demo-tiger', {
 , dragEnabled: false
 , controlIconsEnabled: false
 , zoomEnabled: true
+, dblClickZoomEnabled: true
 , zoomScaleSensitivity: 0.2
 , minZoom: 0.5
 , maxZoom: 10
@@ -65,6 +66,7 @@ If any arguments are specified, they must have the following value types:
 * 'dragEnabled' must be true or false. Default is false.
 * 'controlIconsEnabled' must be true or false. Default is false.
 * 'zoomEnabled' must be true or false. Default is true.
+* 'dblClickZoomEnabled' must be true or false. Default is true.
 * 'zoomScaleSensitivity' must be a scalar. Default is 0.2.
 * 'minZoom' must be a scalar. Default is 0.5.
 * 'maxZoom' must be a scalar. Default is 10.
@@ -96,6 +98,8 @@ When you call `svgPanZoom` method it returns an object with following methods:
 * enableControlIcons
 * disableControlIcons
 * isControlIconsEnabled
+* enableDblClickZoom
+* disableDblClickZoom
 * setZoomScaleSensitivity
 * setMinZoom
 * setMaxZoom

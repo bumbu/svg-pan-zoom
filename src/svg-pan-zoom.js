@@ -15,6 +15,7 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
   , dragEnabled: false // enable or disable dragging (default disabled)
   , controlIconsEnabled: false // insert icons to give user an option in addition to mouse events to control pan/zoom (default disabled)
   , zoomEnabled: true // enable or disable zooming (default enabled)
+  , dblClickZoomEnabled: true // enable or disable zooming by double clicking (default enabled)
   , zoomScaleSensitivity: 0.2 // Zoom sensitivity
   , minZoom: 0.5 // Minimum Zoom level
   , maxZoom: 10 // Maximum Zoom level
@@ -411,7 +412,7 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
    */
   SvgPanZoom.prototype.handleMouseDown = function(evt) {
     // Double click detection; more consistent than ondblclick
-    if (evt.detail === 2){
+    if (evt.detail === 2 && this.options.dblClickZoomEnabled){
       this.handleDblClick(evt)
     }
 
@@ -599,6 +600,9 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
           }
         }
       , isControlIconsEnabled: function() {return !!that.options.controlIconsEnabled}
+        // Double click zoom
+      , enableDblClickZoom: function() {that.options.dblClickZoomEnabled = true}
+      , disableDblClickZoom: function() {that.options.dblClickZoomEnabled = false}
         // Zoom scale and bounds
       , setZoomScaleSensitivity: function(scale) {that.options.zoomScaleSensitivity = scale}
       , setMinZoom: function(zoom) {that.options.minZoom = zoom}
