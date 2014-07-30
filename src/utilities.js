@@ -126,4 +126,60 @@ module.exports = {
 , getType: function(o) {
     return Object.prototype.toString.apply(o).replace(/^\[object\s/, '').replace(/\]$/, '')
   }
+
+  /**
+   * If it is a touch event than add clientX and clientY to event object
+   *
+   * @param  {object} evt Event object
+   */
+, mouseAndTouchNormalize: function(evt, svg) {
+    // If no cilentX and but touch objects are available
+    if (evt.clientX === void 0 || evt.clientX === null) {
+      // If it is a touch event
+      if (evt.changedTouches !== void 0 && evt.changedTouches.length) {
+        // If touch event has changedTouches
+        if (evt.changedTouches[0].clientX !== void 0) {
+          evt.clientX = evt.changedTouches[0].clientX
+          evt.clientY = evt.changedTouches[0].clientY
+        }
+        // If changedTouches has pageX attribute
+        else if (evt.changedTouches[0].pageX !== void 0) {
+          var rect = svg.getBoundingClientRect();
+
+          evt.clientX = evt.changedTouches[0].pageX - rect.left
+          evt.clientY = evt.changedTouches[0].pageY - rect.top
+        }
+      } else {
+        // Fallback
+        evt.clientX = 0
+        evt.clientY = 0
+      }
+    }
+  }
+
+  /**
+   * Check if an event is a double click/tap
+   * TODO: For touch gestures use a library (hammer.js) that takes in account other events
+   * (touchmove and touchend). It should take in account tap duration and traveled distance
+   *
+   * @param  {object}  evt     Event
+   * @param  {object}  prevEvt Previous Event
+   * @return {Boolean}         [description]
+   */
+, isDblClick: function(evt, prevEvt) {
+    // Double click detected by browser
+    if (evt.detail === 2) {
+      return true;
+    }
+    // Try to compare events
+    else if (prevEvt !== void 0 && prevEvt !== null) {
+      var timeStampDiff = evt.timeStamp - prevEvt.timeStamp // should be lower than 250 ms
+        , touchesDistance = Math.sqrt(Math.pow(evt.clientX - prevEvt.clientX, 2) + Math.pow(evt.clientY - prevEvt.clientY, 2))
+
+      return timeStampDiff < 250 && touchesDistance < 10
+    }
+
+    // Nothing found
+    return false;
+  }
 }

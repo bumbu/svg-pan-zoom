@@ -38,6 +38,7 @@ module.exports = {
     zoomIn.setAttribute('transform', 'translate(30.5 5) scale(0.015)');
     zoomIn.setAttribute('class', 'svg-pan-zoom-control');
     zoomIn.addEventListener('click', function() {instance.getPublicInstance().zoomIn()}, false)
+    zoomIn.addEventListener('touchstart', function() {instance.getPublicInstance().zoomIn()}, false)
 
     var zoomInBackground = document.createElementNS('http://www.w3.org/2000/svg', 'rect'); // TODO change these background space fillers to rounded rectangles so they look prettier
     zoomInBackground.setAttribute('x', '0');
@@ -62,6 +63,7 @@ module.exports = {
     resetPanZoomControl.setAttribute('transform', 'translate(5 35) scale(0.4)');
     resetPanZoomControl.setAttribute('class', 'svg-pan-zoom-control');
     resetPanZoomControl.addEventListener('click', function() {instance.getPublicInstance().resetZoom()}, false);
+    resetPanZoomControl.addEventListener('touchstart', function() {instance.getPublicInstance().resetZoom()}, false);
 
     var resetPanZoomControlBackground = document.createElementNS('http://www.w3.org/2000/svg', 'rect'); // TODO change these background space fillers to rounded rectangles so they look prettier
     resetPanZoomControlBackground.setAttribute('x', '2');
@@ -91,6 +93,7 @@ module.exports = {
     zoomOut.setAttribute('transform', 'translate(30.5 70) scale(0.015)');
     zoomOut.setAttribute('class', 'svg-pan-zoom-control');
     zoomOut.addEventListener('click', function() {instance.getPublicInstance().zoomOut()}, false);
+    zoomOut.addEventListener('touchstart', function() {instance.getPublicInstance().zoomOut()}, false);
 
     var zoomOutBackground = document.createElementNS('http://www.w3.org/2000/svg', 'rect'); // TODO change these background space fillers to rounded rectangles so they look prettier
     zoomOutBackground.setAttribute('x', '0');
@@ -203,9 +206,9 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
 
   var optionsDefaults = {
     panEnabled: true // enable or disable panning (default enabled)
-  , dragEnabled: false // enable or disable dragging (default disabled)
   , controlIconsEnabled: false // insert icons to give user an option in addition to mouse events to control pan/zoom (default disabled)
   , zoomEnabled: true // enable or disable zooming (default enabled)
+  , dblClickZoomEnabled: true // enable or disable zooming by double clicking (default enabled)
   , zoomScaleSensitivity: 0.2 // Zoom sensitivity
   , minZoom: 0.5 // Minimum Zoom level
   , maxZoom: 10 // Maximum Zoom level
@@ -346,13 +349,17 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
    */
   SvgPanZoom.prototype.setupHandlers = function() {
     var that = this
+      , prevEvt = null // use for touchstart event to detect double tap
+      ;
 
     // Mouse down group
     this.svg.addEventListener("mousedown", function(evt) {
-      return that.handleMouseDown(evt);
+      return that.handleMouseDown(evt, null);
     }, false);
     this.svg.addEventListener("touchstart", function(evt) {
-      return that.handleMouseDown(evt);
+      var result = that.handleMouseDown(evt, prevEvt);
+      prevEvt = evt
+      return result;
     }, false);
 
     // Mouse up group
@@ -527,9 +534,6 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
       evt.returnValue = false
     }
 
-    var svg = (evt.target.tagName === 'svg' || evt.target.tagName === 'SVG') ? evt.target : evt.target.ownerSVGElement || evt.target.correspondingElement.ownerSVGElement
-
-    var point;
     if (this.state === 'pan' && this.options.panEnabled) {
       // Trigger beforePan
       if (Utils.isFunction(this.options.beforePan)) {
@@ -537,8 +541,8 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
       }
 
       // Pan mode
-      point = SvgUtils.getEventPoint(evt).matrixTransform(this.stateTf)
-      var viewportCTM = this.stateTf.inverse().translate(point.x - this.stateOrigin.x, point.y - this.stateOrigin.y)
+      var point = SvgUtils.getEventPoint(evt).matrixTransform(this.stateTf)
+        , viewportCTM = this.stateTf.inverse().translate(point.x - this.stateOrigin.x, point.y - this.stateOrigin.y)
 
       SvgUtils.setCTM(this.viewport, viewportCTM)
 
@@ -548,13 +552,6 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
 
       // Trigger onPan
       this.options.onPan(this._pan.x, this._pan.y)
-    } else if (this.state === 'drag' && this.options.dragEnabled) {
-      // Drag mode
-      point = SvgUtils.getEventPoint(evt).matrixTransform(this.viewport.getCTM().inverse())
-
-      SvgUtils.setCTM(this.stateTarget, svg.createSVGMatrix().translate(point.x - this.stateOrigin.x, point.y - this.stateOrigin.y).multiply(this.viewport.getCTM().inverse()).multiply(this.stateTarget.getCTM()))
-
-      this.stateOrigin = point;
     }
   }
 
@@ -600,12 +597,7 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
    *
    * @param {object} evt Event
    */
-  SvgPanZoom.prototype.handleMouseDown = function(evt) {
-    // Double click detection; more consistent than ondblclick
-    if (evt.detail === 2){
-      this.handleDblClick(evt)
-    }
-
+  SvgPanZoom.prototype.handleMouseDown = function(evt, prevEvt) {
     if (evt.preventDefault) {
       evt.preventDefault()
     } else {
@@ -613,16 +605,14 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
     }
 
     var svg = (evt.target.tagName === 'svg' || evt.target.tagName === 'SVG') ? evt.target : evt.target.ownerSVGElement || evt.target.correspondingElement.ownerSVGElement
+    Utils.mouseAndTouchNormalize(evt, svg)
 
-    if (evt.target.tagName === 'svg' || !this.options.dragEnabled) { // Pan anyway when drag is disabled and the user clicked on an element
+    // Double click detection; more consistent than ondblclick
+    if (this.options.dblClickZoomEnabled && Utils.isDblClick(evt, prevEvt)){
+      this.handleDblClick(evt)
+    } else {
       // Pan mode
       this.state = 'pan'
-      this.stateTf = this.viewport.getCTM().inverse()
-      this.stateOrigin = SvgUtils.getEventPoint(evt).matrixTransform(this.stateTf)
-    } else {
-      // Drag mode
-      this.state = 'drag'
-      this.stateTarget = evt.target
       this.stateTf = this.viewport.getCTM().inverse()
       this.stateOrigin = SvgUtils.getEventPoint(evt).matrixTransform(this.stateTf)
     }
@@ -640,9 +630,7 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
       evt.returnValue = false
     }
 
-    var svg = (evt.target.tagName === 'svg' || evt.target.tagName === 'SVG') ? evt.target : evt.target.ownerSVGElement || evt.target.correspondingElement.ownerSVGElement
-
-    if (this.state === 'pan' || this.state === 'drag') {
+    if (this.state === 'pan') {
       // Quit pan mode
       this.state = 'none'
     }
@@ -759,10 +747,6 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
         // Pan event
       , setBeforePan: function(fn) {that.options.beforePan = Utils.proxy(fn, that.publicInstance)}
       , setOnPan: function(fn) {that.options.onPan = Utils.proxy(fn, that.publicInstance)}
-        // Drag
-      , enableDrag: function() {that.options.dragEnabled = true}
-      , disableDrag: function() {that.options.dragEnabled = false}
-      , isDragEnabled: function() {return !!that.options.dragEnabled}
         // Zoom and Control Icons
       , enableZoom: function() {
           if (that.options.controlIconsEnabled && !that.options.zoomEnabled) {
@@ -790,6 +774,9 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
           }
         }
       , isControlIconsEnabled: function() {return !!that.options.controlIconsEnabled}
+        // Double click zoom
+      , enableDblClickZoom: function() {that.options.dblClickZoomEnabled = true}
+      , disableDblClickZoom: function() {that.options.dblClickZoomEnabled = false}
         // Zoom scale and bounds
       , setZoomScaleSensitivity: function(scale) {that.options.zoomScaleSensitivity = scale}
       , setMinZoom: function(zoom) {that.options.minZoom = zoom}
@@ -860,6 +847,8 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
 })(window, document)
 
 },{"./control-icons":1,"./mousewheel":2,"./svg-utilities":4,"./utilities":5}],4:[function(require,module,exports){
+var Utils = require('./utilities');
+
 module.exports = {
   /**
    * Get svg dimensions: width and height
@@ -1006,6 +995,8 @@ module.exports = {
    * @return {object}     point
    */
 , getRelativeMousePoint: function(svg, evt) {
+    Utils.mouseAndTouchNormalize(evt, svg)
+
     var point = svg.createSVGPoint()
 
     point.x = evt.clientX
@@ -1022,6 +1013,8 @@ module.exports = {
 , getEventPoint: function(evt) {
     var svg = (evt.target.tagName === 'svg' || evt.target.tagName === 'SVG') ? evt.target : evt.target.ownerSVGElement || evt.target.correspondingElement.ownerSVGElement
       , point = svg.createSVGPoint()
+
+    Utils.mouseAndTouchNormalize(evt, svg)
 
     point.x = evt.clientX
     point.y = evt.clientY
@@ -1048,7 +1041,7 @@ module.exports = {
   }
 }
 
-},{}],5:[function(require,module,exports){
+},{"./utilities":5}],5:[function(require,module,exports){
 module.exports = {
   /**
    * Extends an object
@@ -1176,6 +1169,62 @@ module.exports = {
    */
 , getType: function(o) {
     return Object.prototype.toString.apply(o).replace(/^\[object\s/, '').replace(/\]$/, '')
+  }
+
+  /**
+   * If it is a touch event than add clientX and clientY to event object
+   *
+   * @param  {object} evt Event object
+   */
+, mouseAndTouchNormalize: function(evt, svg) {
+    // If no cilentX and but touch objects are available
+    if (evt.clientX === void 0 || evt.clientX === null) {
+      // If it is a touch event
+      if (evt.changedTouches !== void 0 && evt.changedTouches.length) {
+        // If touch event has changedTouches
+        if (evt.changedTouches[0].clientX !== void 0) {
+          evt.clientX = evt.changedTouches[0].clientX
+          evt.clientY = evt.changedTouches[0].clientY
+        }
+        // If changedTouches has pageX attribute
+        else if (evt.changedTouches[0].pageX !== void 0) {
+          var rect = svg.getBoundingClientRect();
+
+          evt.clientX = evt.changedTouches[0].pageX - rect.left
+          evt.clientY = evt.changedTouches[0].pageY - rect.top
+        }
+      } else {
+        // Fallback
+        evt.clientX = 0
+        evt.clientY = 0
+      }
+    }
+  }
+
+  /**
+   * Check if an event is a double click/tap
+   * TODO: For touch gestures use a library (hammer.js) that takes in account other events
+   * (touchmove and touchend). It should take in account tap duration and traveled distance
+   *
+   * @param  {object}  evt     Event
+   * @param  {object}  prevEvt Previous Event
+   * @return {Boolean}         [description]
+   */
+, isDblClick: function(evt, prevEvt) {
+    // Double click detected by browser
+    if (evt.detail === 2) {
+      return true;
+    }
+    // Try to compare events
+    else if (prevEvt !== void 0 && prevEvt !== null) {
+      var timeStampDiff = evt.timeStamp - prevEvt.timeStamp // should be lower than 250 ms
+        , touchesDistance = Math.sqrt(Math.pow(evt.clientX - prevEvt.clientX, 2) + Math.pow(evt.clientY - prevEvt.clientY, 2))
+
+      return timeStampDiff < 250 && touchesDistance < 10
+    }
+
+    // Nothing found
+    return false;
   }
 }
 

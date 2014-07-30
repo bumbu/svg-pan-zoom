@@ -37,6 +37,7 @@ module.exports = {
     zoomIn.setAttribute('transform', 'translate(30.5 5) scale(0.015)');
     zoomIn.setAttribute('class', 'svg-pan-zoom-control');
     zoomIn.addEventListener('click', function() {instance.getPublicInstance().zoomIn()}, false)
+    zoomIn.addEventListener('touchstart', function() {instance.getPublicInstance().zoomIn()}, false)
 
     var zoomInBackground = document.createElementNS('http://www.w3.org/2000/svg', 'rect'); // TODO change these background space fillers to rounded rectangles so they look prettier
     zoomInBackground.setAttribute('x', '0');
@@ -61,6 +62,7 @@ module.exports = {
     resetPanZoomControl.setAttribute('transform', 'translate(5 35) scale(0.4)');
     resetPanZoomControl.setAttribute('class', 'svg-pan-zoom-control');
     resetPanZoomControl.addEventListener('click', function() {instance.getPublicInstance().resetZoom()}, false);
+    resetPanZoomControl.addEventListener('touchstart', function() {instance.getPublicInstance().resetZoom()}, false);
 
     var resetPanZoomControlBackground = document.createElementNS('http://www.w3.org/2000/svg', 'rect'); // TODO change these background space fillers to rounded rectangles so they look prettier
     resetPanZoomControlBackground.setAttribute('x', '2');
@@ -90,6 +92,7 @@ module.exports = {
     zoomOut.setAttribute('transform', 'translate(30.5 70) scale(0.015)');
     zoomOut.setAttribute('class', 'svg-pan-zoom-control');
     zoomOut.addEventListener('click', function() {instance.getPublicInstance().zoomOut()}, false);
+    zoomOut.addEventListener('touchstart', function() {instance.getPublicInstance().zoomOut()}, false);
 
     var zoomOutBackground = document.createElementNS('http://www.w3.org/2000/svg', 'rect'); // TODO change these background space fillers to rounded rectangles so they look prettier
     zoomOutBackground.setAttribute('x', '0');

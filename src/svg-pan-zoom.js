@@ -12,9 +12,9 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
 
   var optionsDefaults = {
     panEnabled: true // enable or disable panning (default enabled)
-  , dragEnabled: false // enable or disable dragging (default disabled)
   , controlIconsEnabled: false // insert icons to give user an option in addition to mouse events to control pan/zoom (default disabled)
   , zoomEnabled: true // enable or disable zooming (default enabled)
+  , dblClickZoomEnabled: true // enable or disable zooming by double clicking (default enabled)
   , zoomScaleSensitivity: 0.2 // Zoom sensitivity
   , minZoom: 0.5 // Minimum Zoom level
   , maxZoom: 10 // Maximum Zoom level
@@ -155,13 +155,17 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
    */
   SvgPanZoom.prototype.setupHandlers = function() {
     var that = this
+      , prevEvt = null // use for touchstart event to detect double tap
+      ;
 
     // Mouse down group
     this.svg.addEventListener("mousedown", function(evt) {
-      return that.handleMouseDown(evt);
+      return that.handleMouseDown(evt, null);
     }, false);
     this.svg.addEventListener("touchstart", function(evt) {
-      return that.handleMouseDown(evt);
+      var result = that.handleMouseDown(evt, prevEvt);
+      prevEvt = evt
+      return result;
     }, false);
 
     // Mouse up group
@@ -336,9 +340,6 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
       evt.returnValue = false
     }
 
-    var svg = (evt.target.tagName === 'svg' || evt.target.tagName === 'SVG') ? evt.target : evt.target.ownerSVGElement || evt.target.correspondingElement.ownerSVGElement
-
-    var point;
     if (this.state === 'pan' && this.options.panEnabled) {
       // Trigger beforePan
       if (Utils.isFunction(this.options.beforePan)) {
@@ -346,8 +347,8 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
       }
 
       // Pan mode
-      point = SvgUtils.getEventPoint(evt).matrixTransform(this.stateTf)
-      var viewportCTM = this.stateTf.inverse().translate(point.x - this.stateOrigin.x, point.y - this.stateOrigin.y)
+      var point = SvgUtils.getEventPoint(evt).matrixTransform(this.stateTf)
+        , viewportCTM = this.stateTf.inverse().translate(point.x - this.stateOrigin.x, point.y - this.stateOrigin.y)
 
       SvgUtils.setCTM(this.viewport, viewportCTM)
 
@@ -357,13 +358,6 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
 
       // Trigger onPan
       this.options.onPan(this._pan.x, this._pan.y)
-    } else if (this.state === 'drag' && this.options.dragEnabled) {
-      // Drag mode
-      point = SvgUtils.getEventPoint(evt).matrixTransform(this.viewport.getCTM().inverse())
-
-      SvgUtils.setCTM(this.stateTarget, svg.createSVGMatrix().translate(point.x - this.stateOrigin.x, point.y - this.stateOrigin.y).multiply(this.viewport.getCTM().inverse()).multiply(this.stateTarget.getCTM()))
-
-      this.stateOrigin = point;
     }
   }
 
@@ -409,12 +403,7 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
    *
    * @param {object} evt Event
    */
-  SvgPanZoom.prototype.handleMouseDown = function(evt) {
-    // Double click detection; more consistent than ondblclick
-    if (evt.detail === 2){
-      this.handleDblClick(evt)
-    }
-
+  SvgPanZoom.prototype.handleMouseDown = function(evt, prevEvt) {
     if (evt.preventDefault) {
       evt.preventDefault()
     } else {
@@ -422,16 +411,14 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
     }
 
     var svg = (evt.target.tagName === 'svg' || evt.target.tagName === 'SVG') ? evt.target : evt.target.ownerSVGElement || evt.target.correspondingElement.ownerSVGElement
+    Utils.mouseAndTouchNormalize(evt, svg)
 
-    if (evt.target.tagName === 'svg' || !this.options.dragEnabled) { // Pan anyway when drag is disabled and the user clicked on an element
+    // Double click detection; more consistent than ondblclick
+    if (this.options.dblClickZoomEnabled && Utils.isDblClick(evt, prevEvt)){
+      this.handleDblClick(evt)
+    } else {
       // Pan mode
       this.state = 'pan'
-      this.stateTf = this.viewport.getCTM().inverse()
-      this.stateOrigin = SvgUtils.getEventPoint(evt).matrixTransform(this.stateTf)
-    } else {
-      // Drag mode
-      this.state = 'drag'
-      this.stateTarget = evt.target
       this.stateTf = this.viewport.getCTM().inverse()
       this.stateOrigin = SvgUtils.getEventPoint(evt).matrixTransform(this.stateTf)
     }
@@ -449,9 +436,7 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
       evt.returnValue = false
     }
 
-    var svg = (evt.target.tagName === 'svg' || evt.target.tagName === 'SVG') ? evt.target : evt.target.ownerSVGElement || evt.target.correspondingElement.ownerSVGElement
-
-    if (this.state === 'pan' || this.state === 'drag') {
+    if (this.state === 'pan') {
       // Quit pan mode
       this.state = 'none'
     }
@@ -568,10 +553,6 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
         // Pan event
       , setBeforePan: function(fn) {that.options.beforePan = Utils.proxy(fn, that.publicInstance)}
       , setOnPan: function(fn) {that.options.onPan = Utils.proxy(fn, that.publicInstance)}
-        // Drag
-      , enableDrag: function() {that.options.dragEnabled = true}
-      , disableDrag: function() {that.options.dragEnabled = false}
-      , isDragEnabled: function() {return !!that.options.dragEnabled}
         // Zoom and Control Icons
       , enableZoom: function() {
           if (that.options.controlIconsEnabled && !that.options.zoomEnabled) {
@@ -599,6 +580,9 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
           }
         }
       , isControlIconsEnabled: function() {return !!that.options.controlIconsEnabled}
+        // Double click zoom
+      , enableDblClickZoom: function() {that.options.dblClickZoomEnabled = true}
+      , disableDblClickZoom: function() {that.options.dblClickZoomEnabled = false}
         // Zoom scale and bounds
       , setZoomScaleSensitivity: function(scale) {that.options.zoomScaleSensitivity = scale}
       , setMinZoom: function(zoom) {that.options.minZoom = zoom}
