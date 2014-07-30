@@ -76,9 +76,17 @@ module.exports = {
 
 , setupSvgAttributes: function(svg) {
     // Setting default attributes
-    svg.setAttribute('xmlns', 'http://www.w3.org/1999/xlink');
-    svg.setAttributeNS('xmlns', 'xlink', 'http://www.w3.org/1999/xlink');
-    svg.setAttributeNS('xmlns', 'ev', 'http://www.w3.org/2001/xml-events');
+    // TODO the svgNS value is repeated in the codebase. It should be defined once.
+    var svgNS = 'http://www.w3.org/2000/svg'
+      , xlinkNS = 'http://www.w3.org/1999/xlink'
+      , xmlNS = 'http://www.w3.org/XML/1998/namespace'
+      , xmlnsNS = 'http://www.w3.org/2000/xmlns/'
+      , evNS = 'http://www.w3.org/2001/xml-events'
+      ;
+
+    svg.setAttribute('xmlns', svgNS);
+    svg.setAttributeNS(xmlnsNS, 'xmlns:xlink', xlinkNS);
+    svg.setAttributeNS(xmlnsNS, 'xmlns:ev', evNS);
 
     // Needed for Internet Explorer, otherwise the viewport overflows
     if (svg.parentNode !== null) {
