@@ -155,13 +155,17 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
    */
   SvgPanZoom.prototype.setupHandlers = function() {
     var that = this
+      , prevEvt = null // use for touchstart event to detect double tap
+      ;
 
     // Mouse down group
     this.svg.addEventListener("mousedown", function(evt) {
-      return that.handleMouseDown(evt);
+      return that.handleMouseDown(evt, null);
     }, false);
     this.svg.addEventListener("touchstart", function(evt) {
-      return that.handleMouseDown(evt);
+      var result = that.handleMouseDown(evt, prevEvt);
+      prevEvt = evt
+      return result;
     }, false);
 
     // Mouse up group
@@ -399,15 +403,18 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
    *
    * @param {object} evt Event
    */
-  SvgPanZoom.prototype.handleMouseDown = function(evt) {
+  SvgPanZoom.prototype.handleMouseDown = function(evt, prevEvt) {
     if (evt.preventDefault) {
       evt.preventDefault()
     } else {
       evt.returnValue = false
     }
 
+    var svg = (evt.target.tagName === 'svg' || evt.target.tagName === 'SVG') ? evt.target : evt.target.ownerSVGElement || evt.target.correspondingElement.ownerSVGElement
+    Utils.mouseAndTouchNormalize(evt, svg)
+
     // Double click detection; more consistent than ondblclick
-    if (evt.detail === 2 && this.options.dblClickZoomEnabled){
+    if (this.options.dblClickZoomEnabled && Utils.isDblClick(evt, prevEvt)){
       this.handleDblClick(evt)
     } else {
       // Pan mode
