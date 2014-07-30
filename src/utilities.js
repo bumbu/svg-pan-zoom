@@ -126,4 +126,19 @@ module.exports = {
 , getType: function(o) {
     return Object.prototype.toString.apply(o).replace(/^\[object\s/, '').replace(/\]$/, '')
   }
+
+  /**
+   * If it is a touch event than add clientX and clientY to event object
+   *
+   * @param  {object} evt Event object
+   */
+, mouseAndTouchNormalize: function(evt) {
+    // If no cilentX and but touch objects are available
+    if (evt.clientX === void 0 && evt.touches !== void 0 && evt.touches.length) {
+      evt.clientX = evt.touches[0].clientX
+    }
+    if (evt.clientY === void 0 && evt.touches !== void 0 && evt.touches.length) {
+      evt.clientY = evt.touches[0].clientY
+    }
+  }
 }

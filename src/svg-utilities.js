@@ -1,3 +1,5 @@
+var Utils = require('./utilities');
+
 module.exports = {
   /**
    * Get svg dimensions: width and height
@@ -136,6 +138,8 @@ module.exports = {
    * @return {object}     point
    */
 , getRelativeMousePoint: function(svg, evt) {
+    Utils.mouseAndTouchNormalize(evt)
+
     var point = svg.createSVGPoint()
 
     point.x = evt.clientX
@@ -150,6 +154,8 @@ module.exports = {
    * @param {object} evt Event
    */
 , getEventPoint: function(evt) {
+    Utils.mouseAndTouchNormalize(evt)
+
     var svg = (evt.target.tagName === 'svg' || evt.target.tagName === 'SVG') ? evt.target : evt.target.ownerSVGElement || evt.target.correspondingElement.ownerSVGElement
       , point = svg.createSVGPoint()
 
