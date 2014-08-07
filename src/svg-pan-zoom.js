@@ -279,6 +279,10 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
 
       // Cache zoom level
       this._zoom = setZoom.a
+
+      // Cache new pan coordinates
+      this._pan.x = setZoom.e
+      this._pan.y = setZoom.f
     }
 
     if (!this.stateTf) {
