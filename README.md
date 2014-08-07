@@ -110,6 +110,7 @@ When you call `svgPanZoom` method it returns an object with following methods:
 * getZoom
 * fit
 * center
+* resize
 
 To programmatically pan, call the pan method with vector as first argument:
 
@@ -177,6 +178,17 @@ var panZoomTiger = svgPanZoom('#demo-tiger');
 
 panZoomTiger.fit();
 panZoomTiger.center();
+```
+
+If you want to fit and center your SVG after its container resize:
+
+```js
+// Get instance
+var panZoomTiger = svgPanZoom('#demo-tiger');
+
+panZoomTiger.resize(); // update SVG cached size and controls positions
+panZoomTiger.fit(true); // dropCache and fit
+panZoomTiger.center(true); // dropCache and center
 ```
 
 Related Work

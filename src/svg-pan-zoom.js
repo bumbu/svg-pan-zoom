@@ -534,6 +534,22 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
   }
 
   /**
+   * Recalculates cached svg dimensions and controls position
+   */
+  SvgPanZoom.prototype.resize = function() {
+    // Get dimensions
+    var dimensions = SvgUtils.getSvgDimensions(this.svg)
+    this.width = dimensions.width
+    this.height = dimensions.height
+
+    // Reposition control icons by re-enabling them
+    if (this.options.controlIconsEnabled) {
+      this.getPublicInstance().disableControlIcons()
+      this.getPublicInstance().enableControlIcons()
+    }
+  }
+
+  /**
    * Returns a public instance object
    * @return {object} Public instance object
    */
@@ -613,6 +629,7 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
       , getZoom: function() {return that.getZoom()}
       , fit: function(dropCache) {return that.fit(dropCache)}
       , center: function(dropCache) {return that.center(dropCache)}
+      , resize: function() {that.resize()}
       }
     }
 
