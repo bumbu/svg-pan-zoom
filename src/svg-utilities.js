@@ -54,18 +54,19 @@ module.exports = {
   }
 
   /**
-   * Gets g.viewport element or creates it if it doesn't exist
+   * Gets g#viewport element or creates it if it doesn't exist
    * @param  {object} svg
    * @return {object}     g element
    */
 , getOrCreateViewport: function(svg) {
-    var viewport = svg.querySelector('g.viewport')
+    var viewport = svg.querySelector('g#viewport')
 
     // If no g container with id 'viewport' exists, create one
     if (!viewport) {
-      var viewport = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-      viewport.setAttribute('class', 'viewport');
+      viewport = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      viewport.setAttribute('id', 'viewport');
 
+      // Internet Explorer (all versions?) can't use childNodes, but other browsers prefer (require?) using childNodes
       var svgChildren = svg.childNodes || svg.children;
       do {
         viewport.appendChild(svgChildren[0]);
@@ -80,15 +81,21 @@ module.exports = {
     // Setting default attributes
     // TODO the svgNS value is repeated in the codebase. It should be defined once.
     var svgNS = 'http://www.w3.org/2000/svg'
-      , xlinkNS = 'http://www.w3.org/1999/xlink'
       , xmlNS = 'http://www.w3.org/XML/1998/namespace'
       , xmlnsNS = 'http://www.w3.org/2000/xmlns/'
+      , xlinkNS = 'http://www.w3.org/1999/xlink'
       , evNS = 'http://www.w3.org/2001/xml-events'
       ;
 
-    svg.setAttribute('xmlns', svgNS);
-    svg.setAttributeNS(xmlnsNS, 'xmlns:xlink', xlinkNS);
-    svg.setAttributeNS(xmlnsNS, 'xmlns:ev', evNS);
+    if (!svg.getAttribute('xmlns')) {
+      svg.setAttribute('xmlns', svgNS);
+    }
+    if (!svg.getAttributeNS(xmlnsNS, 'xmlns:xlink')) {
+      svg.setAttributeNS(xmlnsNS, 'xmlns:xlink', xlinkNS);
+    }
+    if (!svg.getAttributeNS(xmlnsNS, 'xmlns:ev')) {
+      svg.setAttributeNS(xmlnsNS, 'xmlns:ev', evNS);
+    }
 
     // Needed for Internet Explorer, otherwise the viewport overflows
     if (svg.parentNode !== null) {
