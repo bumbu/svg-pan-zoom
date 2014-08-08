@@ -1,7 +1,12 @@
 {
   "name": "svg-pan-zoom",
+<<<<<<< HEAD
+  "version": "2.3.2",
+  "main": "./src/svg-pan-zoom.js",
+=======
   "version": "2.3.3",
   "main": "svg-pan-zoom.js",
+>>>>>>> 66196fd6cc80b439f3a5fa764f2f7d5a16e61f45
   "license": "BSD",
   "devDependencies": {
     "gulp": "~3.5.0",

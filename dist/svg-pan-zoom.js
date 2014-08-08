@@ -466,8 +466,8 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
       setZoom.a = setZoom.d = zoomScale
     }
 
-    if (setZoom.a < this.options.minZoom * this.initialCTM.a) {setZoom.a = setZoom.d = wasZoom.a}
-    if (setZoom.a > this.options.maxZoom * this.initialCTM.a) {setZoom.a = setZoom.d = wasZoom.a}
+    if (setZoom.a < this.options.minZoom * this.initialCTM.a) {setZoom.a = setZoom.d = this.options.minZoom * this.initialCTM.a}
+    if (setZoom.a > this.options.maxZoom * this.initialCTM.a) {setZoom.a = setZoom.d = this.options.maxZoom * this.initialCTM.a}
     if (setZoom.a !== wasZoom.a) {
       SvgUtils.setCTM(this.viewport, setZoom)
 
