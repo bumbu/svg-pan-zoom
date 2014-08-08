@@ -648,7 +648,7 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
    */
   var instancesStore = []
 
-  window.svgPanZoom = function(elementOrSelector, options){
+  var svgPanZoom = function(elementOrSelector, options){
     var svg = Utils.getSvg(elementOrSelector)
 
     if (svg === null) {
@@ -670,5 +670,20 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
       // Return just pushed instance
       return instancesStore[instancesStore.length - 1].instance.getPublicInstance()
     }
+  }
+
+  // AMD/CMD module definition
+  // TODO do not add it to a global variable when not necessary
+  //      right now it is added because module.exports is available from browserify
+  if ((typeof module !== 'undefined' && module.exports)) {
+    module.exports = svgPanZoom;
+    window.svgPanZoom = svgPanZoom;
+  } else if (typeof define === "function" && define.amd) {
+    define("svg-pan-zoom", function (require, exports, module) {
+      return svgPanZoom;
+    });
+    window.svgPanZoom = svgPanZoom;
+  } else {
+    window.svgPanZoom = svgPanZoom;
   }
 })(window, document)
