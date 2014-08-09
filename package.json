@@ -2,7 +2,7 @@
   "name": "svg-pan-zoom",
   "version": "2.3.3",
   "main": "dist/svg-pan-zoom.js",
-  "browser": "src/svg-pan-zoom.js",
+  "browser": "src/browserify.js",
   "license": "BSD",
   "devDependencies": {
     "gulp": "~3.5.0",

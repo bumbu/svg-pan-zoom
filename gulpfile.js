@@ -14,7 +14,7 @@ var gulp   = require('gulp')
  *  Build script
  */
 gulp.task('build', function() {
-  return browserify({entries:'./src/svg-pan-zoom.js'})
+  return browserify({entries:'./src/stand-alone.js'})
     .bundle()
     .on('error', function (err) {
       console.log(err.toString())
