@@ -304,7 +304,7 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
 
   /**
    * Cache initial viewBox value
-   * If nok viewBox is defined than use viewport sizes as viewBox values
+   * If no viewBox is defined then use viewport sizes as viewBox values
    */
   SvgPanZoom.prototype.cacheViewBox = function() {
     // ViewBox cache
@@ -842,7 +842,7 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
    */
   var instancesStore = []
 
-  window.svgPanZoom = function(elementOrSelector, options){
+  var svgPanZoom = function(elementOrSelector, options){
     var svg = Utils.getSvg(elementOrSelector)
 
     if (svg === null) {
@@ -865,12 +865,33 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
       return instancesStore[instancesStore.length - 1].instance.getPublicInstance()
     }
   }
+
+  // AMD/CMD module definition
+  // TODO do not add it to a global variable when not necessary
+  //      right now it is added because module.exports is available from browserify
+  if ((typeof module !== 'undefined' && module.exports)) {
+    module.exports = svgPanZoom;
+    window.svgPanZoom = svgPanZoom;
+  } else if (typeof define === "function" && define.amd) {
+    define("svg-pan-zoom", function (require, exports, module) {
+      return svgPanZoom;
+    });
+    window.svgPanZoom = svgPanZoom;
+  } else {
+    window.svgPanZoom = svgPanZoom;
+  }
 })(window, document)
 
 },{"./control-icons":1,"./mousewheel":2,"./svg-utilities":4,"./utilities":5}],4:[function(require,module,exports){
 var Utils = require('./utilities');
 
 module.exports = {
+  svgNS:  'http://www.w3.org/2000/svg',
+  xmlNS:  'http://www.w3.org/XML/1998/namespace',
+  xmlnsNS:  'http://www.w3.org/2000/xmlns/',
+  xlinkNS:  'http://www.w3.org/1999/xlink',
+  evNS:  'http://www.w3.org/2001/xml-events',
+
   /**
    * Get svg dimensions: width and height
    *
@@ -924,23 +945,27 @@ module.exports = {
   }
 
   /**
-   * Gets g#viewport element or creates it if it doesn't exist
+   * Gets g element with class of "viewport" or creates it if it doesn't exist
    * @param  {object} svg
    * @return {object}     g element
    */
 , getOrCreateViewport: function(svg) {
-    var viewport = svg.querySelector('g#viewport')
+    var viewport = svg.querySelector('g.viewport')
 
-    // If no g container with id 'viewport' exists, create one
+    // If no g element with class 'viewport' exists, create one
     if (!viewport) {
-      viewport = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-      viewport.setAttribute('id', 'viewport');
+      var viewportId = 'viewport-' + new Date().toISOString().replace(/\D/g, '');
+      viewport = document.createElementNS(this.svgNS, 'g');
+      viewport.setAttribute('id', viewportId);
+      viewport.setAttribute('class', 'viewport');
 
       // Internet Explorer (all versions?) can't use childNodes, but other browsers prefer (require?) using childNodes
       var svgChildren = svg.childNodes || svg.children;
-      do {
-        viewport.appendChild(svgChildren[0]);
-      } while (svgChildren.length > 0);
+      if (!!svgChildren && svgChildren.length > 0) {
+        do {
+          viewport.appendChild(svgChildren[0]);
+        } while (svgChildren.length > 0);
+      }
       svg.appendChild(viewport);
     }
 
@@ -949,23 +974,12 @@ module.exports = {
 
 , setupSvgAttributes: function(svg) {
     // Setting default attributes
-    // TODO the svgNS value is repeated in the codebase. It should be defined once.
-    var svgNS = 'http://www.w3.org/2000/svg'
-      , xmlNS = 'http://www.w3.org/XML/1998/namespace'
-      , xmlnsNS = 'http://www.w3.org/2000/xmlns/'
-      , xlinkNS = 'http://www.w3.org/1999/xlink'
-      , evNS = 'http://www.w3.org/2001/xml-events'
-      ;
 
-    if (!svg.getAttribute('xmlns')) {
-      svg.setAttribute('xmlns', svgNS);
-    }
-    if (!svg.getAttributeNS(xmlnsNS, 'xmlns:xlink')) {
-      svg.setAttributeNS(xmlnsNS, 'xmlns:xlink', xlinkNS);
-    }
-    if (!svg.getAttributeNS(xmlnsNS, 'xmlns:ev')) {
-      svg.setAttributeNS(xmlnsNS, 'xmlns:ev', evNS);
-    }
+    //*
+    svg.setAttribute('xmlns', this.svgNS);
+    svg.setAttributeNS(this.xmlnsNS, 'xmlns:xlink', this.xlinkNS);
+    svg.setAttributeNS(this.xmlnsNS, 'xmlns:ev', this.evNS);
+    //*/
 
     // Needed for Internet Explorer, otherwise the viewport overflows
     if (svg.parentNode !== null) {
@@ -982,8 +996,16 @@ module.exports = {
    * @param {object} matrix  CTM
    */
 , setCTM: function(element, matrix) {
+
     var s = 'matrix(' + matrix.a + ',' + matrix.b + ',' + matrix.c + ',' + matrix.d + ',' + matrix.e + ',' + matrix.f + ')';
-    element.setAttribute('transform', s);
+    element.setAttributeNS(null, 'transform', s);
+    var isIE = /*@cc_on!@*/false || !!document.documentMode;
+    // see http://stackoverflow.com/questions/17654578/svg-marker-does-not-work-in-ie9-10
+    if (isIE) {
+      var parent = element.parentNode;
+      parent.removeChild(element);
+      parent.appendChild(element);
+    }
   }
 
   /**

@@ -110,7 +110,7 @@ var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is 
 
   /**
    * Cache initial viewBox value
-   * If nok viewBox is defined than use viewport sizes as viewBox values
+   * If no viewBox is defined then use viewport sizes as viewBox values
    */
   SvgPanZoom.prototype.cacheViewBox = function() {
     // ViewBox cache
