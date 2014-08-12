@@ -21,6 +21,7 @@ var optionsDefaults = {
 , onZoom: function(){}
 , beforePan: null
 , onPan: function(){}
+, refreshRate: 60 // in hz 
 }
 
 SvgPanZoom.prototype.init = function(svg, options) {
@@ -28,6 +29,7 @@ SvgPanZoom.prototype.init = function(svg, options) {
 
   // Set options
   this.options = Utils.extend(Utils.extend({}, optionsDefaults), options)
+  SvgUtils.refreshRate = options.refreshRate;
 
   // Set default state
   this.state = 'none'
@@ -47,7 +49,7 @@ SvgPanZoom.prototype.init = function(svg, options) {
   // Sets initialCTM
   this.processCTM()
 
-  if (this.options.controlIconsEnabled && this.options.zoomEnabled) {
+  if (this.options.controlIconsEnabled) {
     ControlIcons.enable(this)
   }
 
@@ -56,6 +58,13 @@ SvgPanZoom.prototype.init = function(svg, options) {
 
   // Init events handlers
   this.setupHandlers()
+
+  // thanks to http://stackoverflow.com/questions/9847580/how-to-detect-safari-chrome-ie-firefox-and-opera-browser
+  if (/*@cc_on!@*/false || !!document.documentMode) { // internet explorer
+    SvgUtils._browser = 'ie';
+  } else if (typeof InstallTrigger !== 'undefined') { // firefox
+    SvgUtils._browser = 'firefox';
+  }
 
   // TODO what for do we need this?
   // It is replacing window.svgPanZoom constructor with this instance
@@ -86,7 +95,7 @@ SvgPanZoom.prototype.processCTM = function() {
     this.initialCTM = newCTM;
 
     // Update viewport CTM
-    SvgUtils.setCTM(this.viewport, this.initialCTM);
+    SvgUtils.setCTM(this.viewport, newCTM);
   } else {
     // Leave sizes as they are
     this.svg.removeAttribute('viewBox')
@@ -101,7 +110,21 @@ SvgPanZoom.prototype.processCTM = function() {
   this._pan.y = this.initialCTM.f
 
   if (this.options.center) {
-    this.center()
+    var that = this;
+    window.setTimeout(function() {
+      that.center();
+      window.setTimeout(function() {
+        that.viewport.getCTM();
+        that.initialCTM = that.viewport.getCTM();
+
+        // Cache zoom level
+        that._zoom = that.initialCTM.a
+
+        // Cache pan level
+        that._pan.x = that.initialCTM.e
+        that._pan.y = that.initialCTM.f
+      }, 1000/this.refreshRate + 1);
+    }, 1000/this.refreshRate + 1);
   }
 }
 
@@ -318,15 +341,25 @@ SvgPanZoom.prototype.getZoom = function() {
 }
 
 SvgPanZoom.prototype.resetZoom = function() {
-  this.getPublicInstance().zoom(this.initialCTM.a)
-  this.getPublicInstance().pan({x: this.initialCTM.e, y: this.initialCTM.f})
+  var publicInstance = this.getPublicInstance()
 
+  var zoomScale = this.initialCTM.a;
+  publicInstance.zoom(zoomScale);
   // Cache zoom level
-  this._zoom = this.initialCTM.a
+  this._zoom = zoomScale;
 
+  var x = this.initialCTM.e;
+  var y = this.initialCTM.f;
   // Cache pan level
-  this._pan.x = this.initialCTM.e
-  this._pan.y = this.initialCTM.f
+  this._pan.x = x;
+  this._pan.y = y;
+
+  if (this.options.center) {
+    var that = this;
+    window.setTimeout(function() {
+      publicInstance.pan({x: x, y: y})
+    }, 1000/this.refreshRate + 1);
+  }
 }
 
 /**
@@ -572,20 +605,14 @@ SvgPanZoom.prototype.getPublicInstance = function() {
     , setOnPan: function(fn) {that.options.onPan = Utils.proxy(fn, that.publicInstance)}
       // Zoom and Control Icons
     , enableZoom: function() {
-        if (that.options.controlIconsEnabled && !that.options.zoomEnabled) {
-          ControlIcons.enable(that)
-        }
         that.options.zoomEnabled = true;
       }
     , disableZoom: function() {
-        if (that.options.controlIconsEnabled && that.options.zoomEnabled) {
-          ControlIcons.disable(that)
-        }
         that.options.zoomEnabled = false;
       }
     , isZoomEnabled: function() {return !!that.options.zoomEnabled}
     , enableControlIcons: function() {
-        if (that.options.zoomEnabled && !that.options.controlIconsEnabled) {
+        if (!that.options.controlIconsEnabled) {
           that.options.controlIconsEnabled = true
           ControlIcons.enable(that)
         }

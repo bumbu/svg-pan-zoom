@@ -1,11 +1,11 @@
 var Utils = require('./utilities');
 
 module.exports = {
-  svgNS:  'http://www.w3.org/2000/svg',
-  xmlNS:  'http://www.w3.org/XML/1998/namespace',
-  xmlnsNS:  'http://www.w3.org/2000/xmlns/',
-  xlinkNS:  'http://www.w3.org/1999/xlink',
-  evNS:  'http://www.w3.org/2001/xml-events',
+  svgNS:  'http://www.w3.org/2000/svg'
+, xmlNS:  'http://www.w3.org/XML/1998/namespace'
+, xmlnsNS:  'http://www.w3.org/2000/xmlns/'
+, xlinkNS:  'http://www.w3.org/1999/xlink'
+, evNS:  'http://www.w3.org/2001/xml-events'
 
   /**
    * Get svg dimensions: width and height
@@ -13,19 +13,16 @@ module.exports = {
    * @param  {object} svg
    * @return {object}     {width: 0, height: 0}
    */
-  getSvgDimensions: function(svg) {
+, getSvgDimensions: function(svg) {
     var width = 0
       , height = 0
       , svgClientRects = svg.getClientRects()
-
-    // thanks to http://stackoverflow.com/questions/9847580/how-to-detect-safari-chrome-ie-firefox-and-opera-browser
-    var isFirefox = typeof InstallTrigger !== 'undefined';
 
     // Firefox has no nice way of detecting SVG size, so we'll check for
     // width/height from getComputedStyle, specified in pixels,
     // and if they don't exist, we'll use the parent dimensions.
     // TODO: check whether this method would be a better method for other browsers too.
-    if (isFirefox) {
+    if (this._browser === 'firefox') {
       var svgComputedStyle = window.getComputedStyle(svg, null);
       width = parseFloat(svgComputedStyle.width) - (parseFloat(svgComputedStyle.borderLeftWidth) + parseFloat(svgComputedStyle.paddingLeft) + parseFloat(svgComputedStyle.borderRightWidth) + parseFloat(svgComputedStyle.paddingRight));
       height = parseFloat(svgComputedStyle.height) - (parseFloat(svgComputedStyle.borderTopWidth) + parseFloat(svgComputedStyle.paddingTop) + parseFloat(svgComputedStyle.borderBottomWidth) + parseFloat(svgComputedStyle.paddingBottom));
@@ -87,7 +84,7 @@ module.exports = {
     return viewport
   }
 
-, setupSvgAttributes: function(svg) {
+  , setupSvgAttributes: function(svg) {
     // Setting default attributes
 
     svg.setAttribute('xmlns', this.svgNS);
@@ -108,22 +105,19 @@ module.exports = {
    * @param {object} element SVG Element
    * @param {object} matrix  CTM
    */
-, setCTM: function(element, matrix) {
-
+, setCTM: Utils.throttle(function(element, matrix) {
     var s = 'matrix(' + matrix.a + ',' + matrix.b + ',' + matrix.c + ',' + matrix.d + ',' + matrix.e + ',' + matrix.f + ')';
     element.setAttributeNS(null, 'transform', s);
 
-    // IE has a bug that makes markers disappear whenever the "d" element in the matrix
-    // is not equal to 1.
+    // IE has a bug that makes markers disappear on zoom (when the matrix "a" and/or "d" elements change)
     // see http://stackoverflow.com/questions/17654578/svg-marker-does-not-work-in-ie9-10
-    // TODO improve performance by caching isIE and running this only on zoomEnd.
-    var isIE = /*@cc_on!@*/false || !!document.documentMode;
-    if (isIE) {
+    // and http://srndolha.wordpress.com/2013/11/25/svg-line-markers-may-disappear-in-internet-explorer-11/
+    if (this._browser === 'ie') {
       var parent = element.parentNode;
       parent.removeChild(element);
       parent.appendChild(element);
     }
-  }
+  }, 1000/this.refreshRate)
 
   /**
    * Time-based cache for svg.getScreenCTM().
