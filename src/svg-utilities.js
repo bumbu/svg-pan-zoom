@@ -162,6 +162,7 @@ module.exports = {
 
     point.x = evt.clientX
     point.y = evt.clientY
+    console.log(point.matrixTransform(this.getScreenCTMCached(svg).inverse()))
 
     return point.matrixTransform(this.getScreenCTMCached(svg).inverse())
   }
@@ -197,6 +198,8 @@ module.exports = {
 
     point.x = width / 2
     point.y = height / 2
+    console.log('SvgCenterPoint')
+    console.log(point)
 
     return point
   }

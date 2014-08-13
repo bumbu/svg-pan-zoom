@@ -344,7 +344,7 @@ SvgPanZoom.prototype.processCTM = function() {
 
 /**
  * Cache initial viewBox value
- * If nok viewBox is defined than use viewport sizes as viewBox values
+ * If no viewBox is defined, then use viewport sizes as viewBox values
  */
 SvgPanZoom.prototype.cacheViewBox = function() {
   // ViewBox cache
@@ -361,9 +361,11 @@ SvgPanZoom.prototype.cacheViewBox = function() {
     this._viewBox.width = viewBoxValues[2]
     this._viewBox.height = viewBoxValues[3]
   } else {
-    var boundingClientRect = this.viewport.getBoundingClientRect()
+    var boundingClientRect = this.viewport.getBBox();
 
     // Cache viewbox sizes
+    this._viewBox.x = boundingClientRect.x;
+    this._viewBox.y = boundingClientRect.y;
     this._viewBox.width = boundingClientRect.width
     this._viewBox.height = boundingClientRect.height
   }
@@ -498,6 +500,7 @@ SvgPanZoom.prototype.zoomAtPoint = function(svg, point, zoomScale, zoomAbsolute)
 
   point = point.matrixTransform(viewportCTM.inverse())
 
+  //var k = svg.createSVGMatrix().translate(point.x, point.y).scale(zoomScale).translate(-point.x - zoomScale * this.width/2, -point.y - zoomScale * this.height/2)
   var k = svg.createSVGMatrix().translate(point.x, point.y).scale(zoomScale).translate(-point.x, -point.y)
     , wasZoom = viewportCTM
     , setZoom = viewportCTM.multiply(k)
@@ -506,9 +509,11 @@ SvgPanZoom.prototype.zoomAtPoint = function(svg, point, zoomScale, zoomAbsolute)
     setZoom.a = setZoom.d = zoomScale
   }
 
-  if (setZoom.a < this.options.minZoom * this.initialCTM.a) {setZoom.a = setZoom.d = this.options.minZoom * this.initialCTM.a}
-  if (setZoom.a > this.options.maxZoom * this.initialCTM.a) {setZoom.a = setZoom.d = this.options.maxZoom * this.initialCTM.a}
-  if (setZoom.a !== wasZoom.a) {
+  if (setZoom.a < this.options.minZoom * this.initialCTM.a) {
+    setZoom.a = setZoom.d = this.options.minZoom * this.initialCTM.a
+  } else if (setZoom.a > this.options.maxZoom * this.initialCTM.a) {
+    setZoom.a = setZoom.d = this.options.maxZoom * this.initialCTM.a
+  } else if (setZoom.a !== wasZoom.a) {
     SvgUtils.setCTM(this.viewport, setZoom)
 
     // Cache zoom level
@@ -1077,6 +1082,7 @@ module.exports = {
 
     point.x = evt.clientX
     point.y = evt.clientY
+    console.log(point.matrixTransform(this.getScreenCTMCached(svg).inverse()))
 
     return point.matrixTransform(this.getScreenCTMCached(svg).inverse())
   }
@@ -1112,6 +1118,8 @@ module.exports = {
 
     point.x = width / 2
     point.y = height / 2
+    console.log('SvgCenterPoint')
+    console.log(point)
 
     return point
   }

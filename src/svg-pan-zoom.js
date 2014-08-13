@@ -130,7 +130,7 @@ SvgPanZoom.prototype.processCTM = function() {
 
 /**
  * Cache initial viewBox value
- * If nok viewBox is defined than use viewport sizes as viewBox values
+ * If no viewBox is defined, then use viewport sizes as viewBox values
  */
 SvgPanZoom.prototype.cacheViewBox = function() {
   // ViewBox cache
@@ -286,6 +286,7 @@ SvgPanZoom.prototype.zoomAtPoint = function(svg, point, zoomScale, zoomAbsolute)
 
   point = point.matrixTransform(viewportCTM.inverse())
 
+  //var k = svg.createSVGMatrix().translate(point.x, point.y).scale(zoomScale).translate(-point.x - zoomScale * this.width/2, -point.y - zoomScale * this.height/2)
   var k = svg.createSVGMatrix().translate(point.x, point.y).scale(zoomScale).translate(-point.x, -point.y)
     , wasZoom = viewportCTM
     , setZoom = viewportCTM.multiply(k)
@@ -294,9 +295,11 @@ SvgPanZoom.prototype.zoomAtPoint = function(svg, point, zoomScale, zoomAbsolute)
     setZoom.a = setZoom.d = zoomScale
   }
 
-  if (setZoom.a < this.options.minZoom * this.initialCTM.a) {setZoom.a = setZoom.d = this.options.minZoom * this.initialCTM.a}
-  if (setZoom.a > this.options.maxZoom * this.initialCTM.a) {setZoom.a = setZoom.d = this.options.maxZoom * this.initialCTM.a}
-  if (setZoom.a !== wasZoom.a) {
+  if (setZoom.a < this.options.minZoom * this.initialCTM.a) {
+    setZoom.a = setZoom.d = this.options.minZoom * this.initialCTM.a
+  } else if (setZoom.a > this.options.maxZoom * this.initialCTM.a) {
+    setZoom.a = setZoom.d = this.options.maxZoom * this.initialCTM.a
+  } else if (setZoom.a !== wasZoom.a) {
     SvgUtils.setCTM(this.viewport, setZoom)
 
     // Cache zoom level
