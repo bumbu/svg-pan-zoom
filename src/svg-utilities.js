@@ -113,9 +113,9 @@ module.exports = {
     // see http://stackoverflow.com/questions/17654578/svg-marker-does-not-work-in-ie9-10
     // and http://srndolha.wordpress.com/2013/11/25/svg-line-markers-may-disappear-in-internet-explorer-11/
     if (this._browser === 'ie') {
-      var parent = element.parentNode;
-      parent.removeChild(element);
-      parent.appendChild(element);
+      var parent = this.defs.parentNode;
+      parent.removeChild(this.defs);
+      parent.appendChild(this.defs);
     }
   }, 1000/this.refreshRate)
 
@@ -162,7 +162,6 @@ module.exports = {
 
     point.x = evt.clientX
     point.y = evt.clientY
-    console.log(point.matrixTransform(this.getScreenCTMCached(svg).inverse()))
 
     return point.matrixTransform(this.getScreenCTMCached(svg).inverse())
   }
@@ -198,8 +197,6 @@ module.exports = {
 
     point.x = width / 2
     point.y = height / 2
-    console.log('SvgCenterPoint')
-    console.log(point)
 
     return point
   }

@@ -26,6 +26,8 @@ var optionsDefaults = {
 
 SvgPanZoom.prototype.init = function(svg, options) {
   this.svg = svg
+  SvgUtils.svg = svg
+  SvgUtils.defs = svg.querySelector('defs')
 
   // Set options
   this.options = Utils.extend(Utils.extend({}, optionsDefaults), options)
@@ -130,7 +132,7 @@ SvgPanZoom.prototype.processCTM = function() {
 
 /**
  * Cache initial viewBox value
- * If no viewBox is defined, then use viewport sizes as viewBox values
+ * If no viewBox is defined, then use viewport size/position instead for viewBox values
  */
 SvgPanZoom.prototype.cacheViewBox = function() {
   // ViewBox cache
