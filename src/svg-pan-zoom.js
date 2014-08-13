@@ -147,9 +147,11 @@ SvgPanZoom.prototype.cacheViewBox = function() {
     this._viewBox.width = viewBoxValues[2]
     this._viewBox.height = viewBoxValues[3]
   } else {
-    var boundingClientRect = this.viewport.getBoundingClientRect()
+    var boundingClientRect = this.viewport.getBBox();
 
     // Cache viewbox sizes
+    this._viewBox.x = boundingClientRect.x;
+    this._viewBox.y = boundingClientRect.y;
     this._viewBox.width = boundingClientRect.width
     this._viewBox.height = boundingClientRect.height
   }
