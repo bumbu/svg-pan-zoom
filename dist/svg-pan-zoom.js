@@ -1,21 +1,48 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 module.exports = {
   enable: function(instance) {
+
+    /*
+    // TODO should we create a new SVG or insert the control icons into the existing SVG?
+    // The code below does not work entirely correctly, but it's a start if we want to
+    // create a new SVG
+    // create svg for control icons
+    var controlIconsSvgId = 'svg-pan-zoom-control-icons-' + new Date().toISOString().replace(/\D/g, '');
+    var controlIconsSvg = document.createElementNS(instance.svgNS, 'svg');
+    controlIconsSvg.setAttributeNS(instance.xmlnsNS, 'xmlns', instance.svgNS);
+    controlIconsSvg.setAttributeNS(instance.xmlnsNS, 'xmlns:xlink', instance.xlinkNS);
+    controlIconsSvg.setAttributeNS(instance.xmlnsNS, 'xmlns:ev', instance.evNS);
+    controlIconsSvg.setAttribute('id', controlIconsSvgId);
+    controlIconsSvg.setAttribute('version', '1.1');
+    controlIconsSvg.setAttribute('baseProfile', 'full');
+    controlIconsSvg.setAttribute('preserveAspectRatio', 'xMidYMid');
+    controlIconsSvg.setAttribute('style', 'left:' + ( instance.dimensions.right - 70 ) + '; top:' + ( instance.dimensions.bottom - 76 ) + '; position: absolute;');
+    //controlIconsSvg.setAttribute('width', width);
+    //controlIconsSvg.setAttribute('height', height);
+    //controlIconsSvg.setAttribute('style', 'background-color:' + backgroundColor + '; ');
+    document.body.appendChild(controlIconsSvg);
+
+    // Create defs
+    var defs = document.createElementNS(instance.svgNS, 'defs');
+    controlIconsSvg.appendChild(defs);
+    //*/
+
     // Select (and create if necessary) defs
     var defs = instance.svg.querySelector('defs')
     if (!defs) {
-      defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs')
+      defs = document.createElementNS(instance.svgNS, 'defs')
       instance.svg.appendChild(defs)
     }
 
     // Create style element
-    var style = document.createElementNS('http://www.w3.org/2000/svg', 'style')
+    var style = document.createElementNS(instance.svgNS, 'style')
     style.setAttribute('type', 'text/css')
     style.textContent = '.svg-pan-zoom-control { cursor: pointer; fill: black; fill-opacity: 0.333; } .svg-pan-zoom-control:hover { fill-opacity: 0.8; } .svg-pan-zoom-control-background { fill: white; fill-opacity: 0.5; } .svg-pan-zoom-control-background { fill-opacity: 0.8; }'
     defs.appendChild(style)
 
+
     // Zoom Group
-    var zoomGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    var zoomGroup = document.createElementNS(instance.svgNS, 'g');
     zoomGroup.setAttribute('id', 'svg-pan-zoom-controls');
     zoomGroup.setAttribute('transform', 'translate(' + ( instance.width - 70 ) + ' ' + ( instance.height - 76 ) + ') scale(0.75)');
     zoomGroup.setAttribute('class', 'svg-pan-zoom-control');
@@ -33,14 +60,14 @@ module.exports = {
   }
 
 , _createZoomIn: function(instance) {
-    var zoomIn = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    var zoomIn = document.createElementNS(instance.svgNS, 'g');
     zoomIn.setAttribute('id', 'svg-pan-zoom-zoom-in');
     zoomIn.setAttribute('transform', 'translate(30.5 5) scale(0.015)');
     zoomIn.setAttribute('class', 'svg-pan-zoom-control');
     zoomIn.addEventListener('click', function() {instance.getPublicInstance().zoomIn()}, false)
     zoomIn.addEventListener('touchstart', function() {instance.getPublicInstance().zoomIn()}, false)
 
-    var zoomInBackground = document.createElementNS('http://www.w3.org/2000/svg', 'rect'); // TODO change these background space fillers to rounded rectangles so they look prettier
+    var zoomInBackground = document.createElementNS(instance.svgNS, 'rect'); // TODO change these background space fillers to rounded rectangles so they look prettier
     zoomInBackground.setAttribute('x', '0');
     zoomInBackground.setAttribute('y', '0');
     zoomInBackground.setAttribute('width', '1500'); // larger than expected because the whole group is transformed to scale down
@@ -48,7 +75,7 @@ module.exports = {
     zoomInBackground.setAttribute('class', 'svg-pan-zoom-control-background');
     zoomIn.appendChild(zoomInBackground);
 
-    var zoomInShape = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    var zoomInShape = document.createElementNS(instance.svgNS, 'path');
     zoomInShape.setAttribute('d', 'M1280 576v128q0 26 -19 45t-45 19h-320v320q0 26 -19 45t-45 19h-128q-26 0 -45 -19t-19 -45v-320h-320q-26 0 -45 -19t-19 -45v-128q0 -26 19 -45t45 -19h320v-320q0 -26 19 -45t45 -19h128q26 0 45 19t19 45v320h320q26 0 45 19t19 45zM1536 1120v-960 q0 -119 -84.5 -203.5t-203.5 -84.5h-960q-119 0 -203.5 84.5t-84.5 203.5v960q0 119 84.5 203.5t203.5 84.5h960q119 0 203.5 -84.5t84.5 -203.5z');
     zoomInShape.setAttribute('class', 'svg-pan-zoom-control-element');
     zoomIn.appendChild(zoomInShape);
@@ -58,14 +85,14 @@ module.exports = {
 
 , _createZoomReset: function(instance){
     // reset
-    var resetPanZoomControl = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    var resetPanZoomControl = document.createElementNS(instance.svgNS, 'g');
     resetPanZoomControl.setAttribute('id', 'svg-pan-zoom-reset-pan-zoom');
     resetPanZoomControl.setAttribute('transform', 'translate(5 35) scale(0.4)');
     resetPanZoomControl.setAttribute('class', 'svg-pan-zoom-control');
     resetPanZoomControl.addEventListener('click', function() {instance.getPublicInstance().resetZoom()}, false);
     resetPanZoomControl.addEventListener('touchstart', function() {instance.getPublicInstance().resetZoom()}, false);
 
-    var resetPanZoomControlBackground = document.createElementNS('http://www.w3.org/2000/svg', 'rect'); // TODO change these background space fillers to rounded rectangles so they look prettier
+    var resetPanZoomControlBackground = document.createElementNS(instance.svgNS, 'rect'); // TODO change these background space fillers to rounded rectangles so they look prettier
     resetPanZoomControlBackground.setAttribute('x', '2');
     resetPanZoomControlBackground.setAttribute('y', '2');
     resetPanZoomControlBackground.setAttribute('width', '182'); // larger than expected because the whole group is transformed to scale down
@@ -73,12 +100,12 @@ module.exports = {
     resetPanZoomControlBackground.setAttribute('class', 'svg-pan-zoom-control-background');
     resetPanZoomControl.appendChild(resetPanZoomControlBackground);
 
-    var resetPanZoomControlShape1 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    var resetPanZoomControlShape1 = document.createElementNS(instance.svgNS, 'path');
     resetPanZoomControlShape1.setAttribute('d', 'M33.051,20.632c-0.742-0.406-1.854-0.609-3.338-0.609h-7.969v9.281h7.769c1.543,0,2.701-0.188,3.473-0.562c1.365-0.656,2.048-1.953,2.048-3.891C35.032,22.757,34.372,21.351,33.051,20.632z');
     resetPanZoomControlShape1.setAttribute('class', 'svg-pan-zoom-control-element');
     resetPanZoomControl.appendChild(resetPanZoomControlShape1);
 
-    var resetPanZoomControlShape2 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    var resetPanZoomControlShape2 = document.createElementNS(instance.svgNS, 'path');
     resetPanZoomControlShape2.setAttribute('d', 'M170.231,0.5H15.847C7.102,0.5,0.5,5.708,0.5,11.84v38.861C0.5,56.833,7.102,61.5,15.847,61.5h154.384c8.745,0,15.269-4.667,15.269-10.798V11.84C185.5,5.708,178.976,0.5,170.231,0.5z M42.837,48.569h-7.969c-0.219-0.766-0.375-1.383-0.469-1.852c-0.188-0.969-0.289-1.961-0.305-2.977l-0.047-3.211c-0.03-2.203-0.41-3.672-1.142-4.406c-0.732-0.734-2.103-1.102-4.113-1.102h-7.05v13.547h-7.055V14.022h16.524c2.361,0.047,4.178,0.344,5.45,0.891c1.272,0.547,2.351,1.352,3.234,2.414c0.731,0.875,1.31,1.844,1.737,2.906s0.64,2.273,0.64,3.633c0,1.641-0.414,3.254-1.242,4.84s-2.195,2.707-4.102,3.363c1.594,0.641,2.723,1.551,3.387,2.73s0.996,2.98,0.996,5.402v2.32c0,1.578,0.063,2.648,0.19,3.211c0.19,0.891,0.635,1.547,1.333,1.969V48.569z M75.579,48.569h-26.18V14.022h25.336v6.117H56.454v7.336h16.781v6H56.454v8.883h19.125V48.569z M104.497,46.331c-2.44,2.086-5.887,3.129-10.34,3.129c-4.548,0-8.125-1.027-10.731-3.082s-3.909-4.879-3.909-8.473h6.891c0.224,1.578,0.662,2.758,1.316,3.539c1.196,1.422,3.246,2.133,6.15,2.133c1.739,0,3.151-0.188,4.236-0.562c2.058-0.719,3.087-2.055,3.087-4.008c0-1.141-0.504-2.023-1.512-2.648c-1.008-0.609-2.607-1.148-4.796-1.617l-3.74-0.82c-3.676-0.812-6.201-1.695-7.576-2.648c-2.328-1.594-3.492-4.086-3.492-7.477c0-3.094,1.139-5.664,3.417-7.711s5.623-3.07,10.036-3.07c3.685,0,6.829,0.965,9.431,2.895c2.602,1.93,3.966,4.73,4.093,8.402h-6.938c-0.128-2.078-1.057-3.555-2.787-4.43c-1.154-0.578-2.587-0.867-4.301-0.867c-1.907,0-3.428,0.375-4.565,1.125c-1.138,0.75-1.706,1.797-1.706,3.141c0,1.234,0.561,2.156,1.682,2.766c0.721,0.406,2.25,0.883,4.589,1.43l6.063,1.43c2.657,0.625,4.648,1.461,5.975,2.508c2.059,1.625,3.089,3.977,3.089,7.055C108.157,41.624,106.937,44.245,104.497,46.331z M139.61,48.569h-26.18V14.022h25.336v6.117h-18.281v7.336h16.781v6h-16.781v8.883h19.125V48.569z M170.337,20.14h-10.336v28.43h-7.266V20.14h-10.383v-6.117h27.984V20.14z');
     resetPanZoomControlShape2.setAttribute('class', 'svg-pan-zoom-control-element');
     resetPanZoomControl.appendChild(resetPanZoomControlShape2);
@@ -88,14 +115,14 @@ module.exports = {
 
 , _createZoomOut: function(instance){
     // zoom out
-    var zoomOut = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    var zoomOut = document.createElementNS(instance.svgNS, 'g');
     zoomOut.setAttribute('id', 'svg-pan-zoom-zoom-out');
     zoomOut.setAttribute('transform', 'translate(30.5 70) scale(0.015)');
     zoomOut.setAttribute('class', 'svg-pan-zoom-control');
     zoomOut.addEventListener('click', function() {instance.getPublicInstance().zoomOut()}, false);
     zoomOut.addEventListener('touchstart', function() {instance.getPublicInstance().zoomOut()}, false);
 
-    var zoomOutBackground = document.createElementNS('http://www.w3.org/2000/svg', 'rect'); // TODO change these background space fillers to rounded rectangles so they look prettier
+    var zoomOutBackground = document.createElementNS(instance.svgNS, 'rect'); // TODO change these background space fillers to rounded rectangles so they look prettier
     zoomOutBackground.setAttribute('x', '0');
     zoomOutBackground.setAttribute('y', '0');
     zoomOutBackground.setAttribute('width', '1500'); // larger than expected because the whole group is transformed to scale down
@@ -103,7 +130,7 @@ module.exports = {
     zoomOutBackground.setAttribute('class', 'svg-pan-zoom-control-background');
     zoomOut.appendChild(zoomOutBackground);
 
-    var zoomOutShape = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    var zoomOutShape = document.createElementNS(instance.svgNS, 'path');
     zoomOutShape.setAttribute('d', 'M1280 576v128q0 26 -19 45t-45 19h-896q-26 0 -45 -19t-19 -45v-128q0 -26 19 -45t45 -19h896q26 0 45 19t19 45zM1536 1120v-960q0 -119 -84.5 -203.5t-203.5 -84.5h-960q-119 0 -203.5 84.5t-84.5 203.5v960q0 119 84.5 203.5t203.5 84.5h960q119 0 203.5 -84.5 t84.5 -203.5z');
     zoomOutShape.setAttribute('class', 'svg-pan-zoom-control-element');
     zoomOut.appendChild(zoomOutShape);
@@ -239,9 +266,24 @@ var optionsDefaults = {
 }
 
 SvgPanZoom.prototype.init = function(svg, options) {
+  this.xmlNS = 'http://www.w3.org/XML/1998/namespace';
+  this.svgNS = 'http://www.w3.org/2000/svg';
+  this.xmlnsNS = 'http://www.w3.org/2000/xmlns/';
+  this.xlinkNS = 'http://www.w3.org/1999/xlink';
+  this.evNS = 'http://www.w3.org/2001/xml-events';
+
   this.svg = svg
   SvgUtils.svg = svg
-  SvgUtils.defs = svg.querySelector('defs')
+  var defs = svg.querySelector('defs')
+  this.defs = defs
+  SvgUtils.defs = defs
+
+  // thanks to http://stackoverflow.com/questions/9847580/how-to-detect-safari-chrome-ie-firefox-and-opera-browser
+  if (/*@cc_on!@*/false || !!document.documentMode) { // internet explorer
+    SvgUtils._browser = 'ie';
+  } else if (typeof InstallTrigger !== 'undefined') { // firefox
+    SvgUtils._browser = 'firefox';
+  }
 
   // Set options
   this.options = Utils.extend(Utils.extend({}, optionsDefaults), options)
@@ -251,9 +293,9 @@ SvgPanZoom.prototype.init = function(svg, options) {
   this.state = 'none'
 
   // Get dimensions
-  var dimensions = SvgUtils.getSvgDimensions(svg)
-  this.width = dimensions.width
-  this.height = dimensions.height
+  var boundingClientRectNormalized = SvgUtils.getBoundingClientRectNormalized(svg)
+  this.width = boundingClientRectNormalized.width
+  this.height = boundingClientRectNormalized.height
 
   // Get viewport
   this.viewport = SvgUtils.getOrCreateViewport(svg)
@@ -274,13 +316,6 @@ SvgPanZoom.prototype.init = function(svg, options) {
 
   // Init events handlers
   this.setupHandlers()
-
-  // thanks to http://stackoverflow.com/questions/9847580/how-to-detect-safari-chrome-ie-firefox-and-opera-browser
-  if (/*@cc_on!@*/false || !!document.documentMode) { // internet explorer
-    SvgUtils._browser = 'ie';
-  } else if (typeof InstallTrigger !== 'undefined') { // firefox
-    SvgUtils._browser = 'firefox';
-  }
 
   // TODO what for do we need this?
   // It is replacing window.svgPanZoom constructor with this instance
@@ -363,13 +398,13 @@ SvgPanZoom.prototype.cacheViewBox = function() {
     this._viewBox.width = viewBoxValues[2]
     this._viewBox.height = viewBoxValues[3]
   } else {
-    var boundingClientRect = this.viewport.getBBox();
+    var bBox = this.viewport.getBBox();
 
     // Cache viewbox sizes
-    this._viewBox.x = boundingClientRect.x;
-    this._viewBox.y = boundingClientRect.y;
-    this._viewBox.width = boundingClientRect.width
-    this._viewBox.height = boundingClientRect.height
+    this._viewBox.x = bBox.x;
+    this._viewBox.y = bBox.y;
+    this._viewBox.width = bBox.width
+    this._viewBox.height = bBox.height
   }
 }
 
@@ -502,7 +537,6 @@ SvgPanZoom.prototype.zoomAtPoint = function(svg, point, zoomScale, zoomAbsolute)
 
   point = point.matrixTransform(viewportCTM.inverse())
 
-  //var k = svg.createSVGMatrix().translate(point.x, point.y).scale(zoomScale).translate(-point.x - zoomScale * this.width/2, -point.y - zoomScale * this.height/2)
   var k = svg.createSVGMatrix().translate(point.x, point.y).scale(zoomScale).translate(-point.x, -point.y)
     , wasZoom = viewportCTM
     , setZoom = viewportCTM.multiply(k)
@@ -793,9 +827,9 @@ SvgPanZoom.prototype.getPan = function() {
  */
 SvgPanZoom.prototype.resize = function() {
   // Get dimensions
-  var dimensions = SvgUtils.getSvgDimensions(this.svg)
-  this.width = dimensions.width
-  this.height = dimensions.height
+  var boundingClientRectNormalized = SvgUtils.getBoundingClientRectNormalized(this.svg)
+  this.width = boundingClientRectNormalized.width
+  this.height = boundingClientRectNormalized.height
 
   // Reposition control icons by re-enabling them
   if (this.options.controlIconsEnabled) {
@@ -935,46 +969,37 @@ module.exports = {
    * @param  {object} svg
    * @return {object}     {width: 0, height: 0}
    */
-, getSvgDimensions: function(svg) {
-    var width = 0
-      , height = 0
-      , svgClientRects = svg.getClientRects()
-
-    // Firefox has no nice way of detecting SVG size, so we'll check for
-    // width/height from getComputedStyle, specified in pixels,
-    // and if they don't exist, we'll use the parent dimensions.
-    // TODO: check whether this method would be a better method for other browsers too.
+, getBoundingClientRectNormalized: function(svg) {
+    // Firefox returns values in the SVG coordinate system for getBoundingClientRect(),
+    // whereas other browsers return values in the HTML page coordinate system.
+    // This harmonizes the behavior to use the HTML page coordinate system.
     if (this._browser === 'firefox') {
       var svgComputedStyle = window.getComputedStyle(svg, null);
-      width = parseFloat(svgComputedStyle.width) - (parseFloat(svgComputedStyle.borderLeftWidth) + parseFloat(svgComputedStyle.paddingLeft) + parseFloat(svgComputedStyle.borderRightWidth) + parseFloat(svgComputedStyle.paddingRight));
-      height = parseFloat(svgComputedStyle.height) - (parseFloat(svgComputedStyle.borderTopWidth) + parseFloat(svgComputedStyle.paddingTop) + parseFloat(svgComputedStyle.borderBottomWidth) + parseFloat(svgComputedStyle.paddingBottom));
-      if (!width || !height) {
-        var parentStyle = window.getComputedStyle(svg.parentElement, null);
-        var parentDimensions = svg.parentElement.getBoundingClientRect();
-        width = parentDimensions.width - (parseFloat(parentStyle.borderLeftWidth) + parseFloat(parentStyle.paddingLeft) + parseFloat(parentStyle.borderRightWidth) + parseFloat(parentStyle.paddingRight));
-        height = parentDimensions.height - (parseFloat(parentStyle.borderTopWidth) + parseFloat(parentStyle.paddingTop) + parseFloat(parentStyle.borderBottomWidth) + parseFloat(parentStyle.paddingBottom));
-      }
-    } else {
-      if (typeof svgClientRects !== 'undefined' && svgClientRects.length > 0) {
-        var svgClientRect = svgClientRects[0];
-
-        width = parseFloat(svgClientRect.width);
-        height = parseFloat(svgClientRect.height);
-      } else {
-        var svgBoundingClientRect = svg.getBoundingClientRect();
-
-        if (!!svgBoundingClientRect) {
-          width = parseFloat(svgBoundingClientRect.width);
-          height = parseFloat(svgBoundingClientRect.height);
-        } else {
-          throw new Error('Cannot determine SVG width and height.');
+      var selectedSvgStyleAttributeNames = ['width', 'height', 'left', 'top', 'transform', 'position'];
+      var svgComputedStyleString = '';
+      selectedSvgStyleAttributeNames.forEach(function(styleAttributeName) {
+        var styleAttributeValue = svgComputedStyle[styleAttributeName];
+        if (!!styleAttributeValue) {
+          svgComputedStyleString += ' ' + styleAttributeName + ': ' + styleAttributeValue + ';';
         }
-      }
-    }
+      });
 
-    return {
-      width: width
-    , height: height
+      var parent = svg.parentNode;
+      parent.removeChild(svg);
+
+      var testDiv = document.createElement('div');
+      testDiv.setAttribute('style', svgComputedStyleString);
+      parent.appendChild(testDiv);
+      var testDivBoundingClientRect = testDiv.getBoundingClientRect();
+
+      parent.removeChild(testDiv);
+      parent.appendChild(svg);
+
+      return testDivBoundingClientRect;
+    } else if (!!svg.getBoundingClientRect()) {
+      return svg.getBoundingClientRect();
+    } else {
+      throw new Error('Cannot get BoundingClientRect for SVG.');
     }
   }
 
@@ -1034,7 +1059,7 @@ module.exports = {
     // IE has a bug that makes markers disappear on zoom (when the matrix "a" and/or "d" elements change)
     // see http://stackoverflow.com/questions/17654578/svg-marker-does-not-work-in-ie9-10
     // and http://srndolha.wordpress.com/2013/11/25/svg-line-markers-may-disappear-in-internet-explorer-11/
-    if (this._browser === 'ie') {
+    if (this._browser === 'ie' && !!this.defs) {
       var parent = this.defs.parentNode;
       parent.removeChild(this.defs);
       parent.appendChild(this.defs);
@@ -1112,7 +1137,7 @@ module.exports = {
    * @return {object}     SVG Point
    */
 , getSvgCenterPoint: function(svg) {
-    var boundingClientRect = svg.getBoundingClientRect()
+    var boundingClientRect = this.getBoundingClientRectNormalized(svg)
       , width = boundingClientRect.width
       , height = boundingClientRect.height
       , point = svg.createSVGPoint()

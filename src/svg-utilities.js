@@ -13,46 +13,37 @@ module.exports = {
    * @param  {object} svg
    * @return {object}     {width: 0, height: 0}
    */
-, getSvgDimensions: function(svg) {
-    var width = 0
-      , height = 0
-      , svgClientRects = svg.getClientRects()
-
-    // Firefox has no nice way of detecting SVG size, so we'll check for
-    // width/height from getComputedStyle, specified in pixels,
-    // and if they don't exist, we'll use the parent dimensions.
-    // TODO: check whether this method would be a better method for other browsers too.
+, getBoundingClientRectNormalized: function(svg) {
+    // Firefox returns values in the SVG coordinate system for getBoundingClientRect(),
+    // whereas other browsers return values in the HTML page coordinate system.
+    // This harmonizes the behavior to use the HTML page coordinate system.
     if (this._browser === 'firefox') {
       var svgComputedStyle = window.getComputedStyle(svg, null);
-      width = parseFloat(svgComputedStyle.width) - (parseFloat(svgComputedStyle.borderLeftWidth) + parseFloat(svgComputedStyle.paddingLeft) + parseFloat(svgComputedStyle.borderRightWidth) + parseFloat(svgComputedStyle.paddingRight));
-      height = parseFloat(svgComputedStyle.height) - (parseFloat(svgComputedStyle.borderTopWidth) + parseFloat(svgComputedStyle.paddingTop) + parseFloat(svgComputedStyle.borderBottomWidth) + parseFloat(svgComputedStyle.paddingBottom));
-      if (!width || !height) {
-        var parentStyle = window.getComputedStyle(svg.parentElement, null);
-        var parentDimensions = svg.parentElement.getBoundingClientRect();
-        width = parentDimensions.width - (parseFloat(parentStyle.borderLeftWidth) + parseFloat(parentStyle.paddingLeft) + parseFloat(parentStyle.borderRightWidth) + parseFloat(parentStyle.paddingRight));
-        height = parentDimensions.height - (parseFloat(parentStyle.borderTopWidth) + parseFloat(parentStyle.paddingTop) + parseFloat(parentStyle.borderBottomWidth) + parseFloat(parentStyle.paddingBottom));
-      }
-    } else {
-      if (typeof svgClientRects !== 'undefined' && svgClientRects.length > 0) {
-        var svgClientRect = svgClientRects[0];
-
-        width = parseFloat(svgClientRect.width);
-        height = parseFloat(svgClientRect.height);
-      } else {
-        var svgBoundingClientRect = svg.getBoundingClientRect();
-
-        if (!!svgBoundingClientRect) {
-          width = parseFloat(svgBoundingClientRect.width);
-          height = parseFloat(svgBoundingClientRect.height);
-        } else {
-          throw new Error('Cannot determine SVG width and height.');
+      var selectedSvgStyleAttributeNames = ['width', 'height', 'left', 'top', 'transform', 'position'];
+      var svgComputedStyleString = '';
+      selectedSvgStyleAttributeNames.forEach(function(styleAttributeName) {
+        var styleAttributeValue = svgComputedStyle[styleAttributeName];
+        if (!!styleAttributeValue) {
+          svgComputedStyleString += ' ' + styleAttributeName + ': ' + styleAttributeValue + ';';
         }
-      }
-    }
+      });
 
-    return {
-      width: width
-    , height: height
+      var parent = svg.parentNode;
+      parent.removeChild(svg);
+
+      var testDiv = document.createElement('div');
+      testDiv.setAttribute('style', svgComputedStyleString);
+      parent.appendChild(testDiv);
+      var testDivBoundingClientRect = testDiv.getBoundingClientRect();
+
+      parent.removeChild(testDiv);
+      parent.appendChild(svg);
+
+      return testDivBoundingClientRect;
+    } else if (!!svg.getBoundingClientRect()) {
+      return svg.getBoundingClientRect();
+    } else {
+      throw new Error('Cannot get BoundingClientRect for SVG.');
     }
   }
 
@@ -112,7 +103,7 @@ module.exports = {
     // IE has a bug that makes markers disappear on zoom (when the matrix "a" and/or "d" elements change)
     // see http://stackoverflow.com/questions/17654578/svg-marker-does-not-work-in-ie9-10
     // and http://srndolha.wordpress.com/2013/11/25/svg-line-markers-may-disappear-in-internet-explorer-11/
-    if (this._browser === 'ie') {
+    if (this._browser === 'ie' && !!this.defs) {
       var parent = this.defs.parentNode;
       parent.removeChild(this.defs);
       parent.appendChild(this.defs);
@@ -190,7 +181,7 @@ module.exports = {
    * @return {object}     SVG Point
    */
 , getSvgCenterPoint: function(svg) {
-    var boundingClientRect = svg.getBoundingClientRect()
+    var boundingClientRect = this.getBoundingClientRectNormalized(svg)
       , width = boundingClientRect.width
       , height = boundingClientRect.height
       , point = svg.createSVGPoint()
