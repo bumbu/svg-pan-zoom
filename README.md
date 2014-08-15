@@ -228,4 +228,4 @@ License
   or implied, of Andrea Leofreddi.
 ```
 
-The code from the updates and changes to SVGPan are licensed under the same BSD license, with the copyright for the code from each change held by the author of that code. Submitting a pull request constitutes acceptance of this licensing.
+The code from the updates and changes to SVGPan are licensed under the same BSD license, with the copyright for the code from each change held by the author of that code.
