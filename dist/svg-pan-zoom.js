@@ -262,7 +262,7 @@ var optionsDefaults = {
 , onZoom: function(){}
 , beforePan: null
 , onPan: function(){}
-, refreshRate: 60 // in hz 
+, refreshRate: 60 // in hz
 }
 
 SvgPanZoom.prototype.init = function(svg, options) {
@@ -273,10 +273,7 @@ SvgPanZoom.prototype.init = function(svg, options) {
   this.evNS = 'http://www.w3.org/2001/xml-events';
 
   this.svg = svg
-  SvgUtils.svg = svg
-  var defs = svg.querySelector('defs')
-  this.defs = defs
-  SvgUtils.defs = defs
+  this.defs = svg.querySelector('defs')
 
   // thanks to http://stackoverflow.com/questions/9847580/how-to-detect-safari-chrome-ie-firefox-and-opera-browser
   if (/*@cc_on!@*/false || !!document.documentMode) { // internet explorer
@@ -346,7 +343,7 @@ SvgPanZoom.prototype.processCTM = function() {
     this.initialCTM = newCTM;
 
     // Update viewport CTM
-    SvgUtils.setCTM(this.viewport, newCTM);
+    SvgUtils.setCTM(this.viewport, newCTM, this.defs);
   } else {
     // Leave sizes as they are
     this.svg.removeAttribute('viewBox')
@@ -550,7 +547,7 @@ SvgPanZoom.prototype.zoomAtPoint = function(svg, point, zoomScale, zoomAbsolute)
   } else if (setZoom.a > this.options.maxZoom * this.initialCTM.a) {
     setZoom.a = setZoom.d = this.options.maxZoom * this.initialCTM.a
   } else if (setZoom.a !== wasZoom.a) {
-    SvgUtils.setCTM(this.viewport, setZoom)
+    SvgUtils.setCTM(this.viewport, setZoom, this.defs)
 
     // Cache zoom level
     this._zoom = setZoom.a
@@ -639,7 +636,7 @@ SvgPanZoom.prototype.handleMouseMove = function(evt) {
     var point = SvgUtils.getEventPoint(evt).matrixTransform(this.stateTf)
       , viewportCTM = this.stateTf.inverse().translate(point.x - this.stateOrigin.x, point.y - this.stateOrigin.y)
 
-    SvgUtils.setCTM(this.viewport, viewportCTM)
+    SvgUtils.setCTM(this.viewport, viewportCTM, this.defs)
 
     // Cache pan level
     this._pan.x = viewportCTM.e
@@ -778,7 +775,7 @@ SvgPanZoom.prototype.pan = function(point) {
   var viewportCTM = this.viewport.getCTM()
   viewportCTM.e = point.x
   viewportCTM.f = point.y
-  SvgUtils.setCTM(this.viewport, viewportCTM)
+  SvgUtils.setCTM(this.viewport, viewportCTM, this.defs)
 
   // Cache pan level
   this._pan.x = viewportCTM.e
@@ -802,7 +799,7 @@ SvgPanZoom.prototype.panBy = function(point) {
   var viewportCTM = this.viewport.getCTM()
   viewportCTM.e += point.x
   viewportCTM.f += point.y
-  SvgUtils.setCTM(this.viewport, viewportCTM)
+  SvgUtils.setCTM(this.viewport, viewportCTM, this.defs)
 
   // Cache pan level
   this._pan.x = viewportCTM.e
@@ -1052,19 +1049,19 @@ module.exports = {
    * @param {object} element SVG Element
    * @param {object} matrix  CTM
    */
-, setCTM: function(element, matrix) {
+, setCTM: function(element, matrix, defs) {
     var s = 'matrix(' + matrix.a + ',' + matrix.b + ',' + matrix.c + ',' + matrix.d + ',' + matrix.e + ',' + matrix.f + ')';
     element.setAttributeNS(null, 'transform', s);
 
     // IE has a bug that makes markers disappear on zoom (when the matrix "a" and/or "d" elements change)
     // see http://stackoverflow.com/questions/17654578/svg-marker-does-not-work-in-ie9-10
     // and http://srndolha.wordpress.com/2013/11/25/svg-line-markers-may-disappear-in-internet-explorer-11/
-    if (this._browser === 'ie' && !!this.defs) {
+    if (this._browser !== 'ie' && !!defs) {
       var that = this;
       Utils.throttle(function() {
-        var parent = that.defs.parentNode;
-        parent.removeChild(that.defs);
-        parent.appendChild(that.defs);
+        var parent = defs.parentNode;
+        parent.removeChild(defs);
+        parent.appendChild(defs);
       }, 1000/that.refreshRate)();
     }
   }

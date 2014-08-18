@@ -96,19 +96,19 @@ module.exports = {
    * @param {object} element SVG Element
    * @param {object} matrix  CTM
    */
-, setCTM: function(element, matrix) {
+, setCTM: function(element, matrix, defs) {
     var s = 'matrix(' + matrix.a + ',' + matrix.b + ',' + matrix.c + ',' + matrix.d + ',' + matrix.e + ',' + matrix.f + ')';
     element.setAttributeNS(null, 'transform', s);
 
     // IE has a bug that makes markers disappear on zoom (when the matrix "a" and/or "d" elements change)
     // see http://stackoverflow.com/questions/17654578/svg-marker-does-not-work-in-ie9-10
     // and http://srndolha.wordpress.com/2013/11/25/svg-line-markers-may-disappear-in-internet-explorer-11/
-    if (this._browser === 'ie' && !!this.defs) {
+    if (this._browser !== 'ie' && !!defs) {
       var that = this;
       Utils.throttle(function() {
-        var parent = that.defs.parentNode;
-        parent.removeChild(that.defs);
-        parent.appendChild(that.defs);
+        var parent = defs.parentNode;
+        parent.removeChild(defs);
+        parent.appendChild(defs);
       }, 1000/that.refreshRate)();
     }
   }
