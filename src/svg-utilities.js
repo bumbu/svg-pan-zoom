@@ -96,7 +96,7 @@ module.exports = {
    * @param {object} element SVG Element
    * @param {object} matrix  CTM
    */
-, setCTM: Utils.throttle(function(element, matrix) {
+, setCTM: function(element, matrix) {
     var s = 'matrix(' + matrix.a + ',' + matrix.b + ',' + matrix.c + ',' + matrix.d + ',' + matrix.e + ',' + matrix.f + ')';
     element.setAttributeNS(null, 'transform', s);
 
@@ -104,11 +104,14 @@ module.exports = {
     // see http://stackoverflow.com/questions/17654578/svg-marker-does-not-work-in-ie9-10
     // and http://srndolha.wordpress.com/2013/11/25/svg-line-markers-may-disappear-in-internet-explorer-11/
     if (this._browser === 'ie' && !!this.defs) {
-      var parent = this.defs.parentNode;
-      parent.removeChild(this.defs);
-      parent.appendChild(this.defs);
+      var that = this;
+      Utils.throttle(function() {
+        var parent = that.defs.parentNode;
+        parent.removeChild(that.defs);
+        parent.appendChild(that.defs);
+      }, 1000/that.refreshRate)();
     }
-  }, 1000/this.refreshRate)
+  }
 
   /**
    * Time-based cache for svg.getScreenCTM().
