@@ -1079,8 +1079,8 @@ module.exports = {
    */
 , setCTM: function(element, matrix, defs) {
     var that = this;
-    // this throttling is intentionally not global
-    Utils.throttle(function() {
+    // this throttling causes problems when trying to synchronize the zoom between two different SVGs.
+    //Utils.throttle(function() {
       var s = 'matrix(' + matrix.a + ',' + matrix.b + ',' + matrix.c + ',' + matrix.d + ',' + matrix.e + ',' + matrix.f + ')';
       element.setAttributeNS(null, 'transform', s);
 
@@ -1097,7 +1097,7 @@ module.exports = {
           that.refreshDefsGlobal();
         }, that.internetExplorerRedisplayInterval);
       }
-    }, 1000/that.refreshRate)();
+    //}, 1000/that.refreshRate)();
   }
 
   /**
