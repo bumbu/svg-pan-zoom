@@ -91,26 +91,60 @@ module.exports = {
     }
   }
 
+/**
+ * How long Internet Explorer takes to finish updating its display.
+ * (ms)
+ *
+ * @return
+ */
+, internetExplorerRedisplayInterval: 300
+
+/**
+ * Forces the browser to redisplay all SVG elements that rely on an
+ * element defined in a 'defs' section. It works globally, for every
+ * available defs element on the page.
+ * This throttling is intentionally global.
+ *
+ * This is only needed for IE, as a hack to make markers (and 'use' elements?)
+ * visible after pan/zoom when there are multiple SVGs on the page.
+ * See bug report: https://connect.microsoft.com/IE/feedback/details/781964/
+ * also see svg-pan-zoom issue: https://github.com/ariutta/svg-pan-zoom/issues/62
+ */
+, refreshDefsGlobal: Utils.throttle(function() {
+    var allDefs = document.querySelectorAll('defs');
+    var allDefsCount = allDefs.length;
+    for (var i = 0; i < allDefsCount; i++) {
+      var thisDefs = allDefs[i];
+      thisDefs.parentNode.insertBefore(thisDefs, thisDefs);
+    }
+  }, this.internetExplorerRedisplayInterval)
+
   /**
    * Sets the current transform matrix of an element
    * @param {object} element SVG Element
    * @param {object} matrix  CTM
    */
 , setCTM: function(element, matrix, defs) {
-    var s = 'matrix(' + matrix.a + ',' + matrix.b + ',' + matrix.c + ',' + matrix.d + ',' + matrix.e + ',' + matrix.f + ')';
-    element.setAttributeNS(null, 'transform', s);
+    var that = this;
+    // this throttling is intentionally not global
+    Utils.throttle(function() {
+      var s = 'matrix(' + matrix.a + ',' + matrix.b + ',' + matrix.c + ',' + matrix.d + ',' + matrix.e + ',' + matrix.f + ')';
+      element.setAttributeNS(null, 'transform', s);
 
-    // IE has a bug that makes markers disappear on zoom (when the matrix "a" and/or "d" elements change)
-    // see http://stackoverflow.com/questions/17654578/svg-marker-does-not-work-in-ie9-10
-    // and http://srndolha.wordpress.com/2013/11/25/svg-line-markers-may-disappear-in-internet-explorer-11/
-    if (this._browser !== 'ie' && !!defs) {
-      var that = this;
-      Utils.throttle(function() {
-        var parent = defs.parentNode;
-        parent.removeChild(defs);
-        parent.appendChild(defs);
-      }, 1000/that.refreshRate)();
-    }
+      // IE has a bug that makes markers disappear on zoom (when the matrix "a" and/or "d" elements change)
+      // see http://stackoverflow.com/questions/17654578/svg-marker-does-not-work-in-ie9-10
+      // and http://srndolha.wordpress.com/2013/11/25/svg-line-markers-may-disappear-in-internet-explorer-11/
+      if (that._browser === 'ie' && !!defs) {
+        // this refresh is intended for redisplaying the SVG during zooming
+        defs.parentNode.insertBefore(defs, defs);
+        // this refresh is intended for redisplaying the other SVGs on a page when panning a given SVG
+        // it is also needed for the given SVG itself, on zoomEnd, if the SVG contains any markers that
+        // are located under any other element(s).
+        window.setTimeout(function() {
+          that.refreshDefsGlobal();
+        }, that.internetExplorerRedisplayInterval);
+      }
+    }, 1000/that.refreshRate)();
   }
 
   /**
