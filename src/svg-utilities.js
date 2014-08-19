@@ -103,9 +103,9 @@ module.exports = {
  * Forces the browser to redisplay all SVG elements that rely on an
  * element defined in a 'defs' section. It works globally, for every
  * available defs element on the page.
- * This throttling is intentionally global.
+ * The throttling is intentionally global.
  *
- * This is only needed for IE, as a hack to make markers (and 'use' elements?)
+ * This is only needed for IE. It is as a hack to make markers (and 'use' elements?)
  * visible after pan/zoom when there are multiple SVGs on the page.
  * See bug report: https://connect.microsoft.com/IE/feedback/details/781964/
  * also see svg-pan-zoom issue: https://github.com/ariutta/svg-pan-zoom/issues/62

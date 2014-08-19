@@ -1,6 +1,6 @@
 {
   "name": "svg-pan-zoom",
-  "version": "2.3.6",
+  "version": "2.3.7",
   "main": "dist/svg-pan-zoom.js",
   "browser": "src/browserify.js",
   "license": "BSD",
