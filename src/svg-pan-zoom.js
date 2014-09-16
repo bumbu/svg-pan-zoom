@@ -316,12 +316,6 @@ SvgPanZoom.prototype.zoomAtPoint = function(svg, point, zoomScale, zoomAbsolute)
     this._pan.y = setZoom.f
   }
 
-  if (!this.stateTf) {
-    this.stateTf = setZoom.inverse()
-  }
-
-  this.stateTf = this.stateTf.multiply(k.inverse())
-
   if (this.options.onZoom) {
     this.options.onZoom(setZoom.a)
   }
