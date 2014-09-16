@@ -530,6 +530,13 @@ SvgPanZoom.prototype.zoomAtPoint = function(svg, point, zoomScale, zoomAbsolute)
     this.options.beforeZoom()
   }
 
+  // Fit zoomScale in set bounds
+  if (this._zoom * zoomScale < this.options.minZoom * this.initialCTM.a) {
+    zoomScale = (this.options.minZoom * this.initialCTM.a) / this._zoom
+  } else if (this._zoom * zoomScale > this.options.maxZoom * this.initialCTM.a) {
+    zoomScale = (this.options.maxZoom * this.initialCTM.a) / this._zoom
+  }
+
   var viewportCTM = this.viewport.getCTM()
 
   point = point.matrixTransform(viewportCTM.inverse())
@@ -542,11 +549,7 @@ SvgPanZoom.prototype.zoomAtPoint = function(svg, point, zoomScale, zoomAbsolute)
     setZoom.a = setZoom.d = zoomScale
   }
 
-  if (setZoom.a < this.options.minZoom * this.initialCTM.a) {
-    setZoom.a = setZoom.d = this.options.minZoom * this.initialCTM.a
-  } else if (setZoom.a > this.options.maxZoom * this.initialCTM.a) {
-    setZoom.a = setZoom.d = this.options.maxZoom * this.initialCTM.a
-  } else if (setZoom.a !== wasZoom.a) {
+  if (setZoom.a !== wasZoom.a) {
     SvgUtils.setCTM(this.viewport, setZoom, this.defs)
 
     // Cache zoom level
@@ -556,12 +559,6 @@ SvgPanZoom.prototype.zoomAtPoint = function(svg, point, zoomScale, zoomAbsolute)
     this._pan.x = setZoom.e
     this._pan.y = setZoom.f
   }
-
-  if (!this.stateTf) {
-    this.stateTf = setZoom.inverse()
-  }
-
-  this.stateTf = this.stateTf.multiply(k.inverse())
 
   if (this.options.onZoom) {
     this.options.onZoom(setZoom.a)
