@@ -72,13 +72,6 @@ SvgPanZoom.prototype.init = function(svg, options) {
 
   // Init events handlers
   this.setupHandlers()
-
-  // TODO what for do we need this?
-  // It is replacing window.svgPanZoom constructor with this instance
-  //
-  // if (this.svg.ownerDocument.documentElement.tagName.toLowerCase() !== 'svg') {
-  //   this.svg.ownerDocument.defaultView.svgPanZoom = this
-  // }
 }
 
 /**
