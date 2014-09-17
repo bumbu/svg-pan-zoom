@@ -1,4 +1,13 @@
-var Utils = require('./utilities');
+var Utils = require('./utilities')
+  , _browser = 'unknown'
+  ;
+
+// http://stackoverflow.com/questions/9847580/how-to-detect-safari-chrome-ie-firefox-and-opera-browser
+if (/*@cc_on!@*/false || !!document.documentMode) { // internet explorer
+  _browser = 'ie';
+} else if (typeof InstallTrigger !== 'undefined') { // firefox
+  _browser = 'firefox';
+}
 
 module.exports = {
   svgNS:  'http://www.w3.org/2000/svg'
@@ -17,7 +26,7 @@ module.exports = {
     // Firefox returns values in the SVG coordinate system for getBoundingClientRect(),
     // whereas other browsers return values in the HTML page coordinate system.
     // This harmonizes the behavior to use the HTML page coordinate system.
-    if (this._browser === 'firefox') {
+    if (_browser === 'firefox') {
       var svgComputedStyle = window.getComputedStyle(svg, null);
       var selectedSvgStyleAttributeNames = ['width', 'height', 'left', 'top', 'transform', 'position'];
       var svgComputedStyleString = '';
@@ -134,7 +143,7 @@ module.exports = {
       // IE has a bug that makes markers disappear on zoom (when the matrix "a" and/or "d" elements change)
       // see http://stackoverflow.com/questions/17654578/svg-marker-does-not-work-in-ie9-10
       // and http://srndolha.wordpress.com/2013/11/25/svg-line-markers-may-disappear-in-internet-explorer-11/
-      if (that._browser === 'ie' && !!defs) {
+      if (_browser === 'ie' && !!defs) {
         // this refresh is intended for redisplaying the SVG during zooming
         defs.parentNode.insertBefore(defs, defs);
         // this refresh is intended for redisplaying the other SVGs on a page when panning a given SVG

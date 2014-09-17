@@ -34,13 +34,6 @@ SvgPanZoom.prototype.init = function(svg, options) {
   this.svg = svg
   this.defs = svg.querySelector('defs')
 
-  // thanks to http://stackoverflow.com/questions/9847580/how-to-detect-safari-chrome-ie-firefox-and-opera-browser
-  if (/*@cc_on!@*/false || !!document.documentMode) { // internet explorer
-    SvgUtils._browser = 'ie';
-  } else if (typeof InstallTrigger !== 'undefined') { // firefox
-    SvgUtils._browser = 'firefox';
-  }
-
   // Set options
   this.options = Utils.extend(Utils.extend({}, optionsDefaults), options)
   SvgUtils.refreshRate = this.options.refreshRate;
