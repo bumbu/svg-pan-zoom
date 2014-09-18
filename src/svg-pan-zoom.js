@@ -76,42 +76,49 @@ SvgPanZoom.prototype.setupHandlers = function() {
     , prevEvt = null // use for touchstart event to detect double tap
     ;
 
-  // Mouse down group
-  this.svg.addEventListener("mousedown", function(evt) {
-    return that.handleMouseDown(evt, null);
-  }, false);
-  this.svg.addEventListener("touchstart", function(evt) {
-    var result = that.handleMouseDown(evt, prevEvt);
-    prevEvt = evt
-    return result;
-  }, false);
+  this.eventListeners = {
+    // Mouse down group
+    mousedown: function(evt) {
+      return that.handleMouseDown(evt, null);
+    }
+  , touchstart: function(evt) {
+      var result = that.handleMouseDown(evt, prevEvt);
+      prevEvt = evt
+      return result;
+    }
 
-  // Mouse up group
-  this.svg.addEventListener("mouseup", function(evt) {
-    return that.handleMouseUp(evt);
-  }, false);
-  this.svg.addEventListener("touchend", function(evt) {
-    return that.handleMouseUp(evt);
-  }, false);
+    // Mouse up group
+  , mouseup: function(evt) {
+      return that.handleMouseUp(evt);
+    }
+  , touchend: function(evt) {
+      return that.handleMouseUp(evt);
+    }
 
-  // Mouse move group
-  this.svg.addEventListener("mousemove", function(evt) {
-    return that.handleMouseMove(evt);
-  }, false);
-  this.svg.addEventListener("touchmove", function(evt) {
-    return that.handleMouseMove(evt);
-  }, false);
+    // Mouse move group
+  , mousemove: function(evt) {
+      return that.handleMouseMove(evt);
+    }
+  , touchmove: function(evt) {
+      return that.handleMouseMove(evt);
+    }
 
-  // Mouse leave group
-  this.svg.addEventListener("mouseleave", function(evt) {
-    return that.handleMouseUp(evt);
-  }, false);
-  this.svg.addEventListener("touchleave", function(evt) {
-    return that.handleMouseUp(evt);
-  }, false);
-  this.svg.addEventListener("touchcancel", function(evt) {
-    return that.handleMouseUp(evt);
-  }, false);
+    // Mouse leave group
+  , mouseleave: function(evt) {
+      return that.handleMouseUp(evt);
+    }
+  , touchleave: function(evt) {
+      return that.handleMouseUp(evt);
+    }
+  , touchcancel: function(evt) {
+      return that.handleMouseUp(evt);
+    }
+  }
+
+  // Bind eventListeners
+  for (var event in this.eventListeners) {
+    this.svg.addEventListener(event, this.eventListeners[event], false)
+  }
 
   // Mouse wheel listener
   this.wheelListener = function(evt) {
@@ -449,6 +456,41 @@ SvgPanZoom.prototype.resize = function() {
 }
 
 /**
+ * Unbind mouse events, free callbacks and destroy public instance
+ */
+SvgPanZoom.prototype.destroy = function() {
+  var that = this
+
+  // Free callbacks
+  this.beforeZoom = null
+  this.onZoom = null
+  this.beforePan = null
+  this.onPan = null
+
+  // Unbind eventListeners
+  for (var event in this.eventListeners) {
+    this.svg.removeEventListener(event, this.eventListeners[event], false)
+  }
+
+  // Unbind wheelListener
+  Wheel.off(this.svg, this.wheelListener, false)
+
+  // Remove control icons
+  this.getPublicInstance().disableControlIcons()
+
+  // Remove instance from instancesStore
+  instancesStore = instancesStore.filter(function(instance){
+    return instance.svg !== that.svg
+  })
+
+  // Destroy public instance and rewrite getPublicInstance
+  this.publicInstance = null
+  this.getPublicInstance = function(){
+    return null
+  }
+}
+
+/**
  * Returns a public instance object
  *
  * @return {Object} Public instance object
@@ -524,6 +566,7 @@ SvgPanZoom.prototype.getPublicInstance = function() {
     , fit: function(dropCache) {return that.fit(dropCache)}
     , center: function(dropCache) {return that.center(dropCache)}
     , resize: function() {that.resize()}
+    , destroy: function() {that.destroy()}
     }
   }
 
