@@ -43,7 +43,7 @@ SvgPanZoom.prototype.init = function(svg, options) {
 
   // Set options
   this.options = Utils.extend(Utils.extend({}, optionsDefaults), options)
-  SvgUtils.refreshRate = options.refreshRate;
+  SvgUtils.refreshRate = (options.refreshRate == null ? optionsDefaults.refreshRate : options.refreshRate);
 
   // Set default state
   this.state = 'none'
