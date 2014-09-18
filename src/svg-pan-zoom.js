@@ -1,4 +1,4 @@
-var Mousewheel = require('./mousewheel')  // Keep it here so that mousewheel is initialised
+var Wheel = require('uniwheel')
 , ControlIcons = require('./control-icons')
 , Utils = require('./utilities')
 , SvgUtils = require('./svg-utilities')
@@ -114,9 +114,12 @@ SvgPanZoom.prototype.setupHandlers = function() {
   }, false);
 
   // Mouse wheel listener
-  window.addWheelListener(this.svg, function(evt) {
+  this.wheelListener = function(evt) {
     return that.handleMouseWheel(evt);
-  })
+  }
+
+  // Bind wheelListener
+  Wheel.on(this.svg, this.wheelListener, false)
 }
 
 /**

@@ -5,14 +5,15 @@
   "browser": "src/browserify.js",
   "license": "BSD",
   "devDependencies": {
-    "gulp": "~3.5.0",
-    "gulp-watch": "~0.5.0",
-    "gulp-uglify": "~0.2.0",
-    "gulp-plumber": "~0.5.6",
-    "gulp-concat": "~2.2.0",
-    "vinyl-source-stream": "~0.1.1",
     "browserify": "~3.44.2",
+    "gulp": "~3.5.0",
+    "gulp-concat": "~2.2.0",
+    "gulp-plumber": "~0.5.6",
+    "gulp-rename": "~1.2.0",
     "gulp-streamify": "0.0.5",
-    "gulp-rename": "~1.2.0"
+    "gulp-uglify": "~0.2.0",
+    "gulp-watch": "~0.5.0",
+    "uniwheel": "^0.1.2",
+    "vinyl-source-stream": "~0.1.1"
   }
 }
