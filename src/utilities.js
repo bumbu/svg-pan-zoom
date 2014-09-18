@@ -2,9 +2,9 @@ module.exports = {
   /**
    * Extends an object
    *
-   * @param  {object} target object to extend
-   * @param  {object} source object to take properties from
-   * @return {object}        extended object
+   * @param  {Object} target object to extend
+   * @param  {Object} source object to take properties from
+   * @return {Object}        extended object
    */
   extend: function(target, source) {
     target = target || {};
@@ -22,7 +22,7 @@ module.exports = {
   /**
    * Checks if an object is a DOM element
    *
-   * @param  {object}  o HTML element or String
+   * @param  {Object}  o HTML element or String
    * @return {Boolean}   returns true if object is a DOM element
    */
 , isElement: function(o){
@@ -35,7 +35,7 @@ module.exports = {
   /**
    * Checks if an object is an Object
    *
-   * @param  {object}  o Object
+   * @param  {Object}  o Object
    * @return {Boolean}   returns true if object is an Object
    */
 , isObject: function(o){
@@ -45,7 +45,7 @@ module.exports = {
   /**
    * Checks if an object is a Function
    *
-   * @param  {object}  f Function
+   * @param  {Object}  f Function
    * @return {Boolean}   returns true if object is a Function
    */
 , isFunction: function(f){
@@ -55,8 +55,8 @@ module.exports = {
   /**
    * Search for an SVG element
    *
-   * @param  {object|string} elementOrSelector DOM Element or selector String
-   * @return {object|null}                   SVG or null
+   * @param  {Object|String} elementOrSelector DOM Element or selector String
+   * @return {Object|Null}                   SVG or null
    */
 , getSvg: function(elementOrSelector) {
     var element
@@ -106,7 +106,7 @@ module.exports = {
   /**
    * Attach a given context to a function
    * @param  {Function} fn      Function
-   * @param  {object}   context Context
+   * @param  {Object}   context Context
    * @return {Function}           Function with certain context
    */
 , proxy: function(fn, context) {
@@ -120,8 +120,8 @@ module.exports = {
    * Uses toString that returns [object SVGPoint]
    * And than parses object type from string
    *
-   * @param  {object} o Any object
-   * @return {string}   Object type
+   * @param  {Object} o Any object
+   * @return {String}   Object type
    */
 , getType: function(o) {
     return Object.prototype.toString.apply(o).replace(/^\[object\s/, '').replace(/\]$/, '')
@@ -130,7 +130,8 @@ module.exports = {
   /**
    * If it is a touch event than add clientX and clientY to event object
    *
-   * @param  {object} evt Event object
+   * @param  {Event} evt
+   * @param  {SVGSVGElement} svg
    */
 , mouseAndTouchNormalize: function(evt, svg) {
     // If no cilentX and but touch objects are available
@@ -162,9 +163,9 @@ module.exports = {
    * TODO: For touch gestures use a library (hammer.js) that takes in account other events
    * (touchmove and touchend). It should take in account tap duration and traveled distance
    *
-   * @param  {object}  evt     Event
-   * @param  {object}  prevEvt Previous Event
-   * @return {Boolean}         [description]
+   * @param  {Event}  evt
+   * @param  {Event}  prevEvt Previous Event
+   * @return {Boolean}
    */
 , isDblClick: function(evt, prevEvt) {
     // Double click detected by browser
@@ -182,10 +183,16 @@ module.exports = {
     // Nothing found
     return false;
   }
-  // A (possibly faster) way to get the current timestamp as an integer.
+
+  /**
+   * Returns current timestamp as an integer
+   *
+   * @return {Number}
+   */
 , now: Date.now || function() {
     return new Date().getTime();
   }
+
   // From underscore.
   // Returns a function, that, when invoked, will only be triggered at most once
   // during a given window of time. Normally, the throttled function will run

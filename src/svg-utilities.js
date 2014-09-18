@@ -19,8 +19,8 @@ module.exports = {
   /**
    * Get svg dimensions: width and height
    *
-   * @param  {object} svg
-   * @return {object}     {width: 0, height: 0}
+   * @param  {SVGSVGElement} svg
+   * @return {Object}     {width: 0, height: 0}
    */
 , getBoundingClientRectNormalized: function(svg) {
     // Firefox returns values in the SVG coordinate system for getBoundingClientRect(),
@@ -58,8 +58,9 @@ module.exports = {
 
   /**
    * Gets g element with class of "viewport" or creates it if it doesn't exist
-   * @param  {object} svg
-   * @return {object}     g element
+   *
+   * @param  {SVGSVGElement} svg
+   * @return {SVGElement}     g (group) element
    */
 , getOrCreateViewport: function(svg) {
     var viewport = svg.querySelector('g.viewport')
@@ -84,9 +85,13 @@ module.exports = {
     return viewport
   }
 
+  /**
+   * Set SVG attributes
+   *
+   * @param  {SVGSVGElement} svg
+   */
   , setupSvgAttributes: function(svg) {
     // Setting default attributes
-
     svg.setAttribute('xmlns', this.svgNS);
     svg.setAttributeNS(this.xmlnsNS, 'xmlns:xlink', this.xlinkNS);
     svg.setAttributeNS(this.xmlnsNS, 'xmlns:ev', this.evNS);
@@ -101,10 +106,7 @@ module.exports = {
   }
 
 /**
- * How long Internet Explorer takes to finish updating its display.
- * (ms)
- *
- * @return
+ * How long Internet Explorer takes to finish updating its display (ms).
  */
 , internetExplorerRedisplayInterval: 300
 
@@ -130,8 +132,10 @@ module.exports = {
 
   /**
    * Sets the current transform matrix of an element
-   * @param {object} element SVG Element
-   * @param {object} matrix  CTM
+   *
+   * @param {SVGElement} element
+   * @param {SVGMatrix} matrix  CTM
+   * @param {SVGElement} defs
    */
 , setCTM: function(element, matrix, defs) {
     var that = this;
@@ -157,60 +161,14 @@ module.exports = {
   }
 
   /**
-   * Time-based cache for svg.getScreenCTM().
-   * Needed because getScreenCTM() is very slow on Firefox (FF 28 at time of writing).
-   * The cache expires every 300ms... this is a pretty safe time because it's only called
-   * when we're zooming, when the screenCTM is unlikely/impossible to change.
-   *
-   * @param {object} svg SVG Element
-   * @return {[type]} [description]
-   */
-, getScreenCTMCached: (function() {
-    var svgs = {};
-    return function(svg) {
-      var cur = Date.now();
-      if (svgs.hasOwnProperty(svg)) {
-        var cached = svgs[svg];
-        if (cur - cached.time > 300) {
-          // Cache expired
-          cached.time = cur;
-          cached.ctm = svg.getScreenCTM();
-        }
-        return cached.ctm;
-      } else {
-        var ctm = svg.getScreenCTM();
-        svgs[svg] = {time: cur, ctm: ctm};
-        return ctm;
-      }
-    };
-  })()
-
-  /**
-   * Get an SVGPoint of the mouse co-ordinates of the event, relative to the SVG element
-   *
-   * @param  {object} svg SVG Element
-   * @param  {object} evt Event
-   * @return {object}     point
-   */
-, getRelativeMousePoint: function(svg, evt) {
-    Utils.mouseAndTouchNormalize(evt, svg)
-
-    var point = svg.createSVGPoint()
-
-    point.x = evt.clientX
-    point.y = evt.clientY
-
-    return point.matrixTransform(this.getScreenCTMCached(svg).inverse())
-  }
-
-  /**
    * Instantiate an SVGPoint object with given event coordinates
    *
-   * @param {object} evt Event
+   * @param {Event} evt
+   * @param  {SVGSVGElement} svg
+   * @return {SVGPoint}     point
    */
-, getEventPoint: function(evt) {
-    var svg = (evt.target.tagName === 'svg' || evt.target.tagName === 'SVG') ? evt.target : evt.target.ownerSVGElement || evt.target.correspondingElement.ownerSVGElement
-      , point = svg.createSVGPoint()
+, getEventPoint: function(evt, svg) {
+    var point = svg.createSVGPoint()
 
     Utils.mouseAndTouchNormalize(evt, svg)
 
@@ -223,8 +181,8 @@ module.exports = {
   /**
    * Get SVG center point
    *
-   * @param  {object} svg SVG Element
-   * @return {object}     SVG Point
+   * @param  {SVGSVGElement} svg
+   * @return {SVGPoint}
    */
 , getSvgCenterPoint: function(svg) {
     var boundingClientRect = this.getBoundingClientRectNormalized(svg)
@@ -234,6 +192,22 @@ module.exports = {
 
     point.x = width / 2
     point.y = height / 2
+
+    return point
+  }
+
+  /**
+   * Create a SVGPoint with given x and y
+   *
+   * @param  {SVGSVGElement} svg
+   * @param  {Number} x
+   * @param  {Number} y
+   * @return {SVGPoint}
+   */
+, createSVGPoint: function(svg, x, y) {
+    var point = this.svg.createSVGPoint()
+    point.x = x
+    point.y = y
 
     return point
   }
