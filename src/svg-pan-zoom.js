@@ -178,21 +178,25 @@ SvgPanZoom.prototype.zoomAtPoint = function(point, zoomScale, zoomAbsolute) {
 
   var originalState = this.viewport.getOriginalState()
 
-  // Fit zoomScale in set bounds
-  if (this.getZoom() * zoomScale < this.options.minZoom * originalState.zoom) {
-    zoomScale = (this.options.minZoom * originalState.zoom) / this.getZoom()
-  } else if (this.getZoom() * zoomScale > this.options.maxZoom * originalState.zoom) {
-    zoomScale = (this.options.maxZoom * originalState.zoom) / this.getZoom()
+
+  if (!zoomAbsolute) {
+    // Fit zoomScale in set bounds
+    if (this.getZoom() * zoomScale < this.options.minZoom * originalState.zoom) {
+      zoomScale = (this.options.minZoom * originalState.zoom) / this.getZoom()
+    } else if (this.getZoom() * zoomScale > this.options.maxZoom * originalState.zoom) {
+      zoomScale = (this.options.maxZoom * originalState.zoom) / this.getZoom()
+    }
+  } else {
+    // Fit zoomScale in set bounds
+    zoomScale = Math.max(this.options.minZoom * originalState.zoom, Math.min(this.options.maxZoom * originalState.zoom, zoomScale))
+    // Find relative scale to achieve desired scale
+    zoomScale = zoomScale/this.getZoom()
   }
 
   var oldCTM = this.viewport.getCTM()
     , relativePoint = point.matrixTransform(oldCTM.inverse())
     , modifier = this.svg.createSVGMatrix().translate(relativePoint.x, relativePoint.y).scale(zoomScale).translate(-relativePoint.x, -relativePoint.y)
     , newCTM = oldCTM.multiply(modifier)
-
-  if (zoomAbsolute) {
-    newCTM.a = newCTM.d = zoomScale
-  }
 
   if (newCTM.a !== oldCTM.a) {
     this.viewport.setCTM(newCTM)
