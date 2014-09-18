@@ -157,7 +157,7 @@ module.exports = {
           that.refreshDefsGlobal();
         }, that.internetExplorerRedisplayInterval);
       }
-    //}, 1000/that.refreshRate)();
+    //}, 1000/60)();
   }
 
   /**

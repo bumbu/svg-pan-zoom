@@ -22,7 +22,6 @@ var optionsDefaults = {
 , onZoom: function(){}
 , beforePan: null
 , onPan: function(){}
-, refreshRate: 60 // in hz
 }
 
 SvgPanZoom.prototype.init = function(svg, options) {
@@ -40,7 +39,6 @@ SvgPanZoom.prototype.init = function(svg, options) {
 
   // Set options
   this.options = Utils.extend(Utils.extend({}, optionsDefaults), options)
-  SvgUtils.refreshRate = this.options.refreshRate;
 
   // Set default state
   this.state = 'none'
