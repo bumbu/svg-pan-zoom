@@ -737,7 +737,8 @@
     <script>
       // Don't use window.onLoad like this in production, because it can only listen to one function.
       window.onload = function() {
-        svgPanZoom('#demo-tiger', {
+        // Expose to window namespase for testing purposes
+        window.zoomTiger = svgPanZoom('#demo-tiger', {
           zoomEnabled: true,
           controlIconsEnabled: true,
           fit: true,
