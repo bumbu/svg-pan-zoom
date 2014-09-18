@@ -145,6 +145,10 @@ module.exports = {
 , mouseAndTouchNormalize: function(evt, svg) {
     // If no cilentX and but touch objects are available
     if (evt.clientX === void 0 || evt.clientX === null) {
+      // Fallback
+      evt.clientX = 0
+      evt.clientY = 0
+
       // If it is a touch event
       if (evt.changedTouches !== void 0 && evt.changedTouches.length) {
         // If touch event has changedTouches
@@ -159,10 +163,12 @@ module.exports = {
           evt.clientX = evt.changedTouches[0].pageX - rect.left
           evt.clientY = evt.changedTouches[0].pageY - rect.top
         }
-      } else {
-        // Fallback
-        evt.clientX = 0
-        evt.clientY = 0
+      // If it is a custom event
+      } else if (evt.originalEvent != null) {
+        if (evt.originalEvent.clientX != null) {
+          evt.clientX = evt.originalEvent.clientX
+          evt.clientY = evt.originalEvent.clientY
+        }
       }
     }
   }
