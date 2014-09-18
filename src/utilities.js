@@ -52,16 +52,6 @@ module.exports = {
   }
 
   /**
-   * Checks if an object is a Function
-   *
-   * @param  {Object}  f Function
-   * @return {Boolean}   returns true if object is a Function
-   */
-, isFunction: function(f){
-    return Object.prototype.toString.call(f) === '[object Function]';
-  }
-
-  /**
    * Search for an SVG element
    *
    * @param  {Object|String} elementOrSelector DOM Element or selector String
