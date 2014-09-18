@@ -1,3 +1,12 @@
+/**
+ * Simulates a requestAnimationFrame
+ *
+ * @param  {Function} callback
+ */
+function requestAnimationFrameSimulator(callback) {
+  window.setTimeout(callback, 1000/60)
+}
+
 module.exports = {
   /**
    * Extends an object
@@ -229,4 +238,6 @@ module.exports = {
       return result;
     };
   }
+
+, requestAnimationFrame: window.requestAnimationFrame || requestAnimationFrameSimulator
 }

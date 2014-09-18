@@ -29,6 +29,8 @@ ShadowViewport.prototype.init = function(viewport, options) {
   this.activeState = {zoom: 1, x: 0, y: 0}
   // this.updateCache(this.getCTM()) // Update active cache with
 
+  this.updateCTMCached = Utils.proxy(this.updateCTM, this)
+
   // Process CTM
   this.processCTM()
 }
@@ -155,8 +157,7 @@ ShadowViewport.prototype.getCTM = function() {
 ShadowViewport.prototype.setCTM = function(newCTM) {
   this.updateCache(newCTM)
 
-  // Updates SVG element
-  SvgUtils.setCTM(this.viewport, newCTM, this.defs)
+  this.updateCTMOnNextFrame()
 }
 
 /**
@@ -175,6 +176,32 @@ ShadowViewport.prototype.updateCache = function(newCTM) {
   this.cachedCTM.d = newCTM.d
   this.cachedCTM.f = newCTM.f
   this.cachedCTM.e = newCTM.e
+}
+
+ShadowViewport.prototype.pendingUpdate = false
+
+/**
+ * Place a request to update CTM on next Frame
+ */
+ShadowViewport.prototype.updateCTMOnNextFrame = function() {
+  if (!this.pendingUpdate) {
+    // Lock
+    this.pendingUpdate = true
+
+    // Throttle next update
+    Utils.requestAnimationFrame.call(window, this.updateCTMCached)
+  }
+}
+
+/**
+ * Update viewport CTM with cached CTM
+ */
+ShadowViewport.prototype.updateCTM = function() {
+  // Updates SVG element
+  SvgUtils.setCTM(this.viewport, this.getCTM(), this.defs)
+
+  // Free the lock
+  this.pendingUpdate = false
 }
 
 /**
