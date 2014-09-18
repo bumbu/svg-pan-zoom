@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <script src="../dist/svg-pan-zoom.js"></script>
+  </head>
+
+  <body>
+    <h1>Demo for svg-pan-zoom: Sinchronized pan and zoom</h1>
+    <embed id="demo-tiger" type="image/svg+xml" style="width: 400px; height: 400px; border:1px solid black; float: left;" src="tiger.svg" />
+    <embed id="demo-tiger2" type="image/svg+xml" style="width: 400px; height: 400px; border:1px solid red; " src="tiger.svg" />
+
+    <script>
+      // Don't use window.onLoad like this in production, because it can only listen to one function.
+      window.onload = function() {
+        // Expose variable to use for testing
+        window.zoomTiger = svgPanZoom('#demo-tiger', {
+          zoomEnabled: true,
+          controlIconsEnabled: true
+        });
+
+        // Expose variable to use for testing
+        window.zoomTiger2 = svgPanZoom('#demo-tiger2', {
+          zoomEnabled: true,
+          controlIconsEnabled: true
+        });
+
+        // Pan and zoom flags used to prevent updating loops
+        var tigerPanned = false
+          , tigerZoomed = false
+          , tiger2Panned = false
+          , tiger2Zoomed = false
+
+        zoomTiger.setOnZoom(function(level){
+          if (tiger2Zoomed) {
+            tiger2Zoomed = false
+            return
+          }
+          tigerZoomed = true
+
+          zoomTiger2.zoom(level)
+          zoomTiger2.pan(zoomTiger.getPan())
+        })
+
+        zoomTiger.setOnPan(function(x, y){
+          if (tiger2Panned) {
+            tiger2Panned = false
+            return
+          }
+          tigerPanned = true
+
+          zoomTiger2.pan({x: x, y: y})
+        })
+
+        zoomTiger2.setOnZoom(function(level){
+          if (tigerZoomed) {
+            tigerZoomed = false
+            return
+          }
+          tiger2Zoomed = true
+
+          zoomTiger.zoom(level)
+          zoomTiger.pan(zoomTiger2.getPan())
+        })
+
+        zoomTiger2.setOnPan(function(x, y){
+          if (tigerPanned) {
+            tigerPanned = false
+            return
+          }
+          tiger2Panned = true
+
+          zoomTiger.pan({x: x, y: y})
+        })
+      };
+    </script>
+
+  </body>
+
+</html>

@@ -18,6 +18,7 @@ Demos
  * [SVG Inserted with 'Img' Element](http://ariutta.github.io/svg-pan-zoom/demo/img.html) (These cannot be panned/zoomed.)
  * [SVG With custom controls](http://ariutta.github.io/svg-pan-zoom/demo/custom-controls.html)
  * [Resize SVG container on document resize](http://ariutta.github.io/svg-pan-zoom/demo/resize.html)
+ * [Two SVGs with sinchronized zooming and panning](http://ariutta.github.io/svg-pan-zoom/demo/sinchronized.html)
 
 How To Use
 ----------
