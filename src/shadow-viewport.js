@@ -97,10 +97,10 @@ ShadowViewport.prototype.processCTM = function() {
   if (this.options.fit) {
     var newScale = Math.min(this.options.width/(this.viewBox.width - this.viewBox.x), this.options.height/(this.viewBox.height - this.viewBox.y));
 
-    newCTM.a = newCTM.a * newScale; //x-scale
-    newCTM.d = newCTM.d * newScale; //y-scale
-    newCTM.e = (newCTM.e - this.viewBox.x) * newScale; //x-transform
-    newCTM.f = (newCTM.f - this.viewBox.y) * newScale; //y-transform
+    newCTM.a = newScale; //x-scale
+    newCTM.d = newScale; //y-scale
+    newCTM.e = -this.viewBox.x * newScale; //x-transform
+    newCTM.f = -this.viewBox.y * newScale; //y-transform
   }
 
   if (this.options.center) {
