@@ -21,13 +21,9 @@ ShadowViewport.prototype.init = function(viewport, options) {
   this.viewBox = {x: 0, y: 0, width: 0, height: 0}
   this.cacheViewBox()
 
-  // CTM cache
-  this.cachedCTM = this.viewport.getCTM()
-
   // State cache
   this.originalState = {zoom: 1, x: 0, y: 0}
   this.activeState = {zoom: 1, x: 0, y: 0}
-  // this.updateCache(this.getCTM()) // Update active cache with
 
   this.updateCTMCached = Utils.proxy(this.updateCTM, this)
 
@@ -147,12 +143,12 @@ ShadowViewport.prototype.getCTM = function() {
   var safeCTM = this.options.svg.createSVGMatrix()
 
   // Copy values manually as in FF they are not itterable
-  safeCTM.a = this.cachedCTM.a
-  safeCTM.b = this.cachedCTM.b
-  safeCTM.c = this.cachedCTM.c
-  safeCTM.d = this.cachedCTM.d
-  safeCTM.f = this.cachedCTM.f
-  safeCTM.e = this.cachedCTM.e
+  safeCTM.a = this.activeState.zoom
+  safeCTM.b = 0
+  safeCTM.c = 0
+  safeCTM.d = this.activeState.zoom
+  safeCTM.e = this.activeState.x
+  safeCTM.f = this.activeState.y
 
   return safeCTM
 }
@@ -177,13 +173,6 @@ ShadowViewport.prototype.updateCache = function(newCTM) {
   this.activeState.zoom = newCTM.a
   this.activeState.x = newCTM.e
   this.activeState.y = newCTM.f
-
-  this.cachedCTM.a = newCTM.a
-  this.cachedCTM.b = newCTM.b
-  this.cachedCTM.c = newCTM.c
-  this.cachedCTM.d = newCTM.d
-  this.cachedCTM.f = newCTM.f
-  this.cachedCTM.e = newCTM.e
 }
 
 ShadowViewport.prototype.pendingUpdate = false
