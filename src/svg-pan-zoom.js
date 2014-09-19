@@ -25,12 +25,6 @@ var optionsDefaults = {
 }
 
 SvgPanZoom.prototype.init = function(svg, options) {
-  this.xmlNS = 'http://www.w3.org/XML/1998/namespace';
-  this.svgNS = 'http://www.w3.org/2000/svg';
-  this.xmlnsNS = 'http://www.w3.org/2000/xmlns/';
-  this.xlinkNS = 'http://www.w3.org/1999/xlink';
-  this.evNS = 'http://www.w3.org/2001/xml-events';
-
   this.svg = svg
   this.defs = svg.querySelector('defs')
 
