@@ -42,14 +42,14 @@
           zoomTiger2.pan(zoomTiger.getPan())
         })
 
-        zoomTiger.setOnPan(function(x, y){
+        zoomTiger.setOnPan(function(point){
           if (tiger2Panned) {
             tiger2Panned = false
             return
           }
           tigerPanned = true
 
-          zoomTiger2.pan({x: x, y: y})
+          zoomTiger2.pan(point)
         })
 
         zoomTiger2.setOnZoom(function(level){
@@ -63,14 +63,14 @@
           zoomTiger.pan(zoomTiger2.getPan())
         })
 
-        zoomTiger2.setOnPan(function(x, y){
+        zoomTiger2.setOnPan(function(point){
           if (tigerPanned) {
             tigerPanned = false
             return
           }
           tiger2Panned = true
 
-          zoomTiger.pan({x: x, y: y})
+          zoomTiger.pan(point)
         })
       };
     </script>

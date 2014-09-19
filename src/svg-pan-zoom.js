@@ -343,7 +343,7 @@ SvgPanZoom.prototype.handleMouseMove = function(evt) {
     this.viewport.setCTM(viewportCTM)
 
     // Trigger onPan
-    this.options.onPan && this.options.onPan(this.viewport.getState().x, this.viewport.getState().y)
+    this.options.onPan && this.options.onPan(this.viewport.getState())
   }
 }
 
@@ -415,7 +415,7 @@ SvgPanZoom.prototype.pan = function(point) {
   this.viewport.setCTM(viewportCTM)
 
   // Trigger onPan
-  this.options.onPan && this.options.onPan(this.viewport.getState().x, this.viewport.getState().y)
+  this.options.onPan && this.options.onPan(this.viewport.getState())
 }
 
 /**
@@ -433,7 +433,7 @@ SvgPanZoom.prototype.panBy = function(point) {
   this.viewport.setCTM(viewportCTM)
 
   // Trigger onPan
-  this.options.onPan && this.options.onPan(this.viewport.getState().x, this.viewport.getState().y)
+  this.options.onPan && this.options.onPan(this.viewport.getState())
 }
 
 /**
