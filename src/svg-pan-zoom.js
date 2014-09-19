@@ -25,6 +25,8 @@ var optionsDefaults = {
 }
 
 SvgPanZoom.prototype.init = function(svg, options) {
+  var that = this
+
   this.svg = svg
   this.defs = svg.querySelector('defs')
 
@@ -49,6 +51,19 @@ SvgPanZoom.prototype.init = function(svg, options) {
   , height: this.height
   , fit: this.options.fit
   , center: this.options.center
+  // Put callbacks into functions as they can change through time
+  , beforeZoom: function(scale) {
+      that.options.beforeZoom && that.options.beforeZoom(scale)
+    }
+  , onZoom: function(scale) {
+      that.options.onZoom && that.options.onZoom(scale)
+    }
+  , beforePan: function(point) {
+      that.options.beforePan && that.options.beforePan(point)
+    }
+  , onPan: function(point) {
+      that.options.onPan && that.options.onPan(point)
+    }
   })
 
   if (this.options.controlIconsEnabled) {
@@ -173,8 +188,6 @@ SvgPanZoom.prototype.handleMouseWheel = function(evt) {
  *                                Otherwise, zoomScale is treated as a multiplied (e.g. 1.10 would zoom in 10%)
  */
 SvgPanZoom.prototype.zoomAtPoint = function(zoomScale, point, zoomAbsolute) {
-  this.options.beforeZoom && this.options.beforeZoom(this.viewport.getZoom())
-
   var originalState = this.viewport.getOriginalState()
 
   if (!zoomAbsolute) {
@@ -199,8 +212,6 @@ SvgPanZoom.prototype.zoomAtPoint = function(zoomScale, point, zoomAbsolute) {
   if (newCTM.a !== oldCTM.a) {
     this.viewport.setCTM(newCTM)
   }
-
-  this.options.onZoom && this.options.onZoom(this.viewport.getZoom())
 }
 
 /**
@@ -327,17 +338,11 @@ SvgPanZoom.prototype.handleMouseMove = function(evt) {
   }
 
   if (this.state === 'pan' && this.options.panEnabled) {
-    // Trigger beforePan
-    this.options.beforePan && this.options.beforePan(this.viewport.getState())
-
     // Pan mode
     var point = SvgUtils.getEventPoint(evt, this.svg).matrixTransform(this.firstEventCTM.inverse())
       , viewportCTM = this.firstEventCTM.translate(point.x - this.stateOrigin.x, point.y - this.stateOrigin.y)
 
     this.viewport.setCTM(viewportCTM)
-
-    // Trigger onPan
-    this.options.onPan && this.options.onPan(this.viewport.getState())
   }
 }
 
@@ -400,16 +405,10 @@ SvgPanZoom.prototype.center = function(dropCache) {
  * @param  {Object} point {x: 0, y: 0}
  */
 SvgPanZoom.prototype.pan = function(point) {
-  // Trigger beforePan
-  this.options.beforePan && this.options.beforePan(this.viewport.getState())
-
   var viewportCTM = this.viewport.getCTM()
   viewportCTM.e = point.x
   viewportCTM.f = point.y
   this.viewport.setCTM(viewportCTM)
-
-  // Trigger onPan
-  this.options.onPan && this.options.onPan(this.viewport.getState())
 }
 
 /**
@@ -418,16 +417,10 @@ SvgPanZoom.prototype.pan = function(point) {
  * @param  {Object} point {x: 0, y: 0}
  */
 SvgPanZoom.prototype.panBy = function(point) {
-  // Trigger beforePan
-  this.options.beforePan && this.options.beforePan(this.viewport.getState())
-
   var viewportCTM = this.viewport.getCTM()
   viewportCTM.e += point.x
   viewportCTM.f += point.y
   this.viewport.setCTM(viewportCTM)
-
-  // Trigger onPan
-  this.options.onPan && this.options.onPan(this.viewport.getState())
 }
 
 /**

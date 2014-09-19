@@ -159,10 +159,32 @@ ShadowViewport.prototype.getCTM = function() {
  * @param {SVGMatrix} newCTM
  */
 ShadowViewport.prototype.setCTM = function(newCTM) {
-  this.updateCache(newCTM)
+  var willZoom = this.isZoomDifferent(newCTM)
+    , willPan = this.isPanDifferent(newCTM)
 
-  this.updateCTMOnNextFrame()
+  if (willZoom || willPan) {
+    // Before callbacks
+    willZoom && this.options.beforeZoom(this.getZoom())
+    willPan && this.options.beforePan(this.getState())
+
+    this.updateCache(newCTM)
+
+    this.updateCTMOnNextFrame()
+
+    // After callbacks
+    willZoom && this.options.onZoom(this.getZoom())
+    willPan && this.options.onPan(this.getState())
+  }
 }
+
+ShadowViewport.prototype.isZoomDifferent = function(newCTM) {
+  return this.activeState.zoom !== newCTM.a
+}
+
+ShadowViewport.prototype.isPanDifferent = function(newCTM) {
+  return this.activeState.x !== newCTM.e && this.activeState.y !== newCTM.f
+}
+
 
 /**
  * Update cached CTM and active state
