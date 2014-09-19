@@ -109,6 +109,8 @@ When you call `svgPanZoom` method it returns an object with following methods:
 * zoomIn
 * zoomOut
 * resetZoom
+* resetPan
+* reset
 * getZoom
 * fit
 * center

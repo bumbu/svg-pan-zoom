@@ -245,10 +245,21 @@ SvgPanZoom.prototype.resetZoom = function() {
     , originalState = this.viewport.getOriginalState()
 
   publicInstance.zoom(originalState.zoom);
+}
 
-  if (this.options.center) {
-    publicInstance.pan(originalState)
-  }
+/**
+ * Set pan to initial state
+ */
+SvgPanZoom.prototype.resetPan = function() {
+  this.pan(this.viewport.getOriginalState());
+}
+
+/**
+ * Set pan and zoom to initial state
+ */
+SvgPanZoom.prototype.reset = function() {
+  this.resetZoom()
+  this.resetPan()
 }
 
 /**
@@ -559,6 +570,8 @@ SvgPanZoom.prototype.getPublicInstance = function() {
         this.zoomBy(1 / (1 + that.options.zoomScaleSensitivity))
       }
     , resetZoom: function() {that.resetZoom()}
+    , resetPan: function() {that.resetPan()}
+    , reset: function() {that.reset()}
     , getZoom: function() {return that.getZoom()}
     , fit: function(dropCache) {return that.fit(dropCache)}
     , center: function(dropCache) {return that.center(dropCache)}

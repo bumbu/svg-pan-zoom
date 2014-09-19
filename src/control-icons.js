@@ -88,8 +88,8 @@ module.exports = {
     resetPanZoomControl.setAttribute('id', 'svg-pan-zoom-reset-pan-zoom');
     resetPanZoomControl.setAttribute('transform', 'translate(5 35) scale(0.4)');
     resetPanZoomControl.setAttribute('class', 'svg-pan-zoom-control');
-    resetPanZoomControl.addEventListener('click', function() {instance.getPublicInstance().resetZoom()}, false);
-    resetPanZoomControl.addEventListener('touchstart', function() {instance.getPublicInstance().resetZoom()}, false);
+    resetPanZoomControl.addEventListener('click', function() {instance.getPublicInstance().reset()}, false);
+    resetPanZoomControl.addEventListener('touchstart', function() {instance.getPublicInstance().reset()}, false);
 
     var resetPanZoomControlBackground = document.createElementNS(instance.svgNS, 'rect'); // TODO change these background space fillers to rounded rectangles so they look prettier
     resetPanZoomControlBackground.setAttribute('x', '2');
