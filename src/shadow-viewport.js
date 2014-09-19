@@ -103,6 +103,14 @@ ShadowViewport.prototype.processCTM = function() {
     newCTM.f = (newCTM.f - this.viewBox.y) * newScale; //y-transform
   }
 
+  if (this.options.center) {
+    var offsetX = (this.options.width - (this.viewBox.width + this.viewBox.x) * newCTM.a) * 0.5
+      , offsetY = (this.options.height - (this.viewBox.height + this.viewBox.y) * newCTM.a) * 0.5
+
+    newCTM.e = offsetX
+    newCTM.f = offsetY
+  }
+
   // Cache initial values
   this.originalState.zoom = newCTM.a
   this.originalState.x = newCTM.e

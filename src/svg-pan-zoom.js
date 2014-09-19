@@ -54,11 +54,8 @@ SvgPanZoom.prototype.init = function(svg, options) {
   , width: this.width
   , height: this.height
   , fit: this.options.fit
+  , center: this.options.center
   })
-
-  if (this.options.center) {
-    this.center()
-  }
 
   if (this.options.controlIconsEnabled) {
     ControlIcons.enable(this)
