@@ -77,6 +77,10 @@ If any arguments are specified, they must have the following value types:
 * 'beforePan' must be a callback function to be called before pan changes.
 * 'onPan' must be a callback function to be called when pan changes.
 
+`beforeZoom` and `onZoom` callbacks will be called with a float attribute. The attribute will be equal to current zoom scale of the viewport.
+
+`beforePan` and `onPan` callbacks will be called with an object attribute. The object will have two attributes (x and y) each representing current pan (on X and Y axes) of the viewport.
+
 Public API
 ----------
 
