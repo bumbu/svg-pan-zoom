@@ -205,7 +205,7 @@ module.exports = {
    * @return {SVGPoint}
    */
 , createSVGPoint: function(svg, x, y) {
-    var point = this.svg.createSVGPoint()
+    var point = svg.createSVGPoint()
     point.x = x
     point.y = y
 
