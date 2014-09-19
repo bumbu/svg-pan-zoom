@@ -167,7 +167,7 @@ SvgPanZoom.prototype.handleMouseWheel = function(evt) {
     , relativeMousePoint = SvgUtils.getEventPoint(evt, this.svg).matrixTransform(inversedScreenCTM)
     , zoom = Math.pow(1 + this.options.zoomScaleSensitivity, (-1) * delta); // multiplying by neg. 1 so as to make zoom in/out behavior match Google maps behavior
 
-  this.zoomAtPoint(relativeMousePoint, zoom)
+  this.zoomAtPoint(zoom, relativeMousePoint)
 }
 
 /**
@@ -178,7 +178,7 @@ SvgPanZoom.prototype.handleMouseWheel = function(evt) {
  * @param  {Boolean} zoomAbsolute Default false. If true, zoomScale is treated as an absolute value.
  *                                Otherwise, zoomScale is treated as a multiplied (e.g. 1.10 would zoom in 10%)
  */
-SvgPanZoom.prototype.zoomAtPoint = function(point, zoomScale, zoomAbsolute) {
+SvgPanZoom.prototype.zoomAtPoint = function(zoomScale, point, zoomAbsolute) {
   this.options.beforeZoom && this.options.beforeZoom()
 
   var originalState = this.viewport.getOriginalState()
@@ -225,7 +225,7 @@ SvgPanZoom.prototype.publicZoomAtPoint = function(scale, point, absolute) {
     return
   }
 
-  this.zoomAtPoint(point, scale, absolute)
+  this.zoomAtPoint(scale, point, absolute)
 }
 
 /**
@@ -292,7 +292,7 @@ SvgPanZoom.prototype.handleDblClick = function(evt) {
   }
 
   var point = SvgUtils.getEventPoint(evt, this.svg).matrixTransform(this.svg.getScreenCTM().inverse())
-  this.zoomAtPoint(point, zoomFactor)
+  this.zoomAtPoint(zoomFactor, point)
 }
 
 /**
@@ -552,10 +552,10 @@ SvgPanZoom.prototype.getPublicInstance = function() {
     , setOnZoom: function(fn) {that.options.onZoom = Utils.proxy(fn, that.publicInstance)}
       // Zooming
     , zoom: function(scale) {
-        that.zoomAtPoint(SvgUtils.getSvgCenterPoint(that.svg), scale, true)
+        that.zoomAtPoint(scale, SvgUtils.getSvgCenterPoint(that.svg), true)
       }
     , zoomBy: function(scale) {
-        that.zoomAtPoint(SvgUtils.getSvgCenterPoint(that.svg), scale, false)
+        that.zoomAtPoint(scale, SvgUtils.getSvgCenterPoint(that.svg), false)
       }
     , zoomAtPoint: function(scale, point) {
         that.publicZoomAtPoint(scale, point, true)
