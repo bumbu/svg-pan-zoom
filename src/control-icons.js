@@ -2,32 +2,6 @@ var SvgUtils = require('./svg-utilities');
 
 module.exports = {
   enable: function(instance) {
-
-    /*
-    // TODO should we create a new SVG or insert the control icons into the existing SVG?
-    // The code below does not work entirely correctly, but it's a start if we want to
-    // create a new SVG
-    // create svg for control icons
-    var controlIconsSvgId = 'svg-pan-zoom-control-icons-' + new Date().toISOString().replace(/\D/g, '');
-    var controlIconsSvg = document.createElementNS(SvgUtils.svgNS, 'svg');
-    controlIconsSvg.setAttributeNS(SvgUtils.xmlnsNS, 'xmlns', SvgUtils.svgNS);
-    controlIconsSvg.setAttributeNS(SvgUtils.xmlnsNS, 'xmlns:xlink', SvgUtils.xlinkNS);
-    controlIconsSvg.setAttributeNS(SvgUtils.xmlnsNS, 'xmlns:ev', SvgUtils.evNS);
-    controlIconsSvg.setAttribute('id', controlIconsSvgId);
-    controlIconsSvg.setAttribute('version', '1.1');
-    controlIconsSvg.setAttribute('baseProfile', 'full');
-    controlIconsSvg.setAttribute('preserveAspectRatio', 'xMidYMid');
-    controlIconsSvg.setAttribute('style', 'left:' + ( instance.dimensions.right - 70 ) + '; top:' + ( instance.dimensions.bottom - 76 ) + '; position: absolute;');
-    //controlIconsSvg.setAttribute('width', width);
-    //controlIconsSvg.setAttribute('height', height);
-    //controlIconsSvg.setAttribute('style', 'background-color:' + backgroundColor + '; ');
-    document.body.appendChild(controlIconsSvg);
-
-    // Create defs
-    var defs = document.createElementNS(SvgUtils.svgNS, 'defs');
-    controlIconsSvg.appendChild(defs);
-    //*/
-
     // Select (and create if necessary) defs
     var defs = instance.svg.querySelector('defs')
     if (!defs) {
