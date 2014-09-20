@@ -81,6 +81,8 @@ If any arguments are specified, they must have the following value types:
 
 `beforePan` and `onPan` callbacks will be called with an object attribute. The object will have two attributes (x and y) each representing current pan (on X and Y axes) of the viewport.
 
+`panEnabled` and `zoomEnabled` are related only to user interaction. If any of this options are disabled - you still can zoom and pan via API.
+
 Public API
 ----------
 
@@ -101,6 +103,7 @@ When you call `svgPanZoom` method it returns an object with following methods:
 * isControlIconsEnabled
 * enableDblClickZoom
 * disableDblClickZoom
+* isDblClickZoomEnabled
 * setZoomScaleSensitivity
 * setMinZoom
 * setMaxZoom
