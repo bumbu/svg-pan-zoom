@@ -135,6 +135,24 @@ ShadowViewport.prototype.getState = function() {
 }
 
 /**
+ * Get zoom scale/level
+ *
+ * @return {Float} zoom scale
+ */
+ShadowViewport.prototype.getZoom = function() {
+  return this.activeState.zoom
+}
+
+/**
+ * Get pan
+ *
+ * @return {Object}
+ */
+ShadowViewport.prototype.getPan = function() {
+  return {x: this.activeState.x, y: this.activeState.y}
+}
+
+/**
  * Return cached viewport CTM value that can be safely modified
  *
  * @return {SVGMatrix}
@@ -165,7 +183,7 @@ ShadowViewport.prototype.setCTM = function(newCTM) {
   if (willZoom || willPan) {
     // Before callbacks
     willZoom && this.options.beforeZoom(this.getZoom())
-    willPan && this.options.beforePan(this.getState())
+    willPan && this.options.beforePan(this.getPan())
 
     this.updateCache(newCTM)
 
@@ -173,7 +191,7 @@ ShadowViewport.prototype.setCTM = function(newCTM) {
 
     // After callbacks
     willZoom && this.options.onZoom(this.getZoom())
-    willPan && this.options.onPan(this.getState())
+    willPan && this.options.onPan(this.getPan())
   }
 }
 
@@ -221,15 +239,6 @@ ShadowViewport.prototype.updateCTM = function() {
 
   // Free the lock
   this.pendingUpdate = false
-}
-
-/**
- * Get zoom scale/level
- *
- * @return {Float} zoom scale
- */
-ShadowViewport.prototype.getZoom = function() {
-  return this.activeState.zoom
 }
 
 module.exports = function(viewport, options){
