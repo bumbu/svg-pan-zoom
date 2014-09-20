@@ -533,6 +533,7 @@ SvgPanZoom.prototype.getPublicInstance = function() {
       // Double click zoom
     , enableDblClickZoom: function() {that.options.dblClickZoomEnabled = true}
     , disableDblClickZoom: function() {that.options.dblClickZoomEnabled = false}
+    , isDblClickZoomEnabled: function() {return !!that.options.dblClickZoomEnabled}
       // Zoom scale and bounds
     , setZoomScaleSensitivity: function(scale) {that.options.zoomScaleSensitivity = scale}
     , setMinZoom: function(zoom) {that.options.minZoom = zoom}
