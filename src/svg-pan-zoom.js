@@ -507,8 +507,8 @@ SvgPanZoom.prototype.getPublicInstance = function() {
     , panBy: function(point) {that.panBy(point)}
     , getPan: function() {return that.getPan()}
       // Pan event
-    , setBeforePan: function(fn) {that.options.beforePan = Utils.proxy(fn, that.publicInstance)}
-    , setOnPan: function(fn) {that.options.onPan = Utils.proxy(fn, that.publicInstance)}
+    , setBeforePan: function(fn) {that.options.beforePan = fn == null ? null : Utils.proxy(fn, that.publicInstance)}
+    , setOnPan: function(fn) {that.options.onPan = fn == null ? null : Utils.proxy(fn, that.publicInstance)}
       // Zoom and Control Icons
     , enableZoom: function() {
         that.options.zoomEnabled = true;
@@ -539,8 +539,8 @@ SvgPanZoom.prototype.getPublicInstance = function() {
     , setMinZoom: function(zoom) {that.options.minZoom = zoom}
     , setMaxZoom: function(zoom) {that.options.maxZoom = zoom}
       // Zoom event
-    , setBeforeZoom: function(fn) {that.options.beforeZoom = Utils.proxy(fn, that.publicInstance)}
-    , setOnZoom: function(fn) {that.options.onZoom = Utils.proxy(fn, that.publicInstance)}
+    , setBeforeZoom: function(fn) {that.options.beforeZoom = fn == null ? null : Utils.proxy(fn, that.publicInstance)}
+    , setOnZoom: function(fn) {that.options.onZoom = fn == null ? null : Utils.proxy(fn, that.publicInstance)}
       // Zooming
     , zoom: function(scale) {
         that.zoomAtPoint(scale, SvgUtils.getSvgCenterPoint(that.svg), true)
