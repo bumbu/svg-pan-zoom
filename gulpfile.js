@@ -8,6 +8,7 @@ var gulp   = require('gulp')
   , source     = require('vinyl-source-stream')
   , streamify  = require('gulp-streamify')
   , rename     = require('gulp-rename')
+  , qunit      = require('gulp-qunit')
   ;
 
 /**
@@ -32,6 +33,14 @@ gulp.task('build', function() {
  */
 gulp.task('watch', function () {
   gulp.watch('./src/**/*.js', ['build']);
+});
+
+/**
+ * Test task
+ */
+gulp.task('test', function () {
+  gulp.src('./tests/index.html')
+    .pipe(qunit())
 });
 
 /**

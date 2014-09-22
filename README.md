@@ -213,6 +213,13 @@ panZoomTiger.destroy();
 delete panZoomTiger;
 ```
 
+How to test
+-----------
+
+If you made a change then first build the library. Open `./tests/index.html` in your browser. All tests should pass.
+
+If you have PhantomJS installed then you can run `gulp test`.
+
 Supported Browsers
 ------------------
 * Chrome
