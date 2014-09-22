@@ -1,12 +1,3 @@
-/**
- * Simulates a requestAnimationFrame
- *
- * @param  {Function} callback
- */
-function requestAnimationFrameSimulator(callback) {
-  window.setTimeout(callback, 1000/60)
-}
-
 module.exports = {
   /**
    * Extends an object
@@ -235,5 +226,35 @@ module.exports = {
     };
   }
 
-, requestAnimationFrame: window.requestAnimationFrame || requestAnimationFrameSimulator
+  /**
+   * Create a requestAnimationFrame simulation
+   *
+   * @param  {Number|String} refreshRate
+   * @return {Function}
+   */
+, createRequestAnimationFrame: function(refreshRate){
+    var timeout = null
+
+    // Convert refreshRate to timeout
+    if (refreshRate !== 'auto' && refreshRate < 60 && refreshRate > 1) {
+      timeout = Math.floor(1000/refreshRate)
+    }
+
+    if (timeout === null) {
+      return window.requestAnimationFrame || requestTimeout(33)
+    } else {
+      return requestTimeout(timeout)
+    }
+  }
+}
+
+/**
+ * Create a callback that will execute after a given timeout
+ *
+ * @param  {Function} callback
+ */
+function requestTimeout(timeout) {
+  return function(callback){
+    window.setTimeout(callback, timeout)
+  }
 }

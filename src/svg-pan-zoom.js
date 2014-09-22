@@ -18,6 +18,7 @@ var optionsDefaults = {
 , maxZoom: 10 // Maximum Zoom level
 , fit: true // enable or disable viewport fit in SVG (default true)
 , center: true // enable or disable viewport centering in SVG (default true)
+, refreshRate: 'auto' // Maximum number of frames per second (altering SVG's viewport)
 , beforeZoom: null
 , onZoom: null
 , beforePan: null
@@ -51,6 +52,7 @@ SvgPanZoom.prototype.init = function(svg, options) {
   , height: this.height
   , fit: this.options.fit
   , center: this.options.center
+  , refreshRate: this.options.refreshRate
   // Put callbacks into functions as they can change through time
   , beforeZoom: function(scale) {
       that.options.beforeZoom && that.options.beforeZoom(scale)

@@ -27,6 +27,9 @@ ShadowViewport.prototype.init = function(viewport, options) {
 
   this.updateCTMCached = Utils.proxy(this.updateCTM, this)
 
+  // Create a custom requestAnimationFrame taking in account refreshRate
+  this.requestAnimationFrame = Utils.createRequestAnimationFrame(this.options.refreshRate)
+
   // Process CTM
   this.processCTM()
 }
@@ -226,7 +229,7 @@ ShadowViewport.prototype.updateCTMOnNextFrame = function() {
     this.pendingUpdate = true
 
     // Throttle next update
-    Utils.requestAnimationFrame.call(window, this.updateCTMCached)
+    this.requestAnimationFrame.call(window, this.updateCTMCached)
   }
 }
 

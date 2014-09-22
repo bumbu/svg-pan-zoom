@@ -55,6 +55,7 @@ svgPanZoom.init('#demo-tiger', {
 , maxZoom: 10
 , fit: true
 , center: true
+, refreshRate: 'auto'
 , beforeZoom: function(){}
 , onZoom: function(){}
 , beforePan: function(){}
@@ -72,6 +73,7 @@ If any arguments are specified, they must have the following value types:
 * 'maxZoom' must be a scalar. Default is 10.
 * 'fit' must be true or false. Default is true.
 * 'center' must be true or false. Default is true.
+* 'refreshRate' must be a number or 'auto'
 * 'beforeZoom' must be a callback function to be called before zoom changes.
 * 'onZoom' must be a callback function to be called when zoom changes.
 * 'beforePan' must be a callback function to be called before pan changes.
