@@ -482,7 +482,8 @@ SvgPanZoom.prototype.destroy = function() {
   })
 
   // Destroy public instance and rewrite getPublicInstance
-  this.publicInstance = null
+  delete this.publicInstance
+  delete this.pi
   this.getPublicInstance = function(){
     return null
   }
@@ -498,76 +499,80 @@ SvgPanZoom.prototype.getPublicInstance = function() {
 
   // Create cache
   if (!this.publicInstance) {
-    this.publicInstance = {
+    this.publicInstance = this.pi = {
       // Pan
-      enablePan: function() {that.options.panEnabled = true}
-    , disablePan: function() {that.options.panEnabled = false}
+      enablePan: function() {that.options.panEnabled = true; return that.pi}
+    , disablePan: function() {that.options.panEnabled = false; return that.pi}
     , isPanEnabled: function() {return !!that.options.panEnabled}
-    , pan: function(point) {that.pan(point)}
-    , panBy: function(point) {that.panBy(point)}
+    , pan: function(point) {that.pan(point); return that.pi}
+    , panBy: function(point) {that.panBy(point); return that.pi}
     , getPan: function() {return that.getPan()}
       // Pan event
-    , setBeforePan: function(fn) {that.options.beforePan = fn == null ? null : Utils.proxy(fn, that.publicInstance)}
-    , setOnPan: function(fn) {that.options.onPan = fn == null ? null : Utils.proxy(fn, that.publicInstance)}
+    , setBeforePan: function(fn) {that.options.beforePan = fn == null ? null : Utils.proxy(fn, that.publicInstance); return that.pi}
+    , setOnPan: function(fn) {that.options.onPan = fn == null ? null : Utils.proxy(fn, that.publicInstance); return that.pi}
       // Zoom and Control Icons
-    , enableZoom: function() {
-        that.options.zoomEnabled = true;
-      }
-    , disableZoom: function() {
-        that.options.zoomEnabled = false;
-      }
+    , enableZoom: function() {that.options.zoomEnabled = true; return that.pi}
+    , disableZoom: function() {that.options.zoomEnabled = false; return that.pi}
     , isZoomEnabled: function() {return !!that.options.zoomEnabled}
     , enableControlIcons: function() {
         if (!that.options.controlIconsEnabled) {
           that.options.controlIconsEnabled = true
           ControlIcons.enable(that)
         }
+        return that.pi
       }
     , disableControlIcons: function() {
         if (that.options.controlIconsEnabled) {
           that.options.controlIconsEnabled = false;
           ControlIcons.disable(that)
         }
+        return that.pi
       }
     , isControlIconsEnabled: function() {return !!that.options.controlIconsEnabled}
       // Double click zoom
-    , enableDblClickZoom: function() {that.options.dblClickZoomEnabled = true}
-    , disableDblClickZoom: function() {that.options.dblClickZoomEnabled = false}
+    , enableDblClickZoom: function() {that.options.dblClickZoomEnabled = true; return that.pi}
+    , disableDblClickZoom: function() {that.options.dblClickZoomEnabled = false; return that.pi}
     , isDblClickZoomEnabled: function() {return !!that.options.dblClickZoomEnabled}
       // Zoom scale and bounds
-    , setZoomScaleSensitivity: function(scale) {that.options.zoomScaleSensitivity = scale}
-    , setMinZoom: function(zoom) {that.options.minZoom = zoom}
-    , setMaxZoom: function(zoom) {that.options.maxZoom = zoom}
+    , setZoomScaleSensitivity: function(scale) {that.options.zoomScaleSensitivity = scale; return that.pi}
+    , setMinZoom: function(zoom) {that.options.minZoom = zoom; return that.pi}
+    , setMaxZoom: function(zoom) {that.options.maxZoom = zoom; return that.pi}
       // Zoom event
-    , setBeforeZoom: function(fn) {that.options.beforeZoom = fn == null ? null : Utils.proxy(fn, that.publicInstance)}
-    , setOnZoom: function(fn) {that.options.onZoom = fn == null ? null : Utils.proxy(fn, that.publicInstance)}
+    , setBeforeZoom: function(fn) {that.options.beforeZoom = fn == null ? null : Utils.proxy(fn, that.publicInstance); return that.pi}
+    , setOnZoom: function(fn) {that.options.onZoom = fn == null ? null : Utils.proxy(fn, that.publicInstance); return that.pi}
       // Zooming
     , zoom: function(scale) {
         that.zoomAtPoint(scale, SvgUtils.getSvgCenterPoint(that.svg), true)
+        return that.pi
       }
     , zoomBy: function(scale) {
         that.zoomAtPoint(scale, SvgUtils.getSvgCenterPoint(that.svg), false)
+        return that.pi
       }
     , zoomAtPoint: function(scale, point) {
         that.publicZoomAtPoint(scale, point, true)
+        return that.pi
       }
     , zoomAtPointBy: function(scale, point) {
         that.publicZoomAtPoint(scale, point, false)
+        return that.pi
       }
     , zoomIn: function() {
         this.zoomBy(1 + that.options.zoomScaleSensitivity)
+        return that.pi
       }
     , zoomOut: function() {
         this.zoomBy(1 / (1 + that.options.zoomScaleSensitivity))
+        return that.pi
       }
-    , resetZoom: function() {that.resetZoom()}
-    , resetPan: function() {that.resetPan()}
-    , reset: function() {that.reset()}
+    , resetZoom: function() {that.resetZoom(); return that.pi}
+    , resetPan: function() {that.resetPan(); return that.pi}
+    , reset: function() {that.reset(); return that.pi}
     , getZoom: function() {return that.getZoom()}
-    , fit: function(dropCache) {return that.fit(dropCache)}
-    , center: function(dropCache) {return that.center(dropCache)}
-    , resize: function() {that.resize()}
-    , destroy: function() {that.destroy()}
+    , fit: function(dropCache) {that.fit(dropCache); return that.pi}
+    , center: function(dropCache) {that.center(dropCache); return that.pi}
+    , resize: function() {that.resize(); return that.pi}
+    , destroy: function() {that.destroy(); return that.pi}
     }
   }
 
