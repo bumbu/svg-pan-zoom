@@ -25,51 +25,21 @@
           controlIconsEnabled: true
         });
 
-        // Pan and zoom flags used to prevent updating loops
-        var tigerPanned = false
-          , tigerZoomed = false
-          , tiger2Panned = false
-          , tiger2Zoomed = false
-
         zoomTiger.setOnZoom(function(level){
-          if (tiger2Zoomed) {
-            tiger2Zoomed = false
-            return
-          }
-          tigerZoomed = true
-
           zoomTiger2.zoom(level)
           zoomTiger2.pan(zoomTiger.getPan())
         })
 
         zoomTiger.setOnPan(function(point){
-          if (tiger2Panned) {
-            tiger2Panned = false
-            return
-          }
-          tigerPanned = true
-
           zoomTiger2.pan(point)
         })
 
         zoomTiger2.setOnZoom(function(level){
-          if (tigerZoomed) {
-            tigerZoomed = false
-            return
-          }
-          tiger2Zoomed = true
-
           zoomTiger.zoom(level)
           zoomTiger.pan(zoomTiger2.getPan())
         })
 
         zoomTiger2.setOnPan(function(point){
-          if (tigerPanned) {
-            tigerPanned = false
-            return
-          }
-          tiger2Panned = true
-
           zoomTiger.pan(point)
         })
       };
