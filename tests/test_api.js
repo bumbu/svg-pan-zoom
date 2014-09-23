@@ -23,7 +23,7 @@ var initSvgPanZoom = function(options, alternativeSelector){
  */
 var close = QUnit.assert.close = function(number, expected, error, message) {
   if (error === void 0 || error === null) {
-    error = 0.00001 // default error
+    error = 0.0001 // default error
   }
 
   var result = number == expected || (number < expected + error && number > expected - error) || false
@@ -251,11 +251,58 @@ test('zoom', function() {
   equal(instance.getZoom(), 3);
 });
 
-// zoomBy
-// zoomAtPoint
-// zoomAtPointBy
-// zoomIn
-// zoomOut
+test('zoom by', function() {
+  expect(1);
+  instance = initSvgPanZoom()
+
+  var initialZoom = instance.getZoom()
+
+  instance.zoomBy(2)
+
+  equal(instance.getZoom(), initialZoom * 2);
+});
+
+test('zoom at point', function() {
+  expect(2);
+  instance = initSvgPanZoom({fit: false})
+
+  instance.zoomAtPoint(2, {x: 200, y: 100})
+
+  close(instance.getZoom(), 2)
+  deepEqual(instance.getPan(), {x: -300, y: -600})
+});
+
+test('zoom at point by', function() {
+  expect(2);
+  instance = initSvgPanZoom({fit: false})
+
+  instance.zoomAtPointBy(2, {x: 200, y: 100})
+
+  close(instance.getZoom(), 2)
+  deepEqual(instance.getPan(), {x: -300, y: -600})
+});
+
+test('zoom in', function() {
+  expect(3);
+  instance = initSvgPanZoom({fit: false})
+
+  instance.zoomIn()
+
+  close(instance.getZoom(), 1.2)
+  close(instance.getPan().x, -130)
+  close(instance.getPan().y, -330)
+});
+
+test('zoom out', function() {
+  expect(3);
+  instance = initSvgPanZoom({fit: false})
+
+  instance.zoomOut()
+
+  close(instance.getZoom(), 0.833333)
+  close(instance.getPan().x, 16.666666)
+  close(instance.getPan().y, -183.333325)
+});
 
 /**
  * Zoom settings (min, max, sensitivity)
@@ -452,7 +499,7 @@ test('center', function() {
  * Resize
  */
 
-// ? resize
+// TODO resize
 
 /**
  * Destroy
