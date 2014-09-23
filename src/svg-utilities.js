@@ -26,6 +26,8 @@ module.exports = {
     // Firefox returns values in the SVG coordinate system for getBoundingClientRect(),
     // whereas other browsers return values in the HTML page coordinate system.
     // This harmonizes the behavior to use the HTML page coordinate system.
+
+
     if (_browser === 'firefox') {
       var svgComputedStyle = window.getComputedStyle(svg, null);
       var selectedSvgStyleAttributeNames = ['width', 'height', 'left', 'top', 'transform', 'position'];
@@ -49,6 +51,8 @@ module.exports = {
       parent.appendChild(svg);
 
       return testDivBoundingClientRect;
+    } else if (svg.clientWidth && svg.clientHeight) {
+      return {width: svg.clientWidth, height: svg.clientHeight}
     } else if (!!svg.getBoundingClientRect()) {
       return svg.getBoundingClientRect();
     } else {
