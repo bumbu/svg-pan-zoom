@@ -544,11 +544,11 @@ SvgPanZoom.prototype.getPublicInstance = function() {
     , setOnZoom: function(fn) {that.options.onZoom = fn == null ? null : Utils.proxy(fn, that.publicInstance); return that.pi}
       // Zooming
     , zoom: function(scale) {
-        that.zoomAtPoint(scale, SvgUtils.getSvgCenterPoint(that.svg), true)
+        that.zoomAtPoint(scale, SvgUtils.getSvgCenterPoint(that.svg, that.width, that.height), true)
         return that.pi
       }
     , zoomBy: function(scale) {
-        that.zoomAtPoint(scale, SvgUtils.getSvgCenterPoint(that.svg), false)
+        that.zoomAtPoint(scale, SvgUtils.getSvgCenterPoint(that.svg, that.width, that.height), false)
         return that.pi
       }
     , zoomAtPoint: function(scale, point) {

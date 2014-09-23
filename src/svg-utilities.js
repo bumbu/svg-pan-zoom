@@ -188,16 +188,8 @@ module.exports = {
    * @param  {SVGSVGElement} svg
    * @return {SVGPoint}
    */
-, getSvgCenterPoint: function(svg) {
-    var boundingClientRect = this.getBoundingClientRectNormalized(svg)
-      , width = boundingClientRect.width
-      , height = boundingClientRect.height
-      , point = svg.createSVGPoint()
-
-    point.x = width / 2
-    point.y = height / 2
-
-    return point
+, getSvgCenterPoint: function(svg, width, height) {
+    return this.createSVGPoint(svg, width / 2, height / 2)
   }
 
   /**
