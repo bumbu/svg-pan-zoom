@@ -143,7 +143,7 @@ SvgPanZoom.prototype.setupHandlers = function() {
  * @param  {Event} evt
  */
 SvgPanZoom.prototype.handleMouseWheel = function(evt) {
-  if (!this.options.zoomEnabled) {
+  if (!this.options.zoomEnabled || this.state !== 'none') {
     return;
   }
 
