@@ -218,6 +218,8 @@ delete panZoomTiger;
 How to test
 -----------
 
+Before committing you should check your code style by running `gulp check`.
+
 If you made a change then first build the library. Open `./tests/index.html` in your browser. All tests should pass.
 
 If you have PhantomJS installed then you can run `gulp test`.
