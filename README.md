@@ -230,7 +230,7 @@ Supported Browsers
 * Firefox
 * Safari
 * Opera
-* Internet Explorer 8+ _(works badly if viewBox is set)_
+* Internet Explorer 9+ _(works badly if viewBox is set)_
 
 Related Work
 ------------
