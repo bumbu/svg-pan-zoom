@@ -143,25 +143,23 @@ module.exports = {
    */
 , setCTM: function(element, matrix, defs) {
     var that = this;
-    // this throttling causes problems when trying to synchronize the zoom between two different SVGs.
-    //Utils.throttle(function() {
-      var s = 'matrix(' + matrix.a + ',' + matrix.b + ',' + matrix.c + ',' + matrix.d + ',' + matrix.e + ',' + matrix.f + ')';
-      element.setAttributeNS(null, 'transform', s);
+      , s = 'matrix(' + matrix.a + ',' + matrix.b + ',' + matrix.c + ',' + matrix.d + ',' + matrix.e + ',' + matrix.f + ')';
 
-      // IE has a bug that makes markers disappear on zoom (when the matrix "a" and/or "d" elements change)
-      // see http://stackoverflow.com/questions/17654578/svg-marker-does-not-work-in-ie9-10
-      // and http://srndolha.wordpress.com/2013/11/25/svg-line-markers-may-disappear-in-internet-explorer-11/
-      if (_browser === 'ie' && !!defs) {
-        // this refresh is intended for redisplaying the SVG during zooming
-        defs.parentNode.insertBefore(defs, defs);
-        // this refresh is intended for redisplaying the other SVGs on a page when panning a given SVG
-        // it is also needed for the given SVG itself, on zoomEnd, if the SVG contains any markers that
-        // are located under any other element(s).
-        window.setTimeout(function() {
-          that.refreshDefsGlobal();
-        }, that.internetExplorerRedisplayInterval);
-      }
-    //}, 1000/60)();
+    element.setAttributeNS(null, 'transform', s);
+
+    // IE has a bug that makes markers disappear on zoom (when the matrix "a" and/or "d" elements change)
+    // see http://stackoverflow.com/questions/17654578/svg-marker-does-not-work-in-ie9-10
+    // and http://srndolha.wordpress.com/2013/11/25/svg-line-markers-may-disappear-in-internet-explorer-11/
+    if (_browser === 'ie' && !!defs) {
+      // this refresh is intended for redisplaying the SVG during zooming
+      defs.parentNode.insertBefore(defs, defs);
+      // this refresh is intended for redisplaying the other SVGs on a page when panning a given SVG
+      // it is also needed for the given SVG itself, on zoomEnd, if the SVG contains any markers that
+      // are located under any other element(s).
+      window.setTimeout(function() {
+        that.refreshDefsGlobal();
+      }, that.internetExplorerRedisplayInterval);
+    }
   }
 
   /**
