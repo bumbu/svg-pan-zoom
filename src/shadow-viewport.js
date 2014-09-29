@@ -185,16 +185,16 @@ ShadowViewport.prototype.setCTM = function(newCTM) {
 
   if (willZoom || willPan) {
     // Before callbacks
-    willZoom && this.options.beforeZoom(this.getZoom())
-    willPan && this.options.beforePan(this.getPan())
+    if (willZoom) {this.options.beforeZoom(this.getZoom())}
+    if (willPan) {this.options.beforePan(this.getPan())}
 
     this.updateCache(newCTM)
 
     this.updateCTMOnNextFrame()
 
     // After callbacks
-    willZoom && this.options.onZoom(this.getZoom())
-    willPan && this.options.onPan(this.getPan())
+    if (willZoom) {this.options.onZoom(this.getZoom())}
+    if (willPan) {this.options.onPan(this.getPan())}
   }
 }
 

@@ -3,8 +3,8 @@ var svgPanZoom = require('./svg-pan-zoom.js');
 // UMD module definition
 (function(window, document){
   // AMD
-  if (typeof define === "function" && define.amd) {
-    define("svg-pan-zoom", function () {
+  if (typeof define === 'function' && define.amd) {
+    define('svg-pan-zoom', function () {
       return svgPanZoom;
     });
   // CMD

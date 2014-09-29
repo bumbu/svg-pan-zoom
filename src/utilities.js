@@ -27,8 +27,8 @@ module.exports = {
    */
 , isElement: function(o){
     return (
-      typeof HTMLElement === "object" ? (o instanceof HTMLElement || o instanceof SVGElement || o instanceof SVGSVGElement) : //DOM2
-      o && typeof o === "object" && o !== null && o.nodeType === 1 && typeof o.nodeName==="string"
+      typeof HTMLElement === 'object' ? (o instanceof HTMLElement || o instanceof SVGElement || o instanceof SVGSVGElement) : //DOM2
+      o && typeof o === 'object' && o !== null && o.nodeType === 1 && typeof o.nodeName === 'string'
     );
   }
 
@@ -54,7 +54,7 @@ module.exports = {
 
     if (!this.isElement(elementOrSelector)) {
       // If selector provided
-      if (typeof elementOrSelector == 'string' || elementOrSelector instanceof String) {
+      if (typeof elementOrSelector === 'string' || elementOrSelector instanceof String) {
         // Try to find the element
         element = document.querySelector(elementOrSelector)
 
@@ -62,7 +62,6 @@ module.exports = {
           throw new Error('Provided selector did not find any elements')
           return null
         }
-
       } else {
         throw new Error('Provided selector is not an HTML object nor String')
         return null
@@ -145,8 +144,8 @@ module.exports = {
           evt.clientY = evt.changedTouches[0].pageY - rect.top
         }
       // If it is a custom event
-      } else if (evt.originalEvent != null) {
-        if (evt.originalEvent.clientX != null) {
+      } else if (evt.originalEvent !== void 0) {
+        if (evt.originalEvent.clientX !== void 0) {
           evt.clientX = evt.originalEvent.clientX
           evt.clientY = evt.originalEvent.clientY
         }
@@ -195,6 +194,8 @@ module.exports = {
   // as much as it can, without ever going more than once per `wait` duration;
   // but if you'd like to disable the execution on the leading edge, pass
   // `{leading: false}`. To disable execution on the trailing edge, ditto.
+// jscs:disable
+// jshint ignore:start
 , throttle: function(func, wait, options) {
     var that = this;
     var context, args, result;
@@ -225,6 +226,8 @@ module.exports = {
       return result;
     };
   }
+// jshint ignore:end
+// jscs:enable
 
   /**
    * Create a requestAnimationFrame simulation
@@ -232,12 +235,12 @@ module.exports = {
    * @param  {Number|String} refreshRate
    * @return {Function}
    */
-, createRequestAnimationFrame: function(refreshRate){
+, createRequestAnimationFrame: function(refreshRate) {
     var timeout = null
 
     // Convert refreshRate to timeout
     if (refreshRate !== 'auto' && refreshRate < 60 && refreshRate > 1) {
-      timeout = Math.floor(1000/refreshRate)
+      timeout = Math.floor(1000 / refreshRate)
     }
 
     if (timeout === null) {
@@ -251,10 +254,11 @@ module.exports = {
 /**
  * Create a callback that will execute after a given timeout
  *
- * @param  {Function} callback
+ * @param  {Function} timeout
+ * @return {Function}
  */
 function requestTimeout(timeout) {
-  return function(callback){
+  return function(callback) {
     window.setTimeout(callback, timeout)
   }
 }

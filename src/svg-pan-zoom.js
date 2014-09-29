@@ -55,16 +55,16 @@ SvgPanZoom.prototype.init = function(svg, options) {
   , refreshRate: this.options.refreshRate
   // Put callbacks into functions as they can change through time
   , beforeZoom: function(scale) {
-      that.options.beforeZoom && that.options.beforeZoom(scale)
+      if (that.options.beforeZoom) {that.options.beforeZoom(scale)}
     }
   , onZoom: function(scale) {
-      that.options.onZoom && that.options.onZoom(scale)
+      if (that.options.onZoom) {that.options.onZoom(scale)}
     }
   , beforePan: function(point) {
-      that.options.beforePan && that.options.beforePan(point)
+      if (that.options.beforePan) {that.options.beforePan(point)}
     }
   , onPan: function(point) {
-      that.options.onPan && that.options.onPan(point)
+      if (that.options.onPan) {that.options.onPan(point)}
     }
   })
 
@@ -510,8 +510,8 @@ SvgPanZoom.prototype.getPublicInstance = function() {
     , panBy: function(point) {that.panBy(point); return that.pi}
     , getPan: function() {return that.getPan()}
       // Pan event
-    , setBeforePan: function(fn) {that.options.beforePan = fn == null ? null : Utils.proxy(fn, that.publicInstance); return that.pi}
-    , setOnPan: function(fn) {that.options.onPan = fn == null ? null : Utils.proxy(fn, that.publicInstance); return that.pi}
+    , setBeforePan: function(fn) {that.options.beforePan = fn === null ? null : Utils.proxy(fn, that.publicInstance); return that.pi}
+    , setOnPan: function(fn) {that.options.onPan = fn === null ? null : Utils.proxy(fn, that.publicInstance); return that.pi}
       // Zoom and Control Icons
     , enableZoom: function() {that.options.zoomEnabled = true; return that.pi}
     , disableZoom: function() {that.options.zoomEnabled = false; return that.pi}
@@ -540,8 +540,8 @@ SvgPanZoom.prototype.getPublicInstance = function() {
     , setMinZoom: function(zoom) {that.options.minZoom = zoom; return that.pi}
     , setMaxZoom: function(zoom) {that.options.maxZoom = zoom; return that.pi}
       // Zoom event
-    , setBeforeZoom: function(fn) {that.options.beforeZoom = fn == null ? null : Utils.proxy(fn, that.publicInstance); return that.pi}
-    , setOnZoom: function(fn) {that.options.onZoom = fn == null ? null : Utils.proxy(fn, that.publicInstance); return that.pi}
+    , setBeforeZoom: function(fn) {that.options.beforeZoom = fn === null ? null : Utils.proxy(fn, that.publicInstance); return that.pi}
+    , setOnZoom: function(fn) {that.options.onZoom = fn === null ? null : Utils.proxy(fn, that.publicInstance); return that.pi}
       // Zooming
     , zoom: function(scale) {
         that.zoomAtPoint(scale, SvgUtils.getSvgCenterPoint(that.svg, that.width, that.height), true)
