@@ -156,6 +156,35 @@ test('disable and enable double click zoom via API', function() {
 });
 
 /**
+ * Mouse wheel zoom state (enabled, disabled)
+ */
+
+test('by default mouse wheel zoom is enabled', function() {
+  expect(1);
+  instance = initSvgPanZoom()
+
+  equal(instance.isMouseWheelZoomEnabled(), true)
+});
+
+test('disable mouse wheel zoom via options', function() {
+  expect(1);
+  instance = initSvgPanZoom({mouseWheelZoomEnabled: false})
+
+  equal(instance.isMouseWheelZoomEnabled(), false)
+});
+
+test('disable and enable mouse wheel zoom via API', function() {
+  expect(2);
+  instance = initSvgPanZoom()
+
+  instance.disableMouseWheelZoom()
+  equal(instance.isMouseWheelZoomEnabled(), false)
+
+  instance.enableMouseWheelZoom()
+  equal(instance.isMouseWheelZoomEnabled(), true)
+});
+
+/**
  * Pan
  */
 

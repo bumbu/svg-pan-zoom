@@ -13,6 +13,7 @@ var optionsDefaults = {
 , controlIconsEnabled: false // insert icons to give user an option in addition to mouse events to control pan/zoom (default disabled)
 , zoomEnabled: true // enable or disable zooming (default enabled)
 , dblClickZoomEnabled: true // enable or disable zooming by double clicking (default enabled)
+, mouseWheelZoomEnabled: true // enable or disable zooming by mouse wheel (default enabled)
 , zoomScaleSensitivity: 0.2 // Zoom sensitivity
 , minZoom: 0.5 // Minimum Zoom level
 , maxZoom: 10 // Maximum Zoom level
@@ -128,13 +129,40 @@ SvgPanZoom.prototype.setupHandlers = function() {
     this.svg.addEventListener(event, this.eventListeners[event], false)
   }
 
-  // Mouse wheel listener
-  this.wheelListener = function(evt) {
-    return that.handleMouseWheel(evt);
+  // Zoom using mouse wheel
+  if (this.options.mouseWheelZoomEnabled) {
+    this.options.mouseWheelZoomEnabled = false
+    this.enableMouseWheelZoom()
   }
+}
 
-  // Bind wheelListener
-  Wheel.on(this.svg, this.wheelListener, false)
+/**
+ * Enable ability to zoom using mouse wheel
+ */
+SvgPanZoom.prototype.enableMouseWheelZoom = function() {
+  if (!this.options.mouseWheelZoomEnabled) {
+    var that = this
+
+    // Mouse wheel listener
+    this.wheelListener = function(evt) {
+      return that.handleMouseWheel(evt);
+    }
+
+    // Bind wheelListener
+    Wheel.on(this.svg, this.wheelListener, false)
+
+    this.options.mouseWheelZoomEnabled = true
+  }
+}
+
+/**
+ * Disable ability to zoom using mouse wheel
+ */
+SvgPanZoom.prototype.disableMouseWheelZoom = function() {
+  if (this.options.mouseWheelZoomEnabled) {
+    Wheel.off(this.svg, this.wheelListener, false)
+    this.options.mouseWheelZoomEnabled = false
+  }
 }
 
 /**
@@ -470,7 +498,7 @@ SvgPanZoom.prototype.destroy = function() {
   }
 
   // Unbind wheelListener
-  Wheel.off(this.svg, this.wheelListener, false)
+  this.disableMouseWheelZoom()
 
   // Remove control icons
   this.getPublicInstance().disableControlIcons()
@@ -535,6 +563,10 @@ SvgPanZoom.prototype.getPublicInstance = function() {
     , enableDblClickZoom: function() {that.options.dblClickZoomEnabled = true; return that.pi}
     , disableDblClickZoom: function() {that.options.dblClickZoomEnabled = false; return that.pi}
     , isDblClickZoomEnabled: function() {return !!that.options.dblClickZoomEnabled}
+      // Mouse wheel zoom
+    , enableMouseWheelZoom: function() {that.enableMouseWheelZoom(); return that.pi}
+    , disableMouseWheelZoom: function() {that.disableMouseWheelZoom(); return that.pi}
+    , isMouseWheelZoomEnabled: function() {return !!that.options.mouseWheelZoomEnabled}
       // Zoom scale and bounds
     , setZoomScaleSensitivity: function(scale) {that.options.zoomScaleSensitivity = scale; return that.pi}
     , setMinZoom: function(zoom) {that.options.minZoom = zoom; return that.pi}
