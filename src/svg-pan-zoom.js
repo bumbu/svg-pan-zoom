@@ -131,7 +131,7 @@ SvgPanZoom.prototype.setupHandlers = function() {
 
   // Zoom using mouse wheel
   if (this.options.mouseWheelZoomEnabled) {
-    this.options.mouseWheelZoomEnabled = false
+    this.options.mouseWheelZoomEnabled = false // set to false as enable will set it back to true
     this.enableMouseWheelZoom()
   }
 }
