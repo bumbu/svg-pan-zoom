@@ -85,6 +85,14 @@ If any arguments are specified, they must have the following value types:
 
 `panEnabled` and `zoomEnabled` are related only to user interaction. If any of this options are disabled - you still can zoom and pan via API.
 
+Use with browserify
+-------------------
+
+If you do use browserify in your project you may do it by:
+* Add the package as node module `npm install --save ariutta/svg-pan-zoom`
+* Require _svg-pan-zoom_ in your source file `svgPanZoom = require('svg-pan-zoom')`
+* Use in the same as you would do with global svgPanZoom: `instance = svgPanZoom('#demo-tiger')`
+
 Public API
 ----------
 
