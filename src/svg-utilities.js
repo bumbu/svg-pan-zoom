@@ -66,15 +66,31 @@ module.exports = {
    * @param  {SVGSVGElement} svg
    * @return {SVGElement}     g (group) element
    */
-, getOrCreateViewport: function(svg) {
-    var viewport = svg.querySelector('g.viewport')
+, getOrCreateViewport: function(svg, selector) {
+    var viewport = null
 
-    // If no g element with class 'viewport' exists, create one
+    if (Utils.isElement(selector)) {
+      viewport = selector
+    } else {
+      viewport = svg.querySelector(selector)
+    }
+
+    // Check if there is just one main group in SVG
+    if (!viewport) {
+      var childNodes = Array.prototype.slice.call(svg.childNodes || svg.children).filter(function(el){
+        return el.nodeName !== 'defs' && el.nodeName !== '#text'
+      })
+
+      if (childNodes.length === 1 && childNodes[0].nodeName === 'g') {
+        viewport = childNodes[0]
+      }
+    }
+
+    // If no favorable group element exists then create one
     if (!viewport) {
       var viewportId = 'viewport-' + new Date().toISOString().replace(/\D/g, '');
       viewport = document.createElementNS(this.svgNS, 'g');
       viewport.setAttribute('id', viewportId);
-      viewport.setAttribute('class', 'viewport');
 
       // Internet Explorer (all versions?) can't use childNodes, but other browsers prefer (require?) using childNodes
       var svgChildren = svg.childNodes || svg.children;
@@ -85,6 +101,13 @@ module.exports = {
       }
       svg.appendChild(viewport);
     }
+
+    // Set class (if not set allready)
+    var classNames = ('' + viewport.getAttribute('class')).split(' ')
+    if (classNames.indexOf('svg-pan-zoom_viewport') === -1) {
+      classNames.push('svg-pan-zoom_viewport')
+    }
+    viewport.setAttribute('class', classNames.join(' '))
 
     return viewport
   }

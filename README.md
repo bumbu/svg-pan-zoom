@@ -23,10 +23,10 @@ Demos
 How To Use
 ----------
 
-1) Ensure the target SVG has a top-level 'g' element with the class 'viewport' to enable zooming for the entire SVG:
+1) Ensure the target SVG has a top-level 'g' element with the class `svg-pan-zoom_viewport` to enable zooming for the entire SVG:
 
 ```xml
-<g class="viewport"></g>
+<g class="svg-pan-zoom_viewport"></g>
 ```
 
 If the target SVG does not have this element, the library will create it.
@@ -46,7 +46,8 @@ If you want to override the defaults, you can optionally specify one or more arg
 
 ```js
 svgPanZoom('#demo-tiger', {
-  panEnabled: true
+  viewportSelector: '.svg-pan-zoom_viewport'
+, panEnabled: true
 , controlIconsEnabled: false
 , zoomEnabled: true
 , dblClickZoomEnabled: true
@@ -64,6 +65,7 @@ svgPanZoom('#demo-tiger', {
 ```
 
 If any arguments are specified, they must have the following value types:
+* 'viewportSelector' can be querySelector string or SVGElement.
 * 'panEnabled' must be true or false. Default is true.
 * 'controlIconsEnabled' must be true or false. Default is false.
 * 'zoomEnabled' must be true or false. Default is true.

@@ -9,7 +9,8 @@ var SvgPanZoom = function(svg, options) {
 }
 
 var optionsDefaults = {
-  panEnabled: true // enable or disable panning (default enabled)
+  viewportSelector: '.svg-pan-zoom_viewport' // Viewport selector. Can be querySelector string or SVGElement
+, panEnabled: true // enable or disable panning (default enabled)
 , controlIconsEnabled: false // insert icons to give user an option in addition to mouse events to control pan/zoom (default disabled)
 , zoomEnabled: true // enable or disable zooming (default enabled)
 , dblClickZoomEnabled: true // enable or disable zooming by double clicking (default enabled)
@@ -47,7 +48,7 @@ SvgPanZoom.prototype.init = function(svg, options) {
   this.height = boundingClientRectNormalized.height
 
   // Init shadow viewport
-  this.viewport = ShadowViewport(SvgUtils.getOrCreateViewport(this.svg), {
+  this.viewport = ShadowViewport(SvgUtils.getOrCreateViewport(this.svg, this.options.viewportSelector), {
     svg: this.svg
   , width: this.width
   , height: this.height
