@@ -59,7 +59,7 @@ module.exports = {
         element = document.querySelector(elementOrSelector)
 
         if (!element) {
-          throw new Error('Provided selector did not find any elements')
+          throw new Error('Provided selector did not find any elements. Selector: ' + elementOrSelector)
           return null
         }
       } else {
