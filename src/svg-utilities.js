@@ -97,9 +97,12 @@ module.exports = {
       // Internet Explorer (all versions?) can't use childNodes, but other browsers prefer (require?) using childNodes
       var svgChildren = svg.childNodes || svg.children;
       if (!!svgChildren && svgChildren.length > 0) {
-        do {
-          viewport.appendChild(svgChildren[0]);
-        } while (svgChildren.length > 0);
+        for (var i = svgChildren.length; i > 0; i--) {
+          // Move everything into viewport except defs
+          if (svgChildren[svgChildren.length - i].nodeName !== 'defs') {
+            viewport.appendChild(svgChildren[svgChildren.length - i]);
+          }
+        }
       }
       svg.appendChild(viewport);
     }
