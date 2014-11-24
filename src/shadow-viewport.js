@@ -17,10 +17,6 @@ ShadowViewport.prototype.init = function(viewport, options) {
   this.viewport = viewport
   this.options = options
 
-  // ViewBox
-  this.viewBox = {x: 0, y: 0, width: 0, height: 0}
-  this.cacheViewBox()
-
   // State cache
   this.originalState = {zoom: 1, x: 0, y: 0}
   this.activeState = {zoom: 1, x: 0, y: 0}
@@ -29,6 +25,10 @@ ShadowViewport.prototype.init = function(viewport, options) {
 
   // Create a custom requestAnimationFrame taking in account refreshRate
   this.requestAnimationFrame = Utils.createRequestAnimationFrame(this.options.refreshRate)
+
+  // ViewBox
+  this.viewBox = {x: 0, y: 0, width: 0, height: 0}
+  this.cacheViewBox()
 
   // Process CTM
   this.processCTM()
@@ -49,6 +49,16 @@ ShadowViewport.prototype.cacheViewBox = function() {
     this.viewBox.y = viewBoxValues[1]
     this.viewBox.width = viewBoxValues[2]
     this.viewBox.height = viewBoxValues[3]
+
+    var zoom = Math.min(this.options.width / this.viewBox.width, this.options.height / this.viewBox.height)
+
+    // Update active state
+    this.activeState.zoom = zoom
+    this.activeState.x = (this.options.width - this.viewBox.width * zoom) / 2
+    this.activeState.y = (this.options.height - this.viewBox.height * zoom) / 2
+
+    // Force updating CTM
+    this.updateCTMOnNextFrame()
 
     this.options.svg.removeAttribute('viewBox')
   } else {
@@ -110,7 +120,7 @@ ShadowViewport.prototype.processCTM = function() {
     newCTM.f = offsetY
   }
 
-  // Cache initial values
+  // Cache initial values. Based on activeState and fix+center opitons
   this.originalState.zoom = newCTM.a
   this.originalState.x = newCTM.e
   this.originalState.y = newCTM.f
