@@ -104,12 +104,17 @@ module.exports = {
       svg.appendChild(viewport);
     }
 
-    // Set class (if not set allready)
-    var classNames = ('' + viewport.getAttribute('class')).split(' ')
-    if (classNames.indexOf('svg-pan-zoom_viewport') === -1) {
-      classNames.push('svg-pan-zoom_viewport')
+    // Parse class names
+    var classNames = [];
+    if (viewport.getAttribute('class')) {
+      classNames = viewport.getAttribute('class').split(' ')
     }
-    viewport.setAttribute('class', classNames.join(' '))
+
+    // Set class (if not set already)
+    if (!~classNames.indexOf('svg-pan-zoom_viewport')) {
+      classNames.push('svg-pan-zoom_viewport')
+      viewport.setAttribute('class', classNames.join(' '))
+    }
 
     return viewport
   }
