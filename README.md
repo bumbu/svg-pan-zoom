@@ -121,7 +121,7 @@ Use with browserify
 If you do use browserify in your project you may do it by:
 * Add the package as node module `npm install --save ariutta/svg-pan-zoom`
 * Require _svg-pan-zoom_ in your source file `svgPanZoom = require('svg-pan-zoom')`
-* Use in the same as you would do with global svgPanZoom: `instance = svgPanZoom('#demo-tiger')`
+* Use in the same way as you would do with global svgPanZoom: `instance = svgPanZoom('#demo-tiger')`
 
 Public API
 ----------
@@ -196,9 +196,11 @@ panZoomTiger.zoomBy(1.3)
 // Set zoom level to 2 at point
 panZoomTiger.zoomAtPoint(2, {x: 50, y: 50})
 
-// Zoom by 130% at point
+// Zoom by 130% at given point
 panZoomTiger.zoomAtPointBy(1.3, {x: 50, y: 50})
 ```
+
+> Zoom is relative to initial SVG internal zoom level. If your SVG was fit at the begging (option fit: true) and thus zoomed in or out to fit available space - initial scale will be anyway 1.
 
 Or you can use the zoomIn or zoomOut methods:
 

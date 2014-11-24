@@ -211,7 +211,7 @@ SvgPanZoom.prototype.handleMouseWheel = function(evt) {
 }
 
 /**
- * Zoom in at an SVG point
+ * Zoom in at a SVG point
  *
  * @param  {SVGPoint} point
  * @param  {Float} zoomScale    Number representing how much to zoom
@@ -246,13 +246,42 @@ SvgPanZoom.prototype.zoomAtPoint = function(zoomScale, point, zoomAbsolute) {
 }
 
 /**
+ * Zoom at center point
+ *
+ * @param  {Float} scale
+ * @param  {Boolean} absolute Marks zoom scale as relative or absolute
+ */
+SvgPanZoom.prototype.zoom = function(scale, absolute) {
+  this.zoomAtPoint(scale, SvgUtils.getSvgCenterPoint(this.svg, this.width, this.height), absolute)
+}
+
+/**
+ * Zoom used by public instance
+ *
+ * @param  {Float} scale
+ * @param  {Boolean} absolute Marks zoom scale as relative or absolute
+ */
+SvgPanZoom.prototype.publicZoom = function(scale, absolute) {
+  if (absolute) {
+    scale = this.computeFromRelativeZoom(scale)
+  }
+
+  this.zoom(scale, absolute)
+}
+
+/**
  * Zoom at point used by public instance
  *
  * @param  {Float} scale
  * @param  {SVGPoint|Object} point    An object that has x and y attributes
- * @param  {Boolean} absolute Marks zoom as relative or absolute
+ * @param  {Boolean} absolute Marks zoom scale as relative or absolute
  */
 SvgPanZoom.prototype.publicZoomAtPoint = function(scale, point, absolute) {
+  if (absolute) {
+    // Transform zoom into a relative value
+    scale = this.computeFromRelativeZoom(scale)
+  }
+
   // If not a SVGPoint but has x and y than create a SVGPoint
   if (Utils.getType(point) !== 'SVGPoint' && 'x' in point && 'y' in point) {
     point = SvgUtils.createSVGPoint(this.svg, point.x, point.y)
@@ -265,7 +294,7 @@ SvgPanZoom.prototype.publicZoomAtPoint = function(scale, point, absolute) {
 }
 
 /**
- * Get zoom scale/level
+ * Get zoom scale
  *
  * @return {Float} zoom scale
  */
@@ -274,13 +303,31 @@ SvgPanZoom.prototype.getZoom = function() {
 }
 
 /**
+ * Get zoom scale for public usage
+ *
+ * @return {Float} zoom scale
+ */
+SvgPanZoom.prototype.getRelativeZoom = function() {
+  return this.viewport.getRelativeZoom()
+}
+
+/**
+ * Compute actual zoom from public zoom
+ *
+ * @param  {Float} zoom
+ * @return {Float} zoom scale
+ */
+SvgPanZoom.prototype.computeFromRelativeZoom = function(zoom) {
+  return zoom * this.viewport.getOriginalState().zoom
+}
+
+/**
  * Set zoom to initial state
  */
 SvgPanZoom.prototype.resetZoom = function() {
-  var publicInstance = this.getPublicInstance()
-    , originalState = this.viewport.getOriginalState()
+  var originalState = this.viewport.getOriginalState()
 
-  publicInstance.zoom(originalState.zoom);
+  this.zoom(originalState.zoom, true);
 }
 
 /**
@@ -403,7 +450,7 @@ SvgPanZoom.prototype.fit = function() {
   var viewBox = this.viewport.getViewBox()
     , newScale = Math.min(this.width/(viewBox.width - viewBox.x), this.height/(viewBox.height - viewBox.y))
 
-  this.getPublicInstance().zoom(newScale)
+  this.zoom(newScale, true)
 }
 
 /**
@@ -572,34 +619,16 @@ SvgPanZoom.prototype.getPublicInstance = function() {
     , setBeforeZoom: function(fn) {that.options.beforeZoom = fn === null ? null : Utils.proxy(fn, that.publicInstance); return that.pi}
     , setOnZoom: function(fn) {that.options.onZoom = fn === null ? null : Utils.proxy(fn, that.publicInstance); return that.pi}
       // Zooming
-    , zoom: function(scale) {
-        that.zoomAtPoint(scale, SvgUtils.getSvgCenterPoint(that.svg, that.width, that.height), true)
-        return that.pi
-      }
-    , zoomBy: function(scale) {
-        that.zoomAtPoint(scale, SvgUtils.getSvgCenterPoint(that.svg, that.width, that.height), false)
-        return that.pi
-      }
-    , zoomAtPoint: function(scale, point) {
-        that.publicZoomAtPoint(scale, point, true)
-        return that.pi
-      }
-    , zoomAtPointBy: function(scale, point) {
-        that.publicZoomAtPoint(scale, point, false)
-        return that.pi
-      }
-    , zoomIn: function() {
-        this.zoomBy(1 + that.options.zoomScaleSensitivity)
-        return that.pi
-      }
-    , zoomOut: function() {
-        this.zoomBy(1 / (1 + that.options.zoomScaleSensitivity))
-        return that.pi
-      }
+    , zoom: function(scale) {that.publicZoom(scale, true); return that.pi}
+    , zoomBy: function(scale) {that.publicZoom(scale, false); return that.pi}
+    , zoomAtPoint: function(scale, point) {that.publicZoomAtPoint(scale, point, true); return that.pi}
+    , zoomAtPointBy: function(scale, point) {that.publicZoomAtPoint(scale, point, false); return that.pi}
+    , zoomIn: function() {this.zoomBy(1 + that.options.zoomScaleSensitivity); return that.pi}
+    , zoomOut: function() {this.zoomBy(1 / (1 + that.options.zoomScaleSensitivity)); return that.pi}
     , resetZoom: function() {that.resetZoom(); return that.pi}
     , resetPan: function() {that.resetPan(); return that.pi}
     , reset: function() {that.reset(); return that.pi}
-    , getZoom: function() {return that.getZoom()}
+    , getZoom: function() {return that.getRelativeZoom()}
     , fit: function() {that.fit(); return that.pi}
     , center: function() {that.center(); return that.pi}
     , updateBBox: function() {that.updateBBox(); return that.pi}

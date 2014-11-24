@@ -495,11 +495,25 @@ test('reset (zoom and pan)', function() {
  * SVG size 700x300
  * viewport zise 800x800
  *
- * zoom = Math.min(700/800, 300/800) = 0.375
+ * If no viewBox attribute then initial zoom is always 1
  */
-test('fit', function() {
+test('fit when initialized with fit: true', function() {
   expect(1);
   instance = initSvgPanZoom()
+
+  instance.fit()
+
+  close(instance.getZoom(), 1)
+});
+
+/**
+ * SVG size 700x300
+ * viewport zise 800x800
+ * zoom = Math.min(700/800, 300/800) = 0.375
+ */
+test('fit when initialized with fit: false', function() {
+  expect(1);
+  instance = initSvgPanZoom({fit: false, minZoom: 0.1})
 
   instance.fit()
 
@@ -508,20 +522,37 @@ test('fit', function() {
 
 /**
  * SVG size 700x300
- * viewport zise 800x800
- * zoom 0.375
+ * viewport zise 800x800 (sides ratio is 1)
+ * zoom 1 => width = height = 300
  *
- * panX = (700 - 800 * 0.375)/2 = 200
- * panY = (300 - 800 * 0.375)/2 = 0
+ * panX = (700 - 300)/2 = 200
+ * panY = (300 - 300)/2 = 0
  */
-test('center', function() {
+test('center when zoom is 1', function() {
   expect(1);
   instance = initSvgPanZoom()
 
-  instance.zoom(0.375)
   instance.center()
 
   deepEqual(instance.getPan(), {x: 200, y: 0})
+});
+
+/**
+ * SVG size 700x300
+ * viewport zise 800x800 (sides ratio is 1)
+ * zoom 0.5 => width = height = 150
+ *
+ * panX = (700 - 150)/2 = 275
+ * panY = (300 - 150)/2 = 75
+ */
+test('center when zoom is 0.5', function() {
+  expect(1);
+  instance = initSvgPanZoom()
+
+  instance.zoom(0.5)
+  instance.center()
+
+  deepEqual(instance.getPan(), {x: 275, y: 75})
 });
 
 /**

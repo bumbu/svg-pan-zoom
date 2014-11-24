@@ -148,12 +148,21 @@ ShadowViewport.prototype.getState = function() {
 }
 
 /**
- * Get zoom scale/level
+ * Get zoom scale
  *
  * @return {Float} zoom scale
  */
 ShadowViewport.prototype.getZoom = function() {
   return this.activeState.zoom
+}
+
+/**
+ * Get zoom scale for pubilc usage
+ *
+ * @return {Float} zoom scale
+ */
+ShadowViewport.prototype.getRelativeZoom = function() {
+  return this.activeState.zoom / this.originalState.zoom
 }
 
 /**
@@ -195,7 +204,7 @@ ShadowViewport.prototype.setCTM = function(newCTM) {
 
   if (willZoom || willPan) {
     // Before callbacks
-    if (willZoom) {this.options.beforeZoom(this.getZoom())}
+    if (willZoom) {this.options.beforeZoom(this.getRelativeZoom())}
     if (willPan) {this.options.beforePan(this.getPan())}
 
     this.updateCache(newCTM)
@@ -203,7 +212,7 @@ ShadowViewport.prototype.setCTM = function(newCTM) {
     this.updateCTMOnNextFrame()
 
     // After callbacks
-    if (willZoom) {this.options.onZoom(this.getZoom())}
+    if (willZoom) {this.options.onZoom(this.getRelativeZoom())}
     if (willPan) {this.options.onPan(this.getPan())}
   }
 }
