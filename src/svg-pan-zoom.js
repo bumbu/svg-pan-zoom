@@ -25,6 +25,7 @@ var optionsDefaults = {
 , onZoom: null
 , beforePan: null
 , onPan: null
+, customEventsHandler: null
 }
 
 SvgPanZoom.prototype.init = function(svg, options) {
@@ -122,6 +123,24 @@ SvgPanZoom.prototype.setupHandlers = function() {
     }
   , touchcancel: function(evt) {
       return that.handleMouseUp(evt);
+    }
+  }
+
+  // Init custom events handler if available
+  if (this.options.customEventsHandler != null) {
+    this.options.customEventsHandler.init({
+      svgElement: this.svg
+    , instance: this.getPublicInstance()
+    })
+
+    // Custom event handler may halt builtin listeners
+    var haltEventListeners = this.options.customEventsHandler.haltEventListeners
+    if (haltEventListeners && haltEventListeners.length) {
+      for (var i = haltEventListeners.length - 1; i >= 0; i--) {
+        if (this.eventListeners.hasOwnProperty(haltEventListeners[i])) {
+          delete this.eventListeners[haltEventListeners[i]]
+        }
+      }
     }
   }
 
@@ -536,6 +555,11 @@ SvgPanZoom.prototype.destroy = function() {
   this.beforePan = null
   this.onPan = null
 
+  // Destroy custom event handlers
+  if (this.options.customEventsHandler != null) {
+    this.options.customEventsHandler.destroy()
+  }
+
   // Unbind eventListeners
   for (var event in this.eventListeners) {
     this.svg.removeEventListener(event, this.eventListeners[event], false)
@@ -554,6 +578,9 @@ SvgPanZoom.prototype.destroy = function() {
   instancesStore = instancesStore.filter(function(instance){
     return instance.svg !== that.svg
   })
+
+  // Delete options and its contents
+  delete this.options
 
   // Destroy public instance and rewrite getPublicInstance
   delete this.publicInstance

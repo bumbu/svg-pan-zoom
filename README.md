@@ -53,6 +53,7 @@ svgPanZoom('#demo-tiger', {
 , onZoom: function(){}
 , beforePan: function(){}
 , onPan: function(){}
+, customEventsHandler: {}
 });
 ```
 
@@ -73,6 +74,7 @@ If any arguments are specified, they must have the following value types:
 * 'onZoom' must be a callback function to be called when zoom changes.
 * 'beforePan' must be a callback function to be called before pan changes.
 * 'onPan' must be a callback function to be called when pan changes.
+* 'customEventsHandler' must be a object with init and destroy arguments as functions.
 
 `beforeZoom` and `onZoom` callbacks will be called with a float attribute. The attribute will be equal to current zoom scale of the viewport.
 
@@ -122,6 +124,58 @@ If you do use browserify in your project you may do it by:
 * Add the package as node module `npm install --save ariutta/svg-pan-zoom`
 * Require _svg-pan-zoom_ in your source file `svgPanZoom = require('svg-pan-zoom')`
 * Use in the same way as you would do with global svgPanZoom: `instance = svgPanZoom('#demo-tiger')`
+
+Custom events support
+---------------------
+
+You may want to add custom events support (for example double tap or pinch).
+
+It is possible by setting `customEventsHandler` configuration option.
+`customEventsHandler` should be an object with following attributes:
+* `haltEventListeners`: array of strings
+* `init`: function
+* `destroy`: function
+
+`haltEventListeners` specifies which default event listeners should be disabled (in order to avoid conflicts as svg-pan-zoom supports by default panning using touch events).
+
+`init` is a function that is called when svg-pan-zoom is initialized. A object is passed into this function.
+Passed object has following attributes:
+* `svgElement` - SVGSVGElement
+* `instance` - svg-pan-zoom public API instance
+
+`destroy` is a function called upon svg-pan-zoom destroy
+
+An example of how to use it together with [Hammer.js](http://hammerjs.github.io):
+```js
+var options = {
+  zoomEnabled: true
+, controlIconsEnabled: true
+, customEventsHandler: {
+    // Halt all touch events
+    haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel']
+
+    // Init custom events handler
+  , init: function(options) {
+      // Init Hammer
+      this.hammer = Hammer(options.svgElement)
+
+      // Handle double tap
+      this.hammer.on('doubletap', function(ev){
+        options.instance.zoomIn()
+      })
+    }
+
+    // Destroy custom events handler
+  , destroy: function(){
+      this.hammer.destroy()
+    }
+  }
+}
+
+svgPanZoom('#mobile-svg', options);
+```
+
+You may find an example that adds support for Hammer.js pan, pinch and doubletap in demo/mobile.html
 
 Public API
 ----------
