@@ -419,6 +419,14 @@ SvgPanZoom.prototype.center = function() {
 }
 
 /**
+ * Update content cached BorderBox
+ * Use when viewport contents change
+ */
+SvgPanZoom.prototype.updateBBox = function() {
+  this.viewport.recacheViewBox()
+}
+
+/**
  * Pan to a rendered position
  *
  * @param  {Object} point {x: 0, y: 0}
@@ -594,6 +602,7 @@ SvgPanZoom.prototype.getPublicInstance = function() {
     , getZoom: function() {return that.getZoom()}
     , fit: function() {that.fit(); return that.pi}
     , center: function() {that.center(); return that.pi}
+    , updateBBox: function() {that.updateBBox(); return that.pi}
     , resize: function() {that.resize(); return that.pi}
     , destroy: function() {that.destroy(); return that.pi}
     }

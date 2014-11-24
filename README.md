@@ -164,6 +164,7 @@ When you call `svgPanZoom` method it returns an object with following methods:
 * getZoom
 * fit
 * center
+* updateBBox
 * resize
 * destroy
 
@@ -242,8 +243,24 @@ If you want to fit and center your SVG after its container resize:
 var panZoomTiger = svgPanZoom('#demo-tiger');
 
 panZoomTiger.resize(); // update SVG cached size and controls positions
-panZoomTiger.fit(true); // dropCache and fit
-panZoomTiger.center(true); // dropCache and center
+panZoomTiger.fit();
+panZoomTiger.center();
+```
+
+If you update SVG (viewport) contents so its border box (virtual box that contains all elements) changes you have to call `updateBBox`:
+
+```js
+var panZoomTiger = svgPanZoom('#demo-tiger');
+panZoomTiger.fit();
+
+// Update SVG rectangle width
+document.getElementById('demo-tiger').querySelector('rect').setAttribute('width', 200)
+
+// fit does not work right anymore as viewport bounding box changed
+panZoomTiger.fit();
+
+panZoomTiger.updateBBox(); // Update viewport bounding box
+panZoomTiger.fit(); // fit works as expected
 ```
 
 Destroy SvgPanZoom instance:
@@ -271,7 +288,7 @@ Supported Browsers
 * Firefox
 * Safari
 * Opera
-* Internet Explorer 9+ _(works badly if viewBox is set)_
+* Internet Explorer 9+ _(works badly if viewBox attribute is set)_
 
 Related Work
 ------------
