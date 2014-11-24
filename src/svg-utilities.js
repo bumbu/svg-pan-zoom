@@ -81,7 +81,9 @@ module.exports = {
         return el.nodeName !== 'defs' && el.nodeName !== '#text'
       })
 
-      if (childNodes.length === 1 && childNodes[0].nodeName === 'g') {
+      // Node name should be SVGGElement and should have no transform attribute
+      // Groups with transform are not used as viewport because it involves parsing of all transform possibilities
+      if (childNodes.length === 1 && childNodes[0].nodeName === 'g' && childNodes[0].getAttribute('transform') === null) {
         viewport = childNodes[0]
       }
     }

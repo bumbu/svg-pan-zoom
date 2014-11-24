@@ -23,15 +23,7 @@ Demos
 How To Use
 ----------
 
-1) Ensure the target SVG has a top-level 'g' element with the class `svg-pan-zoom_viewport` to enable zooming for the entire SVG:
-
-```xml
-<g class="svg-pan-zoom_viewport"></g>
-```
-
-If the target SVG does not have this element, the library will create it.
-
-2) Reference the [svg-pan-zoom.js file](http://ariutta.github.io/svg-pan-zoom/dist/svg-pan-zoom.min.js) from your HTML document. Then call the init method:
+Reference the [svg-pan-zoom.js file](http://ariutta.github.io/svg-pan-zoom/dist/svg-pan-zoom.min.js) from your HTML document. Then call the init method:
 
 ```js
 var panZoomTiger = svgPanZoom('#demo-tiger');
@@ -87,6 +79,41 @@ If any arguments are specified, they must have the following value types:
 `beforePan` and `onPan` callbacks will be called with an object attribute. The object will have two attributes (x and y) each representing current pan (on X and Y axes) of the viewport.
 
 `panEnabled` and `zoomEnabled` are related only to user interaction. If any of this options are disabled - you still can zoom and pan via API.
+
+Using a custom viewport
+-----------------------
+
+You may want to use a custom viewport if you have more layers in your SVG but you want to _pan-zoom_ only one of them.
+
+By default if:
+  * There is just one top-level graphical element of type SVGGElement (`<g>`)
+  * SVGGElement has no `transform` attribute
+  * There is no other SVGGElement with class name `svg-pan-zoom_viewport`
+
+then the top-level graphical element will be used as viewport.
+
+To specify which layer (SVGGElement) should be _pan-zoomed_ set the `svg-pan-zoom_viewport` class name to that element:
+`<g class="svg-pan-zoom_viewport"></g>`.
+
+> Do not set any _transform_ attributes to that element. It will make the library misbehave.
+> If you need _transform_ attribute for viewport better create a nested group element and set _transforms_ to that element:
+```
+<g class="svg-pan-zoom_viewport">
+  <g transform="matrix(1,0,0,1,0,0);"></g>
+</g>
+```
+
+You can specify your own viewport selector by altering `viewportSelector` config value:
+```
+svgPanZoom('#demo-tiger', {
+  viewportSelector: '.svg-pan-zoom_viewport'
+});
+// or
+var viewportGroupElement = document.getElemenById('demo-tiger').querySelector('.svg-pan-zoom_viewport');
+svgPanZoom('#demo-tiger', {
+  viewportSelector: viewportGroupElement
+});
+```
 
 Use with browserify
 -------------------
