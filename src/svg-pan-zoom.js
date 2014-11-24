@@ -398,14 +398,8 @@ SvgPanZoom.prototype.handleMouseUp = function(evt) {
 /**
  * Adjust viewport size (only) so it will fit in SVG
  * Does not center image
- *
- * @param  {Boolean} dropCache drop viewBox cache and recalculate SVG's viewport sizes. Default false
  */
-SvgPanZoom.prototype.fit = function(dropCache) {
-  if (dropCache) {
-    this.viewport.recacheViewBox()
-  }
-
+SvgPanZoom.prototype.fit = function() {
   var viewBox = this.viewport.getViewBox()
     , newScale = Math.min(this.width/(viewBox.width - viewBox.x), this.height/(viewBox.height - viewBox.y))
 
@@ -415,14 +409,8 @@ SvgPanZoom.prototype.fit = function(dropCache) {
 /**
  * Adjust viewport pan (only) so it will be centered in SVG
  * Does not zoom/fit image
- *
- * @param  {Boolean} dropCache drop viewBox cache and recalculate SVG's viewport sizes. Default false
  */
-SvgPanZoom.prototype.center = function(dropCache) {
-  if (dropCache) {
-    this.viewport.recacheViewBox()
-  }
-
+SvgPanZoom.prototype.center = function() {
   var viewBox = this.viewport.getViewBox()
     , offsetX = (this.width - (viewBox.width + viewBox.x) * this.getZoom()) * 0.5
     , offsetY = (this.height - (viewBox.height + viewBox.y) * this.getZoom()) * 0.5
@@ -604,8 +592,8 @@ SvgPanZoom.prototype.getPublicInstance = function() {
     , resetPan: function() {that.resetPan(); return that.pi}
     , reset: function() {that.reset(); return that.pi}
     , getZoom: function() {return that.getZoom()}
-    , fit: function(dropCache) {that.fit(dropCache); return that.pi}
-    , center: function(dropCache) {that.center(dropCache); return that.pi}
+    , fit: function() {that.fit(); return that.pi}
+    , center: function() {that.center(); return that.pi}
     , resize: function() {that.resize(); return that.pi}
     , destroy: function() {that.destroy(); return that.pi}
     }
