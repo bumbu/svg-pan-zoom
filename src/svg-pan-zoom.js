@@ -403,7 +403,7 @@ SvgPanZoom.prototype.handleMouseUp = function(evt) {
  */
 SvgPanZoom.prototype.fit = function(dropCache) {
   if (dropCache) {
-    this.viewbox.recacheViewBox()
+    this.viewport.recacheViewBox()
   }
 
   var viewBox = this.viewport.getViewBox()
@@ -420,7 +420,7 @@ SvgPanZoom.prototype.fit = function(dropCache) {
  */
 SvgPanZoom.prototype.center = function(dropCache) {
   if (dropCache) {
-    this.recacheViewBox()
+    this.viewport.recacheViewBox()
   }
 
   var viewBox = this.viewport.getViewBox()
