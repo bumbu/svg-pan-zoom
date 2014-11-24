@@ -213,7 +213,7 @@ ShadowViewport.prototype.isZoomDifferent = function(newCTM) {
 }
 
 ShadowViewport.prototype.isPanDifferent = function(newCTM) {
-  return this.activeState.x !== newCTM.e && this.activeState.y !== newCTM.f
+  return this.activeState.x !== newCTM.e || this.activeState.y !== newCTM.f
 }
 
 
