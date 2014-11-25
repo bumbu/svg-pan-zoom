@@ -564,7 +564,10 @@ SvgPanZoom.prototype.destroy = function() {
 
   // Destroy custom event handlers
   if (this.options.customEventsHandler != null) {
-    this.options.customEventsHandler.destroy()
+    this.options.customEventsHandler.destroy({
+      svgElement: this.svg
+    , instance: this.getPublicInstance()
+    })
   }
 
   // Unbind eventListeners
