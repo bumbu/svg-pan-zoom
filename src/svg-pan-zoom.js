@@ -57,8 +57,8 @@ SvgPanZoom.prototype.init = function(svg, options) {
   , center: this.options.center
   , refreshRate: this.options.refreshRate
   // Put callbacks into functions as they can change through time
-  , beforeZoom: function(scale) {
-      if (that.viewport && that.options.beforeZoom) {return that.options.beforeZoom(scale)}
+  , beforeZoom: function(oldScale, newScale) {
+      if (that.viewport && that.options.beforeZoom) {return that.options.beforeZoom(oldScale, newScale)}
     }
   , onZoom: function(scale) {
       if (that.viewport && that.options.onZoom) {return that.options.onZoom(scale)}

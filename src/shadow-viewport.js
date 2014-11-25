@@ -166,6 +166,15 @@ ShadowViewport.prototype.getRelativeZoom = function() {
 }
 
 /**
+ * Compute zoom scale for pubilc usage
+ *
+ * @return {Float} zoom scale
+ */
+ShadowViewport.prototype.computeRelativeZoom = function(scale) {
+  return scale / this.originalState.zoom
+}
+
+/**
  * Get pan
  *
  * @return {Object}
@@ -206,7 +215,7 @@ ShadowViewport.prototype.setCTM = function(newCTM) {
     // Before zoom
     if (willZoom) {
       // If returns false then cancel zooming
-      if (this.options.beforeZoom(this.getRelativeZoom()) === false) {
+      if (this.options.beforeZoom(this.getRelativeZoom(), this.computeRelativeZoom(newCTM.a)) === false) {
         newCTM.a = newCTM.d = this.activeState.zoom
         willZoom = false
       }

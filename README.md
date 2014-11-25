@@ -76,9 +76,10 @@ If any arguments are specified, they must have the following value types:
 * 'onPan' must be a callback function to be called when pan changes.
 * 'customEventsHandler' must be a object with `init` and `destroy` arguments as functions.
 
-`beforeZoom` and `onZoom` callbacks will be called with a float attribute. The attribute will be equal to current zoom scale of the viewport.
-
+`beforeZoom` will be called with 2 float attributes: oldZoom and newZoom.
 If `beforeZoom` will return `false` then zooming will be halted.
+
+`onZoom` callbacks will be called with one float attribute representing new zoom scale.
 
 `beforePan` will be called with 2 attributes:
 * `oldPan`
@@ -189,6 +190,13 @@ svgPanZoom('#mobile-svg', options);
 ```
 
 You may find an example that adds support for Hammer.js pan, pinch and doubletap in demo/mobile.html
+
+Keep content visible/Limit pan
+------------------------------
+
+You may want to keep SVG content visible by not allowing panning over SVG borders.
+
+To do so you may prevent panning when
 
 Public API
 ----------
