@@ -8,6 +8,8 @@ Simple pan/zoom solution for SVGs in HTML. It adds events listeners for mouse sc
 
 It works cross-browser and supports both inline SVGs and SVGs in HTML 'object' or 'embed' elements.
 
+> If you're looking for version 2.3.x you can find it in [v2.3.x branch](https://github.com/ariutta/svg-pan-zoom/tree/v2.3.x)
+
 Demos
 -----
  Pan and zoom the SVG tiger on github pages:
