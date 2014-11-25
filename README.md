@@ -74,11 +74,24 @@ If any arguments are specified, they must have the following value types:
 * 'onZoom' must be a callback function to be called when zoom changes.
 * 'beforePan' must be a callback function to be called before pan changes.
 * 'onPan' must be a callback function to be called when pan changes.
-* 'customEventsHandler' must be a object with init and destroy arguments as functions.
+* 'customEventsHandler' must be a object with `init` and `destroy` arguments as functions.
 
 `beforeZoom` and `onZoom` callbacks will be called with a float attribute. The attribute will be equal to current zoom scale of the viewport.
 
-`beforePan` and `onPan` callbacks will be called with an object attribute. The object will have two attributes (x and y) each representing current pan (on X and Y axes) of the viewport.
+If `beforeZoom` will return `false` then zooming will be halted.
+
+`beforePan` will be called with 2 attributes:
+* `oldPan`
+* `newPan`
+
+Each of this objects has two attributes (x and y) representing current pan (on X and Y axes).
+
+If `beforePan` will return `false` or an object `{x: true, y: true}` then panning will be halted.
+If you want to prevent panning only on one axis then return a object of type `{x: true, y: false}`.
+
+`onPan` callback will be called with one attribute: `newPan`.
+
+> *Caution!* Calling zoom or pan API methods form inside of `beforeZoom`, `onZoom`, `beforePan` and `onPan` callbacks may lead to infinite loop.
 
 `panEnabled` and `zoomEnabled` are related only to user interaction. If any of this options are disabled - you still can zoom and pan via API.
 

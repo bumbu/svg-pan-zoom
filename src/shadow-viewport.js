@@ -203,17 +203,53 @@ ShadowViewport.prototype.setCTM = function(newCTM) {
     , willPan = this.isPanDifferent(newCTM)
 
   if (willZoom || willPan) {
-    // Before callbacks
-    if (willZoom) {this.options.beforeZoom(this.getRelativeZoom())}
-    if (willPan) {this.options.beforePan(this.getPan())}
+    // Before zoom
+    if (willZoom) {
+      // If returns false then cancel zooming
+      if (this.options.beforeZoom(this.getRelativeZoom()) === false) {
+        newCTM.a = newCTM.d = this.activeState.zoom
+        willZoom = false
+      }
+    }
 
-    this.updateCache(newCTM)
+    // Before pan
+    if (willPan) {
+      var preventPan = this.options.beforePan(this.getPan(), {x: newCTM.e, y: newCTM.f})
+          // If prevent pan is an object
+        , preventPanX = Utils.isObject(preventPan) && preventPan.x === false ? true : false
+        , preventPanY = Utils.isObject(preventPan) && preventPan.y === false ? true : false
 
-    this.updateCTMOnNextFrame()
+      // If prevent pan is boolean false
+      if (preventPan === false) {
+        preventPanX = preventPanY = true
+      }
 
-    // After callbacks
-    if (willZoom) {this.options.onZoom(this.getRelativeZoom())}
-    if (willPan) {this.options.onPan(this.getPan())}
+      // Prevent panning on X axis
+      if (preventPanX) {
+        newCTM.e = this.activeState.x
+      }
+
+      // Prevent panning on Y axis
+      if (preventPanY) {
+        newCTM.f = this.activeState.y
+      }
+
+      // Update willPan flag
+      if (preventPanX && preventPanY) {
+        willPan = false
+      }
+    }
+
+    // Check again if should zoom or pan
+    if (willZoom || willPan) {
+      this.updateCache(newCTM)
+
+      this.updateCTMOnNextFrame()
+
+      // After callbacks
+      if (willZoom) {this.options.onZoom(this.getRelativeZoom())}
+      if (willPan) {this.options.onPan(this.getPan())}
+    }
   }
 }
 
