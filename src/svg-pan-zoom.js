@@ -652,14 +652,26 @@ SvgPanZoom.prototype.getPublicInstance = function() {
     , zoomAtPointBy: function(scale, point) {that.publicZoomAtPoint(scale, point, false); return that.pi}
     , zoomIn: function() {this.zoomBy(1 + that.options.zoomScaleSensitivity); return that.pi}
     , zoomOut: function() {this.zoomBy(1 / (1 + that.options.zoomScaleSensitivity)); return that.pi}
+    , getZoom: function() {return that.getRelativeZoom()}
+      // Reset
     , resetZoom: function() {that.resetZoom(); return that.pi}
     , resetPan: function() {that.resetPan(); return that.pi}
     , reset: function() {that.reset(); return that.pi}
-    , getZoom: function() {return that.getRelativeZoom()}
+      // Fit and Center
     , fit: function() {that.fit(); return that.pi}
     , center: function() {that.center(); return that.pi}
+      // Size and Resize
     , updateBBox: function() {that.updateBBox(); return that.pi}
     , resize: function() {that.resize(); return that.pi}
+    , getSizes: function() {
+        return {
+          width: that.width
+        , height: that.height
+        , realZoom: that.getZoom()
+        , viewBox: that.viewport.getViewBox()
+        }
+      }
+      // Destroy
     , destroy: function() {that.destroy(); return that.pi}
     }
   }

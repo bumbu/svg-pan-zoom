@@ -212,14 +212,15 @@ When you call `svgPanZoom` method it returns an object with following methods:
 * zoomAtPointBy
 * zoomIn
 * zoomOut
+* getZoom
 * resetZoom
 * resetPan
 * reset
-* getZoom
 * fit
 * center
 * updateBBox
 * resize
+* getSizes
 * destroy
 
 To programmatically pan, call the pan method with vector as first argument:
@@ -318,6 +319,16 @@ panZoomTiger.fit();
 panZoomTiger.updateBBox(); // Update viewport bounding box
 panZoomTiger.fit(); // fit works as expected
 ```
+
+If you need more data about SVG you can call `getSizes`. It will return an object that will contain:
+* `width` - SVG cached width
+* `height` - SVG cached height
+* `realZoom` - _a_ and _d_ attributes of transform matrix applied over viewport
+* `viewBox` - an object containing cached sizes of viewport boxder box
+  * `width`
+  * `height`
+  * `x` - x offset
+  * `y` - y offset
 
 Destroy SvgPanZoom instance:
 
