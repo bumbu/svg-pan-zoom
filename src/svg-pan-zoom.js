@@ -58,16 +58,16 @@ SvgPanZoom.prototype.init = function(svg, options) {
   , refreshRate: this.options.refreshRate
   // Put callbacks into functions as they can change through time
   , beforeZoom: function(scale) {
-      if (that.options.beforeZoom) {that.options.beforeZoom(scale)}
+      if (that.options.beforeZoom) {return that.options.beforeZoom(scale)}
     }
   , onZoom: function(scale) {
-      if (that.options.onZoom) {that.options.onZoom(scale)}
+      if (that.options.onZoom) {return that.options.onZoom(scale)}
     }
-  , beforePan: function(point) {
-      if (that.options.beforePan) {that.options.beforePan(point)}
+  , beforePan: function(oldPoint, newPoint) {
+      if (that.options.beforePan) {return that.options.beforePan(oldPoint, newPoint)}
     }
   , onPan: function(point) {
-      if (that.options.onPan) {that.options.onPan(point)}
+      if (that.options.onPan) {return that.options.onPan(point)}
     }
   })
 
