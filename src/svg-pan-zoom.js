@@ -58,18 +58,25 @@ SvgPanZoom.prototype.init = function(svg, options) {
   , refreshRate: this.options.refreshRate
   // Put callbacks into functions as they can change through time
   , beforeZoom: function(scale) {
-      if (that.options.beforeZoom) {return that.options.beforeZoom(scale)}
+      if (that.viewport && that.options.beforeZoom) {return that.options.beforeZoom(scale)}
     }
   , onZoom: function(scale) {
-      if (that.options.onZoom) {return that.options.onZoom(scale)}
+      if (that.viewport && that.options.onZoom) {return that.options.onZoom(scale)}
     }
   , beforePan: function(oldPoint, newPoint) {
-      if (that.options.beforePan) {return that.options.beforePan(oldPoint, newPoint)}
+      if (that.viewport && that.options.beforePan) {return that.options.beforePan(oldPoint, newPoint)}
     }
   , onPan: function(point) {
-      if (that.options.onPan) {return that.options.onPan(point)}
+      if (that.viewport && that.options.onPan) {return that.options.onPan(point)}
     }
   })
+
+  // Wrap callbacks into public API context
+  var publicInstance = this.getPublicInstance()
+  publicInstance.setBeforeZoom(this.options.beforeZoom)
+  publicInstance.setOnZoom(this.options.onZoom)
+  publicInstance.setBeforePan(this.options.beforePan)
+  publicInstance.setOnPan(this.options.onPan)
 
   if (this.options.controlIconsEnabled) {
     ControlIcons.enable(this)
