@@ -11,6 +11,7 @@ var gulp   = require('gulp')
   , qunit      = require('gulp-qunit')
   , jshint     = require('gulp-jshint')
   , jscs       = require('gulp-jscs')
+  , sync       = require('gulp-config-sync')
   , header     = require('gulp-header')
   , pkg        = require('./package.json')
   , banner     = "// svg-pan-zoom v<%= pkg.version %>" + "\n" + "// https://github.com/ariutta/svg-pan-zoom" + "\n"
@@ -61,9 +62,21 @@ gulp.task('check', function() {
 })
 
 /**
+ * Sync metadata (from package.json to bower.json)
+ */
+gulp.task('sync metadata', function(){
+  gulp.src('./bower.json')
+    .pipe(sync({
+      src: 'package.json'
+    , fields: ['name', 'version', {from: 'contributors', to: 'authors'}, 'description', 'main', 'keywords', 'licence']
+    }))
+    .pipe(gulp.dest(''))
+})
+
+/**
  * Build
  */
-gulp.task('build', ['test', 'check', 'browserify'])
+gulp.task('build', ['test', 'check', 'browserify', 'sync metadata'])
 
 /**
  * Default task
