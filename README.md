@@ -11,13 +11,13 @@ It works cross-browser and supports both inline SVGs and SVGs in HTML 'object' o
 Demos
 -----
  Pan and zoom the SVG tiger on github pages:
- * [Single Inline SVG](http://ariutta.github.io/svg-pan-zoom/demo/inline.html)
- * [Multiple Inline SVGs](http://ariutta.github.io/svg-pan-zoom/demo/multi-instance.html)
- * [SVG Inserted with 'Embed' Element](http://ariutta.github.io/svg-pan-zoom/demo/embed.html)
- * [SVG Inserted with 'Object' Element](http://ariutta.github.io/svg-pan-zoom/demo/object.html)
- * [SVG Inserted with 'Img' Element](http://ariutta.github.io/svg-pan-zoom/demo/img.html) (These cannot be panned/zoomed.)
- * [SVG With custom controls](http://ariutta.github.io/svg-pan-zoom/demo/custom-controls.html)
- * [Resize SVG container on document resize](http://ariutta.github.io/svg-pan-zoom/demo/resize.html)
+ * [Single Inline SVG](https://github.com/ariutta/svg-pan-zoom/tree/v2.3.x/demo/inline.html)
+ * [Multiple Inline SVGs](https://github.com/ariutta/svg-pan-zoom/tree/v2.3.x/demo/multi-instance.html)
+ * [SVG Inserted with 'Embed' Element](https://github.com/ariutta/svg-pan-zoom/tree/v2.3.x/demo/embed.html)
+ * [SVG Inserted with 'Object' Element](https://github.com/ariutta/svg-pan-zoom/tree/v2.3.x/demo/object.html)
+ * [SVG Inserted with 'Img' Element](https://github.com/ariutta/svg-pan-zoom/tree/v2.3.x/demo/img.html) (These cannot be panned/zoomed.)
+ * [SVG With custom controls](https://github.com/ariutta/svg-pan-zoom/tree/v2.3.x/demo/custom-controls.html)
+ * [Resize SVG container on document resize](https://github.com/ariutta/svg-pan-zoom/tree/v2.3.x/demo/resize.html)
 
 How To Use
 ----------
@@ -30,7 +30,7 @@ How To Use
 
 If the target SVG does not have this element, the library will create it.
 
-2) Reference the [svg-pan-zoom.js file](http://ariutta.github.io/svg-pan-zoom/dist/svg-pan-zoom.min.js) from your HTML document. Then call the init method:
+2) Reference the [svg-pan-zoom.js file](https://github.com/ariutta/svg-pan-zoom/tree/v2.3.x/dist/svg-pan-zoom.js) ([or minified version](https://github.com/ariutta/svg-pan-zoom/tree/v2.3.x/svg-pan-zoom.min.js)) from your HTML document. Then call the init method:
 
 ```js
 var panZoomTiger = svgPanZoom('#demo-tiger');
