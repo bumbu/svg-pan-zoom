@@ -118,14 +118,14 @@ To specify which layer (SVGGElement) should be _pan-zoomed_ set the `svg-pan-zoo
 
 > Do not set any _transform_ attributes to that element. It will make the library misbehave.
 > If you need _transform_ attribute for viewport better create a nested group element and set _transforms_ to that element:
-```
+```html
 <g class="svg-pan-zoom_viewport">
   <g transform="matrix(1,0,0,1,0,0);"></g>
 </g>
 ```
 
 You can specify your own viewport selector by altering `viewportSelector` config value:
-```
+```js
 svgPanZoom('#demo-tiger', {
   viewportSelector: '.svg-pan-zoom_viewport'
 });
