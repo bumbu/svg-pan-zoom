@@ -25,6 +25,15 @@ Pan and zoom the SVG tiger on github pages:
 * [Custom events: Enable zooming only on click, disable on mouse out](http://ariutta.github.io/svg-pan-zoom/demo/custom-event-handlers.html)
 * [Limit pan](http://ariutta.github.io/svg-pan-zoom/demo/limit-pan.html)
 
+Support
+-------
+
+If you found a bug or have a suggestion first check if there is a similar [open](https://github.com/ariutta/svg-pan-zoom/issues) or [closed](https://github.com/ariutta/svg-pan-zoom/issues?q=is%3Aissue+is%3Aclosed) issue. If there are none then create a new one.
+
+If you solved a bug or implemented a feature that may be useful for others then you're welcome to create a pull request.
+
+If you have any other type of questions, problems, your code is not working or you want to critique the library - you can use StackOverflow. Just tag you question with [`svgpanzoom`](http://stackoverflow.com/questions/tagged/svgpanzoom).
+
 How To Use
 ----------
 
