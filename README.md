@@ -213,7 +213,7 @@ Keep content visible/Limit pan
 
 You may want to keep SVG content visible by not allowing panning over SVG borders.
 
-To do so you may prevent panning when
+To do so you may prevent or alter panning from `beforePan` callback. For more details take a look at `demo/limit-pan.html` example.
 
 Public API
 ----------
