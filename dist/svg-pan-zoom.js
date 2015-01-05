@@ -1,6 +1,26 @@
-// svg-pan-zoom v3.0.0
+// svg-pan-zoom v3.1.0
 // https://github.com/ariutta/svg-pan-zoom
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+var svgPanZoom = require('./svg-pan-zoom.js');
+
+// UMD module definition
+(function(window, document){
+  // AMD
+  if (typeof define === 'function' && define.amd) {
+    define('svg-pan-zoom', function () {
+      return svgPanZoom;
+    });
+  // CMD
+  } else if (typeof module !== 'undefined' && module.exports) {
+    module.exports = svgPanZoom;
+
+    // Browser
+    // Keep exporting globally as module.exports is available because of browserify
+    window.svgPanZoom = svgPanZoom;
+  }
+})(window, document)
+
+},{"./svg-pan-zoom.js":5}],2:[function(require,module,exports){
 (function(factory){
   if ( typeof define === 'function' && define.amd ) {
     // AMD. Register as an anonymous module.
@@ -149,7 +169,7 @@
   };
 
 }));
-},{}],2:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 var SvgUtils = require('./svg-utilities');
 
 module.exports = {
@@ -273,7 +293,7 @@ module.exports = {
   }
 }
 
-},{"./svg-utilities":6}],3:[function(require,module,exports){
+},{"./svg-utilities":6}],4:[function(require,module,exports){
 var SvgUtils = require('./svg-utilities')
   , Utils = require('./utilities')
   ;
@@ -501,22 +521,36 @@ ShadowViewport.prototype.setCTM = function(newCTM) {
     if (willPan) {
       var preventPan = this.options.beforePan(this.getPan(), {x: newCTM.e, y: newCTM.f})
           // If prevent pan is an object
-        , preventPanX = Utils.isObject(preventPan) && preventPan.x === false ? true : false
-        , preventPanY = Utils.isObject(preventPan) && preventPan.y === false ? true : false
+        , preventPanX = false
+        , preventPanY = false
 
-      // If prevent pan is boolean false
+      // If prevent pan is Boolean false
       if (preventPan === false) {
+        // Set x and y same as before
+        newCTM.e = this.getPan().x
+        newCTM.f = this.getPan().y
+
         preventPanX = preventPanY = true
-      }
+      } else if (Utils.isObject(preventPan)) {
+        // Check for X axes attribute
+        if (preventPan.x === false) {
+          // Prevent panning on x axes
+          newCTM.e = this.getPan().x
+          preventPanX = true
+        } else if (Utils.isNumber(preventPan.x)) {
+          // Set a custom pan value
+          newCTM.e = preventPan.x
+        }
 
-      // Prevent panning on X axis
-      if (preventPanX) {
-        newCTM.e = this.activeState.x
-      }
-
-      // Prevent panning on Y axis
-      if (preventPanY) {
-        newCTM.f = this.activeState.y
+        // Check for Y axes attribute
+        if (preventPan.y === false) {
+          // Prevent panning on x axes
+          newCTM.f = this.getPan().y
+          preventPanY = true
+        } else if (Utils.isNumber(preventPan.y)) {
+          // Set a custom pan value
+          newCTM.f = preventPan.y
+        }
       }
 
       // Update willPan flag
@@ -588,27 +622,7 @@ module.exports = function(viewport, options){
   return new ShadowViewport(viewport, options)
 }
 
-},{"./svg-utilities":6,"./utilities":7}],4:[function(require,module,exports){
-var svgPanZoom = require('./svg-pan-zoom.js');
-
-// UMD module definition
-(function(window, document){
-  // AMD
-  if (typeof define === 'function' && define.amd) {
-    define('svg-pan-zoom', function () {
-      return svgPanZoom;
-    });
-  // CMD
-  } else if (typeof module !== 'undefined' && module.exports) {
-    module.exports = svgPanZoom;
-
-    // Browser
-    // Keep exporting globally as module.exports is available because of browserify
-    window.svgPanZoom = svgPanZoom;
-  }
-})(window, document)
-
-},{"./svg-pan-zoom.js":5}],5:[function(require,module,exports){
+},{"./svg-utilities":6,"./utilities":7}],5:[function(require,module,exports){
 var Wheel = require('uniwheel')
 , ControlIcons = require('./control-icons')
 , Utils = require('./utilities')
@@ -745,7 +759,7 @@ SvgPanZoom.prototype.setupHandlers = function() {
   }
 
   // Init custom events handler if available
-  if (this.options.customEventsHandler != null) {
+  if (this.options.customEventsHandler != null) { // jshint ignore:line
     this.options.customEventsHandler.init({
       svgElement: this.svg
     , instance: this.getPublicInstance()
@@ -1174,7 +1188,7 @@ SvgPanZoom.prototype.destroy = function() {
   this.onPan = null
 
   // Destroy custom event handlers
-  if (this.options.customEventsHandler != null) {
+  if (this.options.customEventsHandler != null) { // jshint ignore:line
     this.options.customEventsHandler.destroy({
       svgElement: this.svg
     , instance: this.getPublicInstance()
@@ -1334,7 +1348,7 @@ var svgPanZoom = function(elementOrSelector, options){
 
 module.exports = svgPanZoom;
 
-},{"./control-icons":2,"./shadow-viewport":3,"./svg-utilities":6,"./utilities":7,"uniwheel":1}],6:[function(require,module,exports){
+},{"./control-icons":3,"./shadow-viewport":4,"./svg-utilities":6,"./utilities":7,"uniwheel":2}],6:[function(require,module,exports){
 var Utils = require('./utilities')
   , _browser = 'unknown'
   ;
@@ -1342,8 +1356,6 @@ var Utils = require('./utilities')
 // http://stackoverflow.com/questions/9847580/how-to-detect-safari-chrome-ie-firefox-and-opera-browser
 if (/*@cc_on!@*/false || !!document.documentMode) { // internet explorer
   _browser = 'ie';
-} else if (typeof InstallTrigger !== 'undefined') { // firefox
-  _browser = 'firefox';
 }
 
 module.exports = {
@@ -1360,35 +1372,7 @@ module.exports = {
    * @return {Object}     {width: 0, height: 0}
    */
 , getBoundingClientRectNormalized: function(svg) {
-    // Firefox returns values in the SVG coordinate system for getBoundingClientRect(),
-    // whereas other browsers return values in the HTML page coordinate system.
-    // This harmonizes the behavior to use the HTML page coordinate system.
-
-
-    if (_browser === 'firefox') {
-      var svgComputedStyle = window.getComputedStyle(svg, null);
-      var selectedSvgStyleAttributeNames = ['width', 'height', 'left', 'top', 'transform', 'position'];
-      var svgComputedStyleString = '';
-      selectedSvgStyleAttributeNames.forEach(function(styleAttributeName) {
-        var styleAttributeValue = svgComputedStyle[styleAttributeName];
-        if (!!styleAttributeValue) {
-          svgComputedStyleString += ' ' + styleAttributeName + ': ' + styleAttributeValue + ';';
-        }
-      });
-
-      var parent = svg.parentNode;
-      parent.removeChild(svg);
-
-      var testDiv = document.createElement('div');
-      testDiv.setAttribute('style', svgComputedStyleString);
-      parent.appendChild(testDiv);
-      var testDivBoundingClientRect = testDiv.getBoundingClientRect();
-
-      parent.removeChild(testDiv);
-      parent.appendChild(svg);
-
-      return testDivBoundingClientRect;
-    } else if (svg.clientWidth && svg.clientHeight) {
+    if (svg.clientWidth && svg.clientHeight) {
       return {width: svg.clientWidth, height: svg.clientHeight}
     } else if (!!svg.getBoundingClientRect()) {
       return svg.getBoundingClientRect();
@@ -1623,6 +1607,16 @@ module.exports = {
   }
 
   /**
+   * Checks if variable is Number
+   *
+   * @param  {Integer|Float}  n
+   * @return {Boolean}   returns true if variable is Number
+   */
+, isNumber: function(n) {
+    return !isNaN(parseFloat(n)) && isFinite(n);
+  }
+
+  /**
    * Search for an SVG element
    *
    * @param  {Object|String} elementOrSelector DOM Element or selector String
@@ -1843,4 +1837,4 @@ function requestTimeout(timeout) {
   }
 }
 
-},{}]},{},[4])
+},{}]},{},[1]);
