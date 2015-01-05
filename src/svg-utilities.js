@@ -5,8 +5,6 @@ var Utils = require('./utilities')
 // http://stackoverflow.com/questions/9847580/how-to-detect-safari-chrome-ie-firefox-and-opera-browser
 if (/*@cc_on!@*/false || !!document.documentMode) { // internet explorer
   _browser = 'ie';
-} else if (typeof InstallTrigger !== 'undefined') { // firefox
-  _browser = 'firefox';
 }
 
 module.exports = {
@@ -23,35 +21,7 @@ module.exports = {
    * @return {Object}     {width: 0, height: 0}
    */
 , getBoundingClientRectNormalized: function(svg) {
-    // Firefox returns values in the SVG coordinate system for getBoundingClientRect(),
-    // whereas other browsers return values in the HTML page coordinate system.
-    // This harmonizes the behavior to use the HTML page coordinate system.
-
-
-    if (_browser === 'firefox') {
-      var svgComputedStyle = window.getComputedStyle(svg, null);
-      var selectedSvgStyleAttributeNames = ['width', 'height', 'left', 'top', 'transform', 'position'];
-      var svgComputedStyleString = '';
-      selectedSvgStyleAttributeNames.forEach(function(styleAttributeName) {
-        var styleAttributeValue = svgComputedStyle[styleAttributeName];
-        if (!!styleAttributeValue) {
-          svgComputedStyleString += ' ' + styleAttributeName + ': ' + styleAttributeValue + ';';
-        }
-      });
-
-      var parent = svg.parentNode;
-      parent.removeChild(svg);
-
-      var testDiv = document.createElement('div');
-      testDiv.setAttribute('style', svgComputedStyleString);
-      parent.appendChild(testDiv);
-      var testDivBoundingClientRect = testDiv.getBoundingClientRect();
-
-      parent.removeChild(testDiv);
-      parent.appendChild(svg);
-
-      return testDivBoundingClientRect;
-    } else if (svg.clientWidth && svg.clientHeight) {
+    if (svg.clientWidth && svg.clientHeight) {
       return {width: svg.clientWidth, height: svg.clientHeight}
     } else if (!!svg.getBoundingClientRect()) {
       return svg.getBoundingClientRect();
