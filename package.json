@@ -33,20 +33,20 @@
     "zoom"
   ],
   "devDependencies": {
-    "browserify": "~3.44.2",
-    "gulp": "~3.5.0",
-    "gulp-concat": "~2.2.0",
+    "browserify": "^8.0.3",
+    "gulp": "^3.8.10",
+    "gulp-concat": "^2.4.3",
     "gulp-config-sync": "git://github.com/bumbu/gulp-config-sync",
     "gulp-header": "^1.2.2",
-    "gulp-jscs": "^1.1.2",
-    "gulp-jshint": "^1.8.4",
-    "gulp-plumber": "~0.5.6",
-    "gulp-qunit": "^0.3.3",
-    "gulp-rename": "~1.2.0",
+    "gulp-jscs": "^1.4.0",
+    "gulp-jshint": "^1.9.0",
+    "gulp-plumber": "^0.6.6",
+    "gulp-qunit": "^1.1.0",
+    "gulp-rename": "^1.2.0",
     "gulp-streamify": "0.0.5",
-    "gulp-uglify": "~0.2.0",
-    "gulp-watch": "~0.5.0",
+    "gulp-uglify": "^1.0.2",
+    "gulp-watch": "^3.0.0",
     "uniwheel": "^0.1.2",
-    "vinyl-source-stream": "~0.1.1"
+    "vinyl-source-stream": "^1.0.0"
   }
 }
