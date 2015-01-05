@@ -40,34 +40,11 @@
             , topLimit = -((sizes.viewBox.y + sizes.viewBox.height) * sizes.realZoom) + gutterHeight
             , bottomLimit = sizes.height - gutterHeight - (sizes.viewBox.y * sizes.realZoom)
 
-          // If over left limit and panning to the left
-          if (newPan.x < leftLimit && newPan.x <= oldPan.x) {
-            stopHorizontal = true
-          }
+          customPan = {}
+          customPan.x = Math.max(leftLimit, Math.min(rightLimit, newPan.x))
+          customPan.y = Math.max(topLimit, Math.min(bottomLimit, newPan.y))
 
-          // If over right limit and panning to the right
-          if (newPan.x > rightLimit && newPan.x >= oldPan.x) {
-            stopHorizontal = true
-          }
-
-          // If over top limit and panning to the top
-          if (newPan.y < topLimit && newPan.y <= oldPan.y) {
-            stopVertical = true
-          }
-
-          // If over bottom limit and panning to the bottom
-          if (newPan.y > bottomLimit && newPan.y >= oldPan.y) {
-            stopVertical = true
-          }
-
-
-          if (stopHorizontal && stopVertical) {
-            // Fully prevent panning
-            return false
-          } else if (stopHorizontal || stopVertical) {
-            // Prevent panning only on X or Y axys
-            return {x: !stopHorizontal, y: !stopVertical}
-          }
+          return customPan
         }
 
         // Expose to window namespace for testing purposes
