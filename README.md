@@ -103,6 +103,9 @@ Each of this objects has two attributes (x and y) representing current pan (on X
 
 If `beforePan` will return `false` or an object `{x: true, y: true}` then panning will be halted.
 If you want to prevent panning only on one axis then return a object of type `{x: true, y: false}`.
+You can alter panning on X and Y axes by providing alternative values through return `{x: 10, y: 20}`.
+
+> *Caution!* If you alter panning by returning custom values `{x: 10, y: 20}` it will update only current pan step. If panning is done by mouse/touch you have to take in account that next pan step (after the one that you altered) will be performed with values that do not consider altered values (as they even did not existed).
 
 `onPan` callback will be called with one attribute: `newPan`.
 

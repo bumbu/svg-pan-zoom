@@ -225,22 +225,36 @@ ShadowViewport.prototype.setCTM = function(newCTM) {
     if (willPan) {
       var preventPan = this.options.beforePan(this.getPan(), {x: newCTM.e, y: newCTM.f})
           // If prevent pan is an object
-        , preventPanX = Utils.isObject(preventPan) && preventPan.x === false ? true : false
-        , preventPanY = Utils.isObject(preventPan) && preventPan.y === false ? true : false
+        , preventPanX = false
+        , preventPanY = false
 
-      // If prevent pan is boolean false
+      // If prevent pan is Boolean false
       if (preventPan === false) {
+        // Set x and y same as before
+        newCTM.e = this.getPan().x
+        newCTM.f = this.getPan().y
+
         preventPanX = preventPanY = true
-      }
+      } else if (Utils.isObject(preventPan)) {
+        // Check for X axes attribute
+        if (preventPan.x === false) {
+          // Prevent panning on x axes
+          newCTM.e = this.getPan().x
+          preventPanX = true
+        } else if (Utils.isNumber(preventPan.x)) {
+          // Set a custom pan value
+          newCTM.e = preventPan.x
+        }
 
-      // Prevent panning on X axis
-      if (preventPanX) {
-        newCTM.e = this.activeState.x
-      }
-
-      // Prevent panning on Y axis
-      if (preventPanY) {
-        newCTM.f = this.activeState.y
+        // Check for Y axes attribute
+        if (preventPan.y === false) {
+          // Prevent panning on x axes
+          newCTM.f = this.getPan().y
+          preventPanY = true
+        } else if (Utils.isNumber(preventPan.y)) {
+          // Set a custom pan value
+          newCTM.f = preventPan.y
+        }
       }
 
       // Update willPan flag
