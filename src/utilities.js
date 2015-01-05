@@ -43,6 +43,16 @@ module.exports = {
   }
 
   /**
+   * Checks if variable is Number
+   *
+   * @param  {Integer|Float}  n
+   * @return {Boolean}   returns true if variable is Number
+   */
+, isNumber: function(n) {
+    return !isNaN(parseFloat(n)) && isFinite(n);
+  }
+
+  /**
    * Search for an SVG element
    *
    * @param  {Object|String} elementOrSelector DOM Element or selector String
