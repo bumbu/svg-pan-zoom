@@ -32,6 +32,9 @@
     "pan",
     "zoom"
   ],
+  "dependencies": {
+    "uniwheel": "^0.1.2"
+  },
   "devDependencies": {
     "browserify": "^8.0.3",
     "gulp": "^3.8.10",
@@ -46,7 +49,6 @@
     "gulp-streamify": "0.0.5",
     "gulp-uglify": "^1.0.2",
     "gulp-watch": "^3.0.0",
-    "uniwheel": "^0.1.2",
     "vinyl-source-stream": "^1.0.0"
   }
 }
