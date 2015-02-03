@@ -24,6 +24,7 @@ Pan and zoom the SVG tiger on github pages:
 * [Custom events: Touch events support: pan, double tap, pinch](http://ariutta.github.io/svg-pan-zoom/demo/mobile.html)
 * [Custom events: Enable zooming only on click, disable on mouse out](http://ariutta.github.io/svg-pan-zoom/demo/custom-event-handlers.html)
 * [Limit pan](http://ariutta.github.io/svg-pan-zoom/demo/limit-pan.html)
+* [Dynamic SVG load](http://ariutta.github.io/svg-pan-zoom/demo/dynamic-load.html)
 
 Support
 -------
