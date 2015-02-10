@@ -15,6 +15,7 @@ var optionsDefaults = {
 , zoomEnabled: true // enable or disable zooming (default enabled)
 , dblClickZoomEnabled: true // enable or disable zooming by double clicking (default enabled)
 , mouseWheelZoomEnabled: true // enable or disable zooming by mouse wheel (default enabled)
+, rightClickResets: true // enable or disable right-click to reset zoom
 , zoomScaleSensitivity: 0.2 // Zoom sensitivity
 , minZoom: 0.5 // Minimum Zoom level
 , maxZoom: 10 // Maximum Zoom level
@@ -421,6 +422,9 @@ SvgPanZoom.prototype.handleMouseDown = function(evt, prevEvt) {
   // Double click detection; more consistent than ondblclick
   if (this.options.dblClickZoomEnabled && Utils.isDblClick(evt, prevEvt)){
     this.handleDblClick(evt)
+  } else if (this.options.rightClickResets && evt.button === 2) {
+    // Reset zoom and pan on right-click.
+    this.reset()
   } else {
     // Pan mode
     this.state = 'pan'
