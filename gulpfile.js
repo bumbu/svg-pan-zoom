@@ -55,7 +55,7 @@ gulp.task('test', function () {
  * Check
  */
 gulp.task('check', function() {
-  gulp.src('./src/*')
+  gulp.src(['./src/*', '!./src/uniwheel.js']) // Ignore uniwheel
     .pipe(jshint())
     .pipe(jshint.reporter('default'))
     .pipe(jscs())

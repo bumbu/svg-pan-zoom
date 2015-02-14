@@ -1,4 +1,4 @@
-var Wheel = require('uniwheel')
+var Wheel = require('./uniwheel')
 , ControlIcons = require('./control-icons')
 , Utils = require('./utilities')
 , SvgUtils = require('./svg-utilities')

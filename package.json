@@ -32,9 +32,6 @@
     "pan",
     "zoom"
   ],
-  "dependencies": {
-    "uniwheel": "^0.1.2"
-  },
   "devDependencies": {
     "browserify": "^8.0.3",
     "gulp": "^3.8.10",
