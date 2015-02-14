@@ -25,6 +25,7 @@ Pan and zoom the SVG tiger on github pages:
 * [Custom events: Enable zooming only on click, disable on mouse out](http://ariutta.github.io/svg-pan-zoom/demo/custom-event-handlers.html)
 * [Limit pan](http://ariutta.github.io/svg-pan-zoom/demo/limit-pan.html)
 * [Dynamic SVG load](http://ariutta.github.io/svg-pan-zoom/demo/dynamic-load.html)
+* [Using Require.js](http://ariutta.github.io/svg-pan-zoom/demo/require.html)
 
 Support
 -------
@@ -156,6 +157,11 @@ If you do use browserify in your project you may do it by:
 * Add the package as node module `npm install --save ariutta/svg-pan-zoom`
 * Require _svg-pan-zoom_ in your source file `svgPanZoom = require('svg-pan-zoom')`
 * Use in the same way as you would do with global svgPanZoom: `instance = svgPanZoom('#demo-tiger')`
+
+Use with Require.js (or other AMD libraries)
+-------------------
+
+An example of how to load library using Require.js is available in [demo/require.html](http://ariutta.github.io/svg-pan-zoom/demo/require.html)
 
 Custom events support
 ---------------------
