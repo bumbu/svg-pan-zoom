@@ -26,6 +26,7 @@ Pan and zoom the SVG tiger on github pages:
 * [Limit pan](http://ariutta.github.io/svg-pan-zoom/demo/limit-pan.html)
 * [Dynamic SVG load](http://ariutta.github.io/svg-pan-zoom/demo/dynamic-load.html)
 * [Using Require.js](http://ariutta.github.io/svg-pan-zoom/demo/require.html)
+* [Pan animation](http://ariutta.github.io/svg-pan-zoom/demo/simple-animation.html)
 
 Support
 -------
