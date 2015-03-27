@@ -10,6 +10,27 @@ It works cross-browser and supports both inline SVGs and SVGs in HTML 'object' o
 
 > If you're looking for version 2.3.x you can find it in [v2.3.x branch](https://github.com/ariutta/svg-pan-zoom/tree/v2.3.x)
 
+Support
+-------
+
+### Bugs and Issues
+
+If you found a bug or have a suggestion first check if there is a similar [open](https://github.com/ariutta/svg-pan-zoom/issues) or [closed](https://github.com/ariutta/svg-pan-zoom/issues?q=is%3Aissue+is%3Aclosed) issue. If there are none then create a new one.
+
+When oppening a new issue **please provide a reproductible example**:
+- Share it so we could get directly to the problem. You can use [this starter jsfiddle setup](http://jsfiddle.net/bumbu/167usffr/) to provide your example. Or upload your own [jsfiddle.net](http://jsfiddle.net) (or any other live) example. 
+- Mention your library version (located in library file in header)
+- Mention your browser name, version and operating system
+- Mention any other important for debug details
+
+### Solved Bugs and Implemented Features
+
+If you solved a bug or implemented a feature that may be useful for others then you're welcome to create a pull request.
+
+### Questions, How To's, Need Help
+
+If you have any other type of questions, problems, your code is not working or you want to critique the library - you can use StackOverflow. Just tag you question with [`svgpanzoom`](http://stackoverflow.com/questions/tagged/svgpanzoom).
+
 Demos
 -----
 Pan and zoom the SVG tiger on github pages:
@@ -27,21 +48,6 @@ Pan and zoom the SVG tiger on github pages:
 * [Dynamic SVG load](http://ariutta.github.io/svg-pan-zoom/demo/dynamic-load.html)
 * [Using Require.js](http://ariutta.github.io/svg-pan-zoom/demo/require.html)
 * [Pan animation](http://ariutta.github.io/svg-pan-zoom/demo/simple-animation.html)
-
-Support
--------
-
-If you found a bug or have a suggestion first check if there is a similar [open](https://github.com/ariutta/svg-pan-zoom/issues) or [closed](https://github.com/ariutta/svg-pan-zoom/issues?q=is%3Aissue+is%3Aclosed) issue. If there are none then create a new one.
-
-When oppening a new issue **please provide a reproductible example**:
-- Share it so we could get directly to the problem. You can use [this starter jsfiddle setup](http://jsfiddle.net/bumbu/167usffr/) to provide your example. Or upload your own [jsfiddle.net](http://jsfiddle.net) (or any other live) example. 
-- Mention your library version (located in library file in header)
-- Mention your browser name, version and operating system
-- Mention any other important for debug details
-
-If you solved a bug or implemented a feature that may be useful for others then you're welcome to create a pull request.
-
-If you have any other type of questions, problems, your code is not working or you want to critique the library - you can use StackOverflow. Just tag you question with [`svgpanzoom`](http://stackoverflow.com/questions/tagged/svgpanzoom).
 
 How To Use
 ----------
