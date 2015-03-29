@@ -1,3 +1,5 @@
+![svg-pan-zoom logo](http://ariutta.github.io/svg-pan-zoom/svg-pan-zoom-logo.png)
+
 svg-pan-zoom library
 ==========================
 
