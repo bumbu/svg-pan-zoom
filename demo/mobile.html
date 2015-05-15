@@ -52,7 +52,7 @@
             })
 
             // Handle pan
-            this.hammer.on('pan panstart panend', function(ev){
+            this.hammer.on('panstart panmove', function(ev){
               // On pan start reset panned variables
               if (ev.type === 'panstart') {
                 pannedX = 0
@@ -60,26 +60,21 @@
               }
 
               // Pan only the difference
-              if (ev.type === 'pan' || ev.type === 'panend') {
-                console.log('p')
-                instance.panBy({x: ev.deltaX - pannedX, y: ev.deltaY - pannedY})
-                pannedX = ev.deltaX
-                pannedY = ev.deltaY
-              }
+              instance.panBy({x: ev.deltaX - pannedX, y: ev.deltaY - pannedY})
+              pannedX = ev.deltaX
+              pannedY = ev.deltaY
             })
 
             // Handle pinch
-            this.hammer.on('pinch pinchstart pinchend', function(ev){
+            this.hammer.on('pinchstart pinchmove', function(ev){
               // On pinch start remember initial zoom
               if (ev.type === 'pinchstart') {
                 initialScale = instance.getZoom()
                 instance.zoom(initialScale * ev.scale)
               }
 
-              // On pinch zoom
-              if (ev.type === 'pinch' || ev.type === 'pinchend') {
-                instance.zoom(initialScale * ev.scale)
-              }
+              instance.zoom(initialScale * ev.scale)
+
             })
 
             // Prevent moving the page on some devices when panning over SVG
