@@ -410,12 +410,6 @@ SvgPanZoom.prototype.handleDblClick = function(evt) {
  * @param {Event} evt
  */
 SvgPanZoom.prototype.handleMouseDown = function(evt, prevEvt) {
-  if (evt.preventDefault) {
-    evt.preventDefault()
-  } else {
-    evt.returnValue = false
-  }
-
   Utils.mouseAndTouchNormalize(evt, this.svg)
 
   // Double click detection; more consistent than ondblclick
@@ -456,12 +450,6 @@ SvgPanZoom.prototype.handleMouseMove = function(evt) {
  * @param {Event} evt
  */
 SvgPanZoom.prototype.handleMouseUp = function(evt) {
-  if (evt.preventDefault) {
-    evt.preventDefault()
-  } else {
-    evt.returnValue = false
-  }
-
   if (this.state === 'pan') {
     // Quit pan mode
     this.state = 'none'
