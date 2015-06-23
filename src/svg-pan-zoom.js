@@ -468,7 +468,7 @@ SvgPanZoom.prototype.handleMouseUp = function(evt) {
  */
 SvgPanZoom.prototype.fit = function() {
   var viewBox = this.viewport.getViewBox()
-    , newScale = Math.min(this.width/(viewBox.width - viewBox.x), this.height/(viewBox.height - viewBox.y))
+    , newScale = Math.min(this.width/viewBox.width, this.height/viewBox.height)
 
   this.zoom(newScale, true)
 }
@@ -479,8 +479,8 @@ SvgPanZoom.prototype.fit = function() {
  */
 SvgPanZoom.prototype.center = function() {
   var viewBox = this.viewport.getViewBox()
-    , offsetX = (this.width - (viewBox.width + viewBox.x) * this.getZoom()) * 0.5
-    , offsetY = (this.height - (viewBox.height + viewBox.y) * this.getZoom()) * 0.5
+    , offsetX = (this.width - (viewBox.width + viewBox.x * 2) * this.getZoom()) * 0.5
+    , offsetY = (this.height - (viewBox.height + viewBox.y * 2) * this.getZoom()) * 0.5
 
   this.getPublicInstance().pan({x: offsetX, y: offsetY})
 }
