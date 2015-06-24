@@ -221,7 +221,7 @@ SvgPanZoom.prototype.handleMouseWheel = function(evt) {
   // Quadratic scale if |d| > 1
   d = d < 1 ? d < -1 ? (-Math.pow(d, 2) - n1) / n : d : (Math.pow(d, 2) + n1) / n;
   // Delta *should* not be greater than 2...
-  delta = Math.min(Math.max(d / 2, -1), 1);
+  delta = -Math.min(Math.max(d / 2, -1), 1);
 
   var inversedScreenCTM = this.svg.getScreenCTM().inverse()
     , relativeMousePoint = SvgUtils.getEventPoint(evt, this.svg).matrixTransform(inversedScreenCTM)
