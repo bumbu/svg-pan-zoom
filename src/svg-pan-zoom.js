@@ -218,7 +218,7 @@ SvgPanZoom.prototype.handleMouseWheel = function(evt) {
 
     if (evt.wheelDelta) {
       // Normalizer for Chrome
-      delta = evt.deltaY == 0 ? 0 :  Math.abs(evt.wheelDelta) / evt.deltaY
+      delta = evt.deltaY === 0 ? 0 :  Math.abs(evt.wheelDelta) / evt.deltaY
     } else {
       // Others. Possibly tablets? Use a value just in case
       delta = evt.deltaY / 120
