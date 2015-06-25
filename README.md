@@ -20,7 +20,7 @@ Support
 If you found a bug or have a suggestion first check if there is a similar [open](https://github.com/ariutta/svg-pan-zoom/issues) or [closed](https://github.com/ariutta/svg-pan-zoom/issues?q=is%3Aissue+is%3Aclosed) issue. If there are none then create a new one.
 
 When oppening a new issue **please provide a reproductible example**:
-- Share it so we could get directly to the problem. You can use [this starter jsfiddle setup](http://jsfiddle.net/bumbu/167usffr/) to provide your example. Or upload your own [jsfiddle.net](http://jsfiddle.net) (or any other live) example. 
+- Share it so we could get directly to the problem. You can use [this starter jsfiddle setup](http://jsfiddle.net/bumbu/167usffr/) to provide your example. Or upload your own [jsfiddle.net](http://jsfiddle.net) (or any other live) example.
 - Mention your library version (located in library file in header)
 - Mention your browser name, version and operating system
 - Mention any other important for debug details
@@ -95,6 +95,8 @@ svgPanZoom('#demo-tiger', {
 , controlIconsEnabled: false
 , zoomEnabled: true
 , dblClickZoomEnabled: true
+, mouseWheelZoomEnabled: true
+, preventMouseEventsDefault: true
 , zoomScaleSensitivity: 0.2
 , minZoom: 0.5
 , maxZoom: 10
@@ -116,6 +118,7 @@ If any arguments are specified, they must have the following value types:
 * 'zoomEnabled' must be true or false. Default is true.
 * 'dblClickZoomEnabled' must be true or false. Default is true.
 * 'mouseWheelZoomEnabled' must be true or false. Default is true.
+* 'preventMouseEventsDefault' must be true or false. Default is true.
 * 'zoomScaleSensitivity' must be a scalar. Default is 0.2.
 * 'minZoom' must be a scalar. Default is 0.5.
 * 'maxZoom' must be a scalar. Default is 10.

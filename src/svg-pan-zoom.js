@@ -15,6 +15,7 @@ var optionsDefaults = {
 , zoomEnabled: true // enable or disable zooming (default enabled)
 , dblClickZoomEnabled: true // enable or disable zooming by double clicking (default enabled)
 , mouseWheelZoomEnabled: true // enable or disable zooming by mouse wheel (default enabled)
+, preventMouseEventsDefault: true // enable or disable preventDefault for mouse events
 , zoomScaleSensitivity: 0.2 // Zoom sensitivity
 , minZoom: 0.5 // Minimum Zoom level
 , maxZoom: 10 // Maximum Zoom level
@@ -202,10 +203,12 @@ SvgPanZoom.prototype.handleMouseWheel = function(evt) {
     return;
   }
 
-  if (evt.preventDefault) {
-    evt.preventDefault();
-  } else {
-    evt.returnValue = false;
+  if (this.options.preventMouseEventsDefault){
+    if (evt.preventDefault) {
+      evt.preventDefault();
+    } else {
+      evt.returnValue = false;
+    }
   }
 
   var delta = 0
@@ -380,10 +383,12 @@ SvgPanZoom.prototype.reset = function() {
  * @param {Event} evt
  */
 SvgPanZoom.prototype.handleDblClick = function(evt) {
-  if (evt.preventDefault) {
-    evt.preventDefault()
-  } else {
-    evt.returnValue = false
+  if (this.options.preventMouseEventsDefault) {
+    if (evt.preventDefault) {
+      evt.preventDefault()
+    } else {
+      evt.returnValue = false
+    }
   }
 
   // Check if target was a control button
@@ -412,10 +417,12 @@ SvgPanZoom.prototype.handleDblClick = function(evt) {
  * @param {Event} evt
  */
 SvgPanZoom.prototype.handleMouseDown = function(evt, prevEvt) {
-  if (evt.preventDefault) {
-    evt.preventDefault()
-  } else {
-    evt.returnValue = false
+  if (this.options.preventMouseEventsDefault) {
+    if (evt.preventDefault) {
+      evt.preventDefault()
+    } else {
+      evt.returnValue = false
+    }
   }
 
   Utils.mouseAndTouchNormalize(evt, this.svg)
@@ -437,10 +444,12 @@ SvgPanZoom.prototype.handleMouseDown = function(evt, prevEvt) {
  * @param  {Event} evt
  */
 SvgPanZoom.prototype.handleMouseMove = function(evt) {
-  if (evt.preventDefault) {
-    evt.preventDefault()
-  } else {
-    evt.returnValue = false
+  if (this.options.preventMouseEventsDefault) {
+    if (evt.preventDefault) {
+      evt.preventDefault()
+    } else {
+      evt.returnValue = false
+    }
   }
 
   if (this.state === 'pan' && this.options.panEnabled) {
@@ -458,10 +467,12 @@ SvgPanZoom.prototype.handleMouseMove = function(evt) {
  * @param {Event} evt
  */
 SvgPanZoom.prototype.handleMouseUp = function(evt) {
-  if (evt.preventDefault) {
-    evt.preventDefault()
-  } else {
-    evt.returnValue = false
+  if (this.options.preventMouseEventsDefault) {
+    if (evt.preventDefault) {
+      evt.preventDefault()
+    } else {
+      evt.returnValue = false
+    }
   }
 
   if (this.state === 'pan') {
