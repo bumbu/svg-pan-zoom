@@ -15,7 +15,7 @@ var optionsDefaults = {
 , zoomEnabled: true // enable or disable zooming (default enabled)
 , dblClickZoomEnabled: true // enable or disable zooming by double clicking (default enabled)
 , mouseWheelZoomEnabled: true // enable or disable zooming by mouse wheel (default enabled)
-, zoomScaleSensitivity: 0.2 // Zoom sensitivity
+, zoomScaleSensitivity: 0.1 // Zoom sensitivity
 , minZoom: 0.5 // Minimum Zoom level
 , maxZoom: 10 // Maximum Zoom level
 , fit: true // enable or disable viewport fit in SVG (default true)
