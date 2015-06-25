@@ -33,6 +33,27 @@ If you solved a bug or implemented a feature that may be useful for others then 
 
 If you have any other type of questions, problems, your code is not working or you want to critique the library - you can use StackOverflow. Just tag you question with [`svgpanzoom`](http://stackoverflow.com/questions/tagged/svgpanzoom).
 
+### Contributions/Pull Requests
+
+Best way to contribute is to create a pull request. In order to create a pull request:
+* Fork this repository
+* Clone repository fork (created in previous step) locally (on your machine)
+* Ensure that you have nodejs and npm installed locally
+* In console:
+  * `cd` into project folder
+  * Run `npm install`
+  * Run `npm install -g gulp` if you don't have it already installed globally
+  * Running `gulp` will listen for source files changes (in `src` folder) and will automatically build distribution files
+  * Running `gulp browserify` will compile source files
+  * Running `gulp check` for some syntax errors
+  * Running `gulp test` will run tests
+  * Running `gulp build` will prepare the project for a new release
+* Implement the change using `gulp` or `gulp browserify`
+* After change is done test it with `gulp check` and `gulp test`
+* Commit only meaningful changes. **Do not commit distribution files (`dist` folder)**. Distribution files are built only before a release
+* Push your changes into your fork
+* Create a pull request
+
 Demos
 -----
 Pan and zoom the SVG tiger on github pages:
