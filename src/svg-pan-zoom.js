@@ -209,19 +209,27 @@ SvgPanZoom.prototype.handleMouseWheel = function(evt) {
   }
 
   var delta = 0
-    , d = evt.detail
-    , w = evt.wheelDelta
-    , n = 225
-    , n1 = n-1
-    , f
 
-  // http://stackoverflow.com/a/13650579/1194327
-  // Normalize delta
-  d = d ? w && (f = w/d) ? d/f : -d/1.35 : w/120;
-  // Quadratic scale if |d| > 1
-  d = d < 1 ? d < -1 ? (-Math.pow(d, 2) - n1) / n : d : (Math.pow(d, 2) + n1) / n;
-  // Delta *should* not be greater than 2...
-  delta = -Math.min(Math.max(d / 2, -1), 1);
+  if ('deltaMode' in evt && evt.deltaMode === 0) {
+    // Make empirical adjustments for browsers that give deltaY in pixels (deltaMode=0)
+
+    if (evt.wheelDelta) {
+      // Normalizer for Chrome
+      delta = evt.deltaY == 0 ? 0 :  Math.abs(evt.wheelDelta) / evt.deltaY
+    } else {
+      // Others. Possibly tablets? Use a value just in case
+      delta = evt.deltaY / 120
+    }
+  } else if ('mozPressure' in evt) {
+    // Normalizer for newer Firefox
+    // NOTE: May need to change detection at some point if mozPressure disappears.
+    delta = evt.deltaY / 30;
+  } else {
+    // Others should be reasonably normalized by the mousewheel code at the end of the file.
+    delta = evt.deltaY;
+  }
+
+  delta = -1 < delta && delta < 1 ? delta : (delta > 0 ? 1 : -1) * Math.log(Math.abs(delta) + 10) / 10
 
   var inversedScreenCTM = this.svg.getScreenCTM().inverse()
     , relativeMousePoint = SvgUtils.getEventPoint(evt, this.svg).matrixTransform(inversedScreenCTM)
