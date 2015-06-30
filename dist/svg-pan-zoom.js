@@ -1,4 +1,4 @@
-// svg-pan-zoom v3.1.3
+// svg-pan-zoom v3.2.0
 // https://github.com/ariutta/svg-pan-zoom
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var svgPanZoom = require('./svg-pan-zoom.js');
@@ -251,7 +251,7 @@ ShadowViewport.prototype.processCTM = function() {
   var newCTM = this.getCTM()
 
   if (this.options.fit) {
-    var newScale = Math.min(this.options.width/(this.viewBox.width - this.viewBox.x), this.options.height/(this.viewBox.height - this.viewBox.y));
+    var newScale = Math.min(this.options.width/this.viewBox.width, this.options.height/this.viewBox.height);
 
     newCTM.a = newScale; //x-scale
     newCTM.d = newScale; //y-scale
@@ -260,8 +260,8 @@ ShadowViewport.prototype.processCTM = function() {
   }
 
   if (this.options.center) {
-    var offsetX = (this.options.width - (this.viewBox.width + this.viewBox.x) * newCTM.a) * 0.5
-      , offsetY = (this.options.height - (this.viewBox.height + this.viewBox.y) * newCTM.a) * 0.5
+    var offsetX = (this.options.width - (this.viewBox.width + this.viewBox.x * 2) * newCTM.a) * 0.5
+      , offsetY = (this.options.height - (this.viewBox.height + this.viewBox.y * 2) * newCTM.a) * 0.5
 
     newCTM.e = offsetX
     newCTM.f = offsetY
@@ -491,7 +491,8 @@ var optionsDefaults = {
 , zoomEnabled: true // enable or disable zooming (default enabled)
 , dblClickZoomEnabled: true // enable or disable zooming by double clicking (default enabled)
 , mouseWheelZoomEnabled: true // enable or disable zooming by mouse wheel (default enabled)
-, zoomScaleSensitivity: 0.2 // Zoom sensitivity
+, preventMouseEventsDefault: true // enable or disable preventDefault for mouse events
+, zoomScaleSensitivity: 0.1 // Zoom sensitivity
 , minZoom: 0.5 // Minimum Zoom level
 , maxZoom: 10 // Maximum Zoom level
 , fit: true // enable or disable viewport fit in SVG (default true)
@@ -559,6 +560,7 @@ SvgPanZoom.prototype.init = function(svg, options) {
   }
 
   // Init events handlers
+  this.lastMouseWheelEventTime = Date.now()
   this.setupHandlers()
 }
 
@@ -678,32 +680,28 @@ SvgPanZoom.prototype.handleMouseWheel = function(evt) {
     return;
   }
 
-  if (evt.preventDefault) {
-    evt.preventDefault();
-  } else {
-    evt.returnValue = false;
-  }
-
-  var delta = 0
-
-  if ('deltaMode' in evt && evt.deltaMode === 0) {
-    // Make empirical adjustments for browsers that give deltaY in pixels (deltaMode=0)
-
-    if (evt.wheelDelta) {
-      // Normalizer for Chrome
-      delta = evt.deltaY / Math.abs(evt.wheelDelta/3)
+  if (this.options.preventMouseEventsDefault){
+    if (evt.preventDefault) {
+      evt.preventDefault();
     } else {
-      // Others. Possibly tablets? Use a value just in case
-      delta = evt.deltaY / 120
+      evt.returnValue = false;
     }
-  } else if ('mozPressure' in evt) {
-    // Normalizer for newer Firefox
-    // NOTE: May need to change detection at some point if mozPressure disappears.
-    delta = evt.deltaY / 3;
-  } else {
-    // Others should be reasonably normalized by the mousewheel code at the end of the file.
-    delta = evt.deltaY;
   }
+
+  // Default delta in case that deltaY is not available
+  var delta = evt.deltaY || 1
+    , timeDelta = Date.now() - this.lastMouseWheelEventTime
+    , divider = 3 + Math.max(0, 30 - timeDelta)
+
+  // Update cache
+  this.lastMouseWheelEventTime = Date.now()
+
+  // Make empirical adjustments for browsers that give deltaY in pixels (deltaMode=0)
+  if ('deltaMode' in evt && evt.deltaMode === 0 && evt.wheelDelta) {
+    delta = evt.deltaY === 0 ? 0 :  Math.abs(evt.wheelDelta) / evt.deltaY
+  }
+
+  delta = -0.3 < delta && delta < 0.3 ? delta : (delta > 0 ? 1 : -1) * Math.log(Math.abs(delta) + 10) / divider
 
   var inversedScreenCTM = this.svg.getScreenCTM().inverse()
     , relativeMousePoint = SvgUtils.getEventPoint(evt, this.svg).matrixTransform(inversedScreenCTM)
@@ -854,10 +852,12 @@ SvgPanZoom.prototype.reset = function() {
  * @param {Event} evt
  */
 SvgPanZoom.prototype.handleDblClick = function(evt) {
-  if (evt.preventDefault) {
-    evt.preventDefault()
-  } else {
-    evt.returnValue = false
+  if (this.options.preventMouseEventsDefault) {
+    if (evt.preventDefault) {
+      evt.preventDefault()
+    } else {
+      evt.returnValue = false
+    }
   }
 
   // Check if target was a control button
@@ -886,10 +886,12 @@ SvgPanZoom.prototype.handleDblClick = function(evt) {
  * @param {Event} evt
  */
 SvgPanZoom.prototype.handleMouseDown = function(evt, prevEvt) {
-  if (evt.preventDefault) {
-    evt.preventDefault()
-  } else {
-    evt.returnValue = false
+  if (this.options.preventMouseEventsDefault) {
+    if (evt.preventDefault) {
+      evt.preventDefault()
+    } else {
+      evt.returnValue = false
+    }
   }
 
   Utils.mouseAndTouchNormalize(evt, this.svg)
@@ -911,10 +913,12 @@ SvgPanZoom.prototype.handleMouseDown = function(evt, prevEvt) {
  * @param  {Event} evt
  */
 SvgPanZoom.prototype.handleMouseMove = function(evt) {
-  if (evt.preventDefault) {
-    evt.preventDefault()
-  } else {
-    evt.returnValue = false
+  if (this.options.preventMouseEventsDefault) {
+    if (evt.preventDefault) {
+      evt.preventDefault()
+    } else {
+      evt.returnValue = false
+    }
   }
 
   if (this.state === 'pan' && this.options.panEnabled) {
@@ -932,10 +936,12 @@ SvgPanZoom.prototype.handleMouseMove = function(evt) {
  * @param {Event} evt
  */
 SvgPanZoom.prototype.handleMouseUp = function(evt) {
-  if (evt.preventDefault) {
-    evt.preventDefault()
-  } else {
-    evt.returnValue = false
+  if (this.options.preventMouseEventsDefault) {
+    if (evt.preventDefault) {
+      evt.preventDefault()
+    } else {
+      evt.returnValue = false
+    }
   }
 
   if (this.state === 'pan') {
@@ -950,7 +956,7 @@ SvgPanZoom.prototype.handleMouseUp = function(evt) {
  */
 SvgPanZoom.prototype.fit = function() {
   var viewBox = this.viewport.getViewBox()
-    , newScale = Math.min(this.width/(viewBox.width - viewBox.x), this.height/(viewBox.height - viewBox.y))
+    , newScale = Math.min(this.width/viewBox.width, this.height/viewBox.height)
 
   this.zoom(newScale, true)
 }
@@ -961,8 +967,8 @@ SvgPanZoom.prototype.fit = function() {
  */
 SvgPanZoom.prototype.center = function() {
   var viewBox = this.viewport.getViewBox()
-    , offsetX = (this.width - (viewBox.width + viewBox.x) * this.getZoom()) * 0.5
-    , offsetY = (this.height - (viewBox.height + viewBox.y) * this.getZoom()) * 0.5
+    , offsetX = (this.width - (viewBox.width + viewBox.x * 2) * this.getZoom()) * 0.5
+    , offsetY = (this.height - (viewBox.height + viewBox.y * 2) * this.getZoom()) * 0.5
 
   this.getPublicInstance().pan({x: offsetX, y: offsetY})
 }

@@ -1,6 +1,6 @@
 {
   "name": "svg-pan-zoom",
-  "version": "3.1.3",
+  "version": "3.2.0",
   "homepage": "https://github.com/ariutta/svg-pan-zoom",
   "authors": [
     "Andrea Leofreddi <a.leofreddi@itcharm.com>",
@@ -15,7 +15,10 @@
     "Siddhanathan Shanmugam <siddhanathan+social@gmail.com>",
     "Karina Simard (https://github.com/ksimard)",
     "Christopher Clark <chris.clark@sparkfun.com>",
-    "Vladimir Prus (http://vladimirprus.com)"
+    "Vladimir Prus (http://vladimirprus.com)",
+    "Barry Coughlan (https://github.com/bcoughlan)",
+    "Ionică Bizău (http://ionicabizau.net/)",
+    "Ciprian Placintă (https://github.com/CiprianPlacinta)"
   ],
   "description": "JavaScript library for panning and zooming an SVG image from the mouse, touches and programmatically.",
   "main": "dist/svg-pan-zoom.js",
