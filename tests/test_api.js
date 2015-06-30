@@ -317,9 +317,9 @@ test('zoom in', function() {
 
   instance.zoomIn()
 
-  close(instance.getZoom(), 1.2)
-  close(instance.getPan().x, -130)
-  close(instance.getPan().y, -330)
+  close(instance.getZoom(), 1.1)
+  close(instance.getPan().x, -90)
+  close(instance.getPan().y, -290)
 });
 
 test('zoom out', function() {
@@ -328,9 +328,9 @@ test('zoom out', function() {
 
   instance.zoomOut()
 
-  close(instance.getZoom(), 0.833333)
-  close(instance.getPan().x, 16.666666)
-  close(instance.getPan().y, -183.333325)
+  close(instance.getZoom(), 0.90909)
+  close(instance.getPan().x, -13.636374)
+  close(instance.getPan().y, -213.636374)
 });
 
 /**
