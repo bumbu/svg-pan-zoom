@@ -84,6 +84,7 @@ SvgPanZoom.prototype.init = function(svg, options) {
   }
 
   // Init events handlers
+  this.lastMouseWheelEventTime = Date.now()
   this.setupHandlers()
 }
 
@@ -211,28 +212,20 @@ SvgPanZoom.prototype.handleMouseWheel = function(evt) {
     }
   }
 
-  var delta = 0
+  // Default delta in case that deltaY is not available
+  var delta = evt.deltaY || 1
+    , timeDelta = Date.now() - this.lastMouseWheelEventTime
+    , divider = 3 + Math.max(0, 30 - timeDelta)
 
-  if ('deltaMode' in evt && evt.deltaMode === 0) {
-    // Make empirical adjustments for browsers that give deltaY in pixels (deltaMode=0)
+  // Update cache
+  this.lastMouseWheelEventTime = Date.now()
 
-    if (evt.wheelDelta) {
-      // Normalizer for Chrome
-      delta = evt.deltaY === 0 ? 0 :  Math.abs(evt.wheelDelta) / evt.deltaY
-    } else {
-      // Others. Possibly tablets? Use a value just in case
-      delta = evt.deltaY / 120
-    }
-  } else if ('mozPressure' in evt) {
-    // Normalizer for newer Firefox
-    // NOTE: May need to change detection at some point if mozPressure disappears.
-    delta = evt.deltaY / 30;
-  } else {
-    // Others should be reasonably normalized by the mousewheel code at the end of the file.
-    delta = evt.deltaY;
+  // Make empirical adjustments for browsers that give deltaY in pixels (deltaMode=0)
+  if ('deltaMode' in evt && evt.deltaMode === 0 && evt.wheelDelta) {
+    delta = evt.deltaY === 0 ? 0 :  Math.abs(evt.wheelDelta) / evt.deltaY
   }
 
-  delta = -1 < delta && delta < 1 ? delta : (delta > 0 ? 1 : -1) * Math.log(Math.abs(delta) + 10) / 10
+  delta = -0.3 < delta && delta < 0.3 ? delta : (delta > 0 ? 1 : -1) * Math.log(Math.abs(delta) + 10) / divider
 
   var inversedScreenCTM = this.svg.getScreenCTM().inverse()
     , relativeMousePoint = SvgUtils.getEventPoint(evt, this.svg).matrixTransform(inversedScreenCTM)
