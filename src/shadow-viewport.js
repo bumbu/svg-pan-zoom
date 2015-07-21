@@ -42,7 +42,7 @@ ShadowViewport.prototype.cacheViewBox = function() {
   var svgViewBox = this.options.svg.getAttribute('viewBox')
 
   if (svgViewBox) {
-    var viewBoxValues = svgViewBox.split(' ').map(parseFloat)
+    var viewBoxValues = svgViewBox.split(/[\s\,]/).filter(function(v){return v}).map(parseFloat)
 
     // Cache viewbox x and y offset
     this.viewBox.x = viewBoxValues[0]
