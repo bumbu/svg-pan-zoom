@@ -1,6 +1,6 @@
 {
   "name": "svg-pan-zoom",
-  "version": "3.2.1",
+  "version": "3.2.2",
   "main": "dist/svg-pan-zoom.js",
   "browser": "src/browserify.js",
   "license": "BSD",
@@ -18,7 +18,7 @@
     "Zeng Xiaohui",
     "Barry Coughlan (https://github.com/bcoughlan)",
     "Risingson",
-    "bumbu alex (http://bumbu.ru>)",
+    "bumbu alex (http://bumbu.me>)",
     "Alexander Pico <apico@gladstone.ucsf.edu>",
     "Kyran Burraston (http://kyranburraston.co.uk)",
     "Risingson (https://github.com/Risingson)",

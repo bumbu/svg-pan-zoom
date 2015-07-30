@@ -1,6 +1,6 @@
 {
   "name": "svg-pan-zoom",
-  "version": "3.2.1",
+  "version": "3.2.2",
   "homepage": "https://github.com/ariutta/svg-pan-zoom",
   "authors": [
     "Andrea Leofreddi <a.leofreddi@itcharm.com>",
@@ -8,7 +8,7 @@
     "Zeng Xiaohui",
     "Barry Coughlan (https://github.com/bcoughlan)",
     "Risingson",
-    "bumbu alex (http://bumbu.ru>)",
+    "bumbu alex (http://bumbu.me>)",
     "Alexander Pico <apico@gladstone.ucsf.edu>",
     "Kyran Burraston (http://kyranburraston.co.uk)",
     "Risingson (https://github.com/Risingson)",
