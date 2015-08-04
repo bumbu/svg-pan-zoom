@@ -1,4 +1,4 @@
-// svg-pan-zoom v3.2.2
+// svg-pan-zoom v3.2.3
 // https://github.com/ariutta/svg-pan-zoom
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var svgPanZoom = require('./svg-pan-zoom.js');
@@ -253,8 +253,13 @@ ShadowViewport.prototype.getViewBox = function() {
 ShadowViewport.prototype.processCTM = function() {
   var newCTM = this.getCTM()
 
-  if (this.options.fit) {
-    var newScale = Math.min(this.options.width/this.viewBox.width, this.options.height/this.viewBox.height);
+  if (this.options.fit || this.options.contain) {
+    var newScale;
+    if (this.options.fit) {
+      newScale = Math.min(this.options.width/this.viewBox.width, this.options.height/this.viewBox.height);
+    } else {
+      newScale = Math.max(this.options.width/this.viewBox.width, this.options.height/this.viewBox.height);
+    }
 
     newCTM.a = newScale; //x-scale
     newCTM.d = newScale; //y-scale
@@ -499,6 +504,7 @@ var optionsDefaults = {
 , minZoom: 0.5 // Minimum Zoom level
 , maxZoom: 10 // Maximum Zoom level
 , fit: true // enable or disable viewport fit in SVG (default true)
+, contain: false // enable or disable viewport contain the svg (default false)
 , center: true // enable or disable viewport centering in SVG (default true)
 , refreshRate: 'auto' // Maximum number of frames per second (altering SVG's viewport)
 , beforeZoom: null
@@ -534,6 +540,7 @@ SvgPanZoom.prototype.init = function(svg, options) {
   , width: this.width
   , height: this.height
   , fit: this.options.fit
+  , contain: this.options.contain
   , center: this.options.center
   , refreshRate: this.options.refreshRate
   // Put callbacks into functions as they can change through time
@@ -965,8 +972,19 @@ SvgPanZoom.prototype.fit = function() {
 }
 
 /**
+ * Adjust viewport size (only) so it will contain the SVG
+ * Does not center image
+ */
+SvgPanZoom.prototype.contain = function() {
+  var viewBox = this.viewport.getViewBox()
+    , newScale = Math.max(this.width/viewBox.width, this.height/viewBox.height)
+
+  this.zoom(newScale, true)
+}
+
+/**
  * Adjust viewport pan (only) so it will be centered in SVG
- * Does not zoom/fit image
+ * Does not zoom/fit/contain image
  */
 SvgPanZoom.prototype.center = function() {
   var viewBox = this.viewport.getViewBox()
@@ -1152,8 +1170,9 @@ SvgPanZoom.prototype.getPublicInstance = function() {
     , resetZoom: function() {that.resetZoom(); return that.pi}
     , resetPan: function() {that.resetPan(); return that.pi}
     , reset: function() {that.reset(); return that.pi}
-      // Fit and Center
+      // Fit, Contain and Center
     , fit: function() {that.fit(); return that.pi}
+    , contain: function() {that.contain(); return that.pi}
     , center: function() {that.center(); return that.pi}
       // Size and Resize
     , updateBBox: function() {that.updateBBox(); return that.pi}
