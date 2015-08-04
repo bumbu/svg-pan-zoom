@@ -101,6 +101,7 @@ svgPanZoom('#demo-tiger', {
 , minZoom: 0.5
 , maxZoom: 10
 , fit: true
+, contain: false
 , center: true
 , refreshRate: 'auto'
 , beforeZoom: function(){}
@@ -123,6 +124,7 @@ If any arguments are specified, they must have the following value types:
 * 'minZoom' must be a scalar. Default is 0.5.
 * 'maxZoom' must be a scalar. Default is 10.
 * 'fit' must be true or false. Default is true.
+* 'contain' must be true or false. Default is false.
 * 'center' must be true or false. Default is true.
 * 'refreshRate' must be a number or 'auto'
 * 'beforeZoom' must be a callback function to be called before zoom changes.
@@ -153,6 +155,8 @@ You can alter panning on X and Y axes by providing alternative values through re
 > *Caution!* Calling zoom or pan API methods form inside of `beforeZoom`, `onZoom`, `beforePan` and `onPan` callbacks may lead to infinite loop.
 
 `panEnabled` and `zoomEnabled` are related only to user interaction. If any of this options are disabled - you still can zoom and pan via API.
+
+`fit` takes preceeding to `contain`. So if you set `fit: true` then `contain`'s value doesn't matter.
 
 Using a custom viewport
 -----------------------
@@ -301,6 +305,7 @@ When you call `svgPanZoom` method it returns an object with following methods:
 * resetPan
 * reset
 * fit
+* contain
 * center
 * updateBBox
 * resize
@@ -367,7 +372,7 @@ panZoomTiger.enableZoom();
 panZoomTiger.disableZoom();
 ```
 
-To fit and center:
+To fit and center (you may try `contain` instead of `fit`):
 
 ```js
 // Get instance
