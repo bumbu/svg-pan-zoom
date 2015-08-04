@@ -106,8 +106,13 @@ ShadowViewport.prototype.getViewBox = function() {
 ShadowViewport.prototype.processCTM = function() {
   var newCTM = this.getCTM()
 
-  if (this.options.fit) {
-    var newScale = Math.min(this.options.width/this.viewBox.width, this.options.height/this.viewBox.height);
+  if (this.options.fit || this.options.contain) {
+    var newScale;
+    if (this.options.fit) {
+      newScale = Math.min(this.options.width/this.viewBox.width, this.options.height/this.viewBox.height);
+    } else {
+      newScale = Math.max(this.options.width/this.viewBox.width, this.options.height/this.viewBox.height);
+    }
 
     newCTM.a = newScale; //x-scale
     newCTM.d = newScale; //y-scale
