@@ -132,7 +132,7 @@ If any arguments are specified, they must have the following value types:
 * 'onZoom' must be a callback function to be called when zoom changes.
 * 'beforePan' must be a callback function to be called before pan changes.
 * 'onPan' must be a callback function to be called when pan changes.
-* 'customEventsHandler' must be a object with `init` and `destroy` arguments as functions.
+* 'customEventsHandler' must be an object with `init` and `destroy` arguments as functions.
 
 `beforeZoom` will be called with 2 float attributes: oldZoom and newZoom.
 If `beforeZoom` will return `false` then zooming will be halted.
@@ -146,7 +146,7 @@ If `beforeZoom` will return `false` then zooming will be halted.
 Each of this objects has two attributes (x and y) representing current pan (on X and Y axes).
 
 If `beforePan` will return `false` or an object `{x: true, y: true}` then panning will be halted.
-If you want to prevent panning only on one axis then return a object of type `{x: true, y: false}`.
+If you want to prevent panning only on one axis then return an object of type `{x: true, y: false}`.
 You can alter panning on X and Y axes by providing alternative values through return `{x: 10, y: 20}`.
 
 > *Caution!* If you alter panning by returning custom values `{x: 10, y: 20}` it will update only current pan step. If panning is done by mouse/touch you have to take in account that next pan step (after the one that you altered) will be performed with values that do not consider altered values (as they even did not existed).
@@ -220,7 +220,7 @@ It is possible by setting `customEventsHandler` configuration option.
 
 `haltEventListeners` specifies which default event listeners should be disabled (in order to avoid conflicts as svg-pan-zoom supports by default panning using touch events).
 
-`init` is a function that is called when svg-pan-zoom is initialized. A object is passed into this function.
+`init` is a function that is called when svg-pan-zoom is initialized. An object is passed into this function.
 Passed object has following attributes:
 * `svgElement` - SVGSVGElement
 * `instance` - svg-pan-zoom public API instance
