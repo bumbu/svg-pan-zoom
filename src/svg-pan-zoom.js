@@ -36,7 +36,7 @@ SvgPanZoom.prototype.init = function(svg, options) {
 
   this.svg = svg;
   this.defs = svg.querySelector('defs');
-  this.eventBindSelector = svg.querySelector(options.eventBindSelector);
+  this.eventBindSelector = options.eventBindSelector ? svg.querySelector(options.eventBindSelector) : null;
 
   // Add default attributes to SVG
   SvgUtils.setupSvgAttributes(this.svg);
