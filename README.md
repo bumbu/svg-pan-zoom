@@ -72,6 +72,7 @@ Pan and zoom the SVG tiger on github pages:
 * [Using Require.js](http://ariutta.github.io/svg-pan-zoom/demo/require.html)
 * [Pan animation](http://ariutta.github.io/svg-pan-zoom/demo/simple-animation.html)
 * [Zooming just one SVG layer](http://ariutta.github.io/svg-pan-zoom/demo/layers.html)
+* [Thumbnail Viewer](http://ariutta.github.io/svg-pan-zoom/demo/thumbnailViewer.html)
 
 How To Use
 ----------
