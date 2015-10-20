@@ -1,8 +1,8 @@
 var Wheel = require('./uniwheel')
-, ControlIcons = require('./control-icons')
-, Utils = require('./utilities')
-, SvgUtils = require('./svg-utilities')
-, ShadowViewport = require('./shadow-viewport')
+  , ControlIcons = require('./control-icons')
+  , Utils = require('./utilities')
+  , SvgUtils = require('./svg-utilities')
+  , ShadowViewport = require('./shadow-viewport')
 
 var SvgPanZoom = function(svg, options) {
   this.init(svg, options)
@@ -10,24 +10,25 @@ var SvgPanZoom = function(svg, options) {
 
 var optionsDefaults = {
   viewportSelector: '.svg-pan-zoom_viewport' // Viewport selector. Can be querySelector string or SVGElement
-, panEnabled: true // enable or disable panning (default enabled)
-, controlIconsEnabled: false // insert icons to give user an option in addition to mouse events to control pan/zoom (default disabled)
-, zoomEnabled: true // enable or disable zooming (default enabled)
-, dblClickZoomEnabled: true // enable or disable zooming by double clicking (default enabled)
-, mouseWheelZoomEnabled: true // enable or disable zooming by mouse wheel (default enabled)
-, preventMouseEventsDefault: true // enable or disable preventDefault for mouse events
-, zoomScaleSensitivity: 0.1 // Zoom sensitivity
-, minZoom: 0.5 // Minimum Zoom level
-, maxZoom: 10 // Maximum Zoom level
-, fit: true // enable or disable viewport fit in SVG (default true)
-, contain: false // enable or disable viewport contain the svg (default false)
-, center: true // enable or disable viewport centering in SVG (default true)
-, refreshRate: 'auto' // Maximum number of frames per second (altering SVG's viewport)
-, beforeZoom: null
-, onZoom: null
-, beforePan: null
-, onPan: null
-, customEventsHandler: null
+  , panEnabled: true // enable or disable panning (default enabled)
+  , controlIconsEnabled: false // insert icons to give user an option in addition to mouse events to control pan/zoom (default disabled)
+  , zoomEnabled: true // enable or disable zooming (default enabled)
+  , dblClickZoomEnabled: true // enable or disable zooming by double clicking (default enabled)
+  , mouseWheelZoomEnabled: true // enable or disable zooming by mouse wheel (default enabled)
+  , preventMouseEventsDefault: true // enable or disable preventDefault for mouse events
+  , zoomScaleSensitivity: 0.1 // Zoom sensitivity
+  , minZoom: 0.5 // Minimum Zoom level
+  , maxZoom: 10 // Maximum Zoom level
+  , fit: true // enable or disable viewport fit in SVG (default true)
+  , contain: false // enable or disable viewport contain the svg (default false)
+  , center: true // enable or disable viewport centering in SVG (default true)
+  , refreshRate: 'auto' // Maximum number of frames per second (altering SVG's viewport)
+  , beforeZoom: null
+  , onZoom: null
+  , beforePan: null
+  , onPan: null
+  , customEventsHandler: null
+  , eventBindSelector : null
 }
 
 SvgPanZoom.prototype.init = function(svg, options) {
@@ -35,6 +36,7 @@ SvgPanZoom.prototype.init = function(svg, options) {
 
   this.svg = svg
   this.defs = svg.querySelector('defs')
+  this.eventBindSelector = options.eventBindSelector ? svg.querySelector(options.eventBindSelector) : null
 
   // Add default attributes to SVG
   SvgUtils.setupSvgAttributes(this.svg)
@@ -53,23 +55,23 @@ SvgPanZoom.prototype.init = function(svg, options) {
   // Init shadow viewport
   this.viewport = ShadowViewport(SvgUtils.getOrCreateViewport(this.svg, this.options.viewportSelector), {
     svg: this.svg
-  , width: this.width
-  , height: this.height
-  , fit: this.options.fit
-  , contain: this.options.contain
-  , center: this.options.center
-  , refreshRate: this.options.refreshRate
-  // Put callbacks into functions as they can change through time
-  , beforeZoom: function(oldScale, newScale) {
+    , width: this.width
+    , height: this.height
+    , fit: this.options.fit
+    , contain: this.options.contain
+    , center: this.options.center
+    , refreshRate: this.options.refreshRate
+    // Put callbacks into functions as they can change through time
+    , beforeZoom: function(oldScale, newScale) {
       if (that.viewport && that.options.beforeZoom) {return that.options.beforeZoom(oldScale, newScale)}
     }
-  , onZoom: function(scale) {
+    , onZoom: function(scale) {
       if (that.viewport && that.options.onZoom) {return that.options.onZoom(scale)}
     }
-  , beforePan: function(oldPoint, newPoint) {
+    , beforePan: function(oldPoint, newPoint) {
       if (that.viewport && that.options.beforePan) {return that.options.beforePan(oldPoint, newPoint)}
     }
-  , onPan: function(point) {
+    , onPan: function(point) {
       if (that.viewport && that.options.onPan) {return that.options.onPan(point)}
     }
   })
@@ -103,36 +105,36 @@ SvgPanZoom.prototype.setupHandlers = function() {
     mousedown: function(evt) {
       return that.handleMouseDown(evt, null);
     }
-  , touchstart: function(evt) {
+    , touchstart: function(evt) {
       var result = that.handleMouseDown(evt, prevEvt);
       prevEvt = evt
       return result;
     }
 
     // Mouse up group
-  , mouseup: function(evt) {
+    , mouseup: function(evt) {
       return that.handleMouseUp(evt);
     }
-  , touchend: function(evt) {
+    , touchend: function(evt) {
       return that.handleMouseUp(evt);
     }
 
     // Mouse move group
-  , mousemove: function(evt) {
+    , mousemove: function(evt) {
       return that.handleMouseMove(evt);
     }
-  , touchmove: function(evt) {
+    , touchmove: function(evt) {
       return that.handleMouseMove(evt);
     }
 
     // Mouse leave group
-  , mouseleave: function(evt) {
+    , mouseleave: function(evt) {
       return that.handleMouseUp(evt);
     }
-  , touchleave: function(evt) {
+    , touchleave: function(evt) {
       return that.handleMouseUp(evt);
     }
-  , touchcancel: function(evt) {
+    , touchcancel: function(evt) {
       return that.handleMouseUp(evt);
     }
   }
@@ -141,7 +143,8 @@ SvgPanZoom.prototype.setupHandlers = function() {
   if (this.options.customEventsHandler != null) { // jshint ignore:line
     this.options.customEventsHandler.init({
       svgElement: this.svg
-    , instance: this.getPublicInstance()
+      , instance: this.getPublicInstance()
+      , eventBindSelector : this.eventBindSelector
     })
 
     // Custom event handler may halt builtin listeners
@@ -157,7 +160,12 @@ SvgPanZoom.prototype.setupHandlers = function() {
 
   // Bind eventListeners
   for (var event in this.eventListeners) {
-    this.svg.addEventListener(event, this.eventListeners[event], false)
+    if(this.eventBindSelector ){
+      this.eventBindSelector.addEventListener(event, this.eventListeners[event], false)
+    }
+    else{
+      this.svg.addEventListener(event, this.eventListeners[event], false)
+    }
   }
 
   // Zoom using mouse wheel
@@ -585,7 +593,7 @@ SvgPanZoom.prototype.destroy = function() {
   if (this.options.customEventsHandler != null) { // jshint ignore:line
     this.options.customEventsHandler.destroy({
       svgElement: this.svg
-    , instance: this.getPublicInstance()
+      , instance: this.getPublicInstance()
     })
   }
 
@@ -632,77 +640,77 @@ SvgPanZoom.prototype.getPublicInstance = function() {
     this.publicInstance = this.pi = {
       // Pan
       enablePan: function() {that.options.panEnabled = true; return that.pi}
-    , disablePan: function() {that.options.panEnabled = false; return that.pi}
-    , isPanEnabled: function() {return !!that.options.panEnabled}
-    , pan: function(point) {that.pan(point); return that.pi}
-    , panBy: function(point) {that.panBy(point); return that.pi}
-    , getPan: function() {return that.getPan()}
+      , disablePan: function() {that.options.panEnabled = false; return that.pi}
+      , isPanEnabled: function() {return !!that.options.panEnabled}
+      , pan: function(point) {that.pan(point); return that.pi}
+      , panBy: function(point) {that.panBy(point); return that.pi}
+      , getPan: function() {return that.getPan()}
       // Pan event
-    , setBeforePan: function(fn) {that.options.beforePan = fn === null ? null : Utils.proxy(fn, that.publicInstance); return that.pi}
-    , setOnPan: function(fn) {that.options.onPan = fn === null ? null : Utils.proxy(fn, that.publicInstance); return that.pi}
+      , setBeforePan: function(fn) {that.options.beforePan = fn === null ? null : Utils.proxy(fn, that.publicInstance); return that.pi}
+      , setOnPan: function(fn) {that.options.onPan = fn === null ? null : Utils.proxy(fn, that.publicInstance); return that.pi}
       // Zoom and Control Icons
-    , enableZoom: function() {that.options.zoomEnabled = true; return that.pi}
-    , disableZoom: function() {that.options.zoomEnabled = false; return that.pi}
-    , isZoomEnabled: function() {return !!that.options.zoomEnabled}
-    , enableControlIcons: function() {
+      , enableZoom: function() {that.options.zoomEnabled = true; return that.pi}
+      , disableZoom: function() {that.options.zoomEnabled = false; return that.pi}
+      , isZoomEnabled: function() {return !!that.options.zoomEnabled}
+      , enableControlIcons: function() {
         if (!that.options.controlIconsEnabled) {
           that.options.controlIconsEnabled = true
           ControlIcons.enable(that)
         }
         return that.pi
       }
-    , disableControlIcons: function() {
+      , disableControlIcons: function() {
         if (that.options.controlIconsEnabled) {
           that.options.controlIconsEnabled = false;
           ControlIcons.disable(that)
         }
         return that.pi
       }
-    , isControlIconsEnabled: function() {return !!that.options.controlIconsEnabled}
+      , isControlIconsEnabled: function() {return !!that.options.controlIconsEnabled}
       // Double click zoom
-    , enableDblClickZoom: function() {that.options.dblClickZoomEnabled = true; return that.pi}
-    , disableDblClickZoom: function() {that.options.dblClickZoomEnabled = false; return that.pi}
-    , isDblClickZoomEnabled: function() {return !!that.options.dblClickZoomEnabled}
+      , enableDblClickZoom: function() {that.options.dblClickZoomEnabled = true; return that.pi}
+      , disableDblClickZoom: function() {that.options.dblClickZoomEnabled = false; return that.pi}
+      , isDblClickZoomEnabled: function() {return !!that.options.dblClickZoomEnabled}
       // Mouse wheel zoom
-    , enableMouseWheelZoom: function() {that.enableMouseWheelZoom(); return that.pi}
-    , disableMouseWheelZoom: function() {that.disableMouseWheelZoom(); return that.pi}
-    , isMouseWheelZoomEnabled: function() {return !!that.options.mouseWheelZoomEnabled}
+      , enableMouseWheelZoom: function() {that.enableMouseWheelZoom(); return that.pi}
+      , disableMouseWheelZoom: function() {that.disableMouseWheelZoom(); return that.pi}
+      , isMouseWheelZoomEnabled: function() {return !!that.options.mouseWheelZoomEnabled}
       // Zoom scale and bounds
-    , setZoomScaleSensitivity: function(scale) {that.options.zoomScaleSensitivity = scale; return that.pi}
-    , setMinZoom: function(zoom) {that.options.minZoom = zoom; return that.pi}
-    , setMaxZoom: function(zoom) {that.options.maxZoom = zoom; return that.pi}
+      , setZoomScaleSensitivity: function(scale) {that.options.zoomScaleSensitivity = scale; return that.pi}
+      , setMinZoom: function(zoom) {that.options.minZoom = zoom; return that.pi}
+      , setMaxZoom: function(zoom) {that.options.maxZoom = zoom; return that.pi}
       // Zoom event
-    , setBeforeZoom: function(fn) {that.options.beforeZoom = fn === null ? null : Utils.proxy(fn, that.publicInstance); return that.pi}
-    , setOnZoom: function(fn) {that.options.onZoom = fn === null ? null : Utils.proxy(fn, that.publicInstance); return that.pi}
+      , setBeforeZoom: function(fn) {that.options.beforeZoom = fn === null ? null : Utils.proxy(fn, that.publicInstance); return that.pi}
+      , setOnZoom: function(fn) {that.options.onZoom = fn === null ? null : Utils.proxy(fn, that.publicInstance); return that.pi}
       // Zooming
-    , zoom: function(scale) {that.publicZoom(scale, true); return that.pi}
-    , zoomBy: function(scale) {that.publicZoom(scale, false); return that.pi}
-    , zoomAtPoint: function(scale, point) {that.publicZoomAtPoint(scale, point, true); return that.pi}
-    , zoomAtPointBy: function(scale, point) {that.publicZoomAtPoint(scale, point, false); return that.pi}
-    , zoomIn: function() {this.zoomBy(1 + that.options.zoomScaleSensitivity); return that.pi}
-    , zoomOut: function() {this.zoomBy(1 / (1 + that.options.zoomScaleSensitivity)); return that.pi}
-    , getZoom: function() {return that.getRelativeZoom()}
+      , zoom: function(scale) {that.publicZoom(scale, true); return that.pi}
+      , zoomBy: function(scale) {that.publicZoom(scale, false); return that.pi}
+      , zoomAtPoint: function(scale, point) {that.publicZoomAtPoint(scale, point, true); return that.pi}
+      , zoomAtPointBy: function(scale, point) {that.publicZoomAtPoint(scale, point, false); return that.pi}
+      , zoomIn: function() {this.zoomBy(1 + that.options.zoomScaleSensitivity); return that.pi}
+      , zoomOut: function() {this.zoomBy(1 / (1 + that.options.zoomScaleSensitivity)); return that.pi}
+      , getZoom: function() {return that.getRelativeZoom()}
       // Reset
-    , resetZoom: function() {that.resetZoom(); return that.pi}
-    , resetPan: function() {that.resetPan(); return that.pi}
-    , reset: function() {that.reset(); return that.pi}
+      , resetZoom: function() {that.resetZoom(); return that.pi}
+      , resetPan: function() {that.resetPan(); return that.pi}
+      , reset: function() {that.reset(); return that.pi}
       // Fit, Contain and Center
-    , fit: function() {that.fit(); return that.pi}
-    , contain: function() {that.contain(); return that.pi}
-    , center: function() {that.center(); return that.pi}
+      , fit: function() {that.fit(); return that.pi}
+      , contain: function() {that.contain(); return that.pi}
+      , center: function() {that.center(); return that.pi}
       // Size and Resize
-    , updateBBox: function() {that.updateBBox(); return that.pi}
-    , resize: function() {that.resize(); return that.pi}
-    , getSizes: function() {
+      , updateBBox: function() {that.updateBBox(); return that.pi}
+      , resize: function() {that.resize(); return that.pi}
+      , getSizes: function() {
         return {
           width: that.width
-        , height: that.height
-        , realZoom: that.getZoom()
-        , viewBox: that.viewport.getViewBox()
+          , height: that.height
+          , realZoom: that.getZoom()
+          , viewBox: that.viewport.getViewBox()
         }
       }
       // Destroy
-    , destroy: function() {that.destroy(); return that.pi}
+      , destroy: function() {that.destroy(); return that.pi}
     }
   }
 
@@ -733,7 +741,7 @@ var svgPanZoom = function(elementOrSelector, options){
     // If instance not found - create one
     instancesStore.push({
       svg: svg
-    , instance: new SvgPanZoom(svg, options)
+      , instance: new SvgPanZoom(svg, options)
     })
 
     // Return just pushed instance
