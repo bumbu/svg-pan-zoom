@@ -1,6 +1,6 @@
 {
   "name": "svg-pan-zoom",
-  "version": "3.2.4",
+  "version": "3.2.5",
   "main": "dist/svg-pan-zoom.js",
   "browser": "src/browserify.js",
   "license": "BSD",
@@ -28,7 +28,8 @@
     "Vladimir Prus (http://vladimirprus.com)",
     "Barry Coughlan (https://github.com/bcoughlan)",
     "Ionică Bizău (http://ionicabizau.net/)",
-    "Ciprian Placintă (https://github.com/CiprianPlacinta)"
+    "Ciprian Placintă (https://github.com/CiprianPlacinta)",
+    "Riccardo Santoro (https://github.com/VeNoMiS)"
   ],
   "keywords": [
     "svg",

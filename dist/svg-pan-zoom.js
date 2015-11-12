@@ -1,4 +1,4 @@
-// svg-pan-zoom v3.2.4
+// svg-pan-zoom v3.2.5
 // https://github.com/ariutta/svg-pan-zoom
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var svgPanZoom = require('./svg-pan-zoom.js');
@@ -626,6 +626,7 @@ SvgPanZoom.prototype.setupHandlers = function() {
   if (this.options.customEventsHandler != null) { // jshint ignore:line
     this.options.customEventsHandler.init({
       svgElement: this.svg
+    , eventsListenerElement: this.options.eventsListenerElement
     , instance: this.getPublicInstance()
     })
 
@@ -678,7 +679,7 @@ SvgPanZoom.prototype.enableMouseWheelZoom = function() {
  */
 SvgPanZoom.prototype.disableMouseWheelZoom = function() {
   if (this.options.mouseWheelZoomEnabled) {
-    Wheel.off(this.svg, this.wheelListener, false)
+    Wheel.off(this.options.eventsListenerElement || this.svg, this.wheelListener, false)
     this.options.mouseWheelZoomEnabled = false
   }
 }
@@ -1072,13 +1073,15 @@ SvgPanZoom.prototype.destroy = function() {
   if (this.options.customEventsHandler != null) { // jshint ignore:line
     this.options.customEventsHandler.destroy({
       svgElement: this.svg
+    , eventsListenerElement: this.options.eventsListenerElement
     , instance: this.getPublicInstance()
     })
   }
 
   // Unbind eventListeners
   for (var event in this.eventListeners) {
-    this.svg.removeEventListener(event, this.eventListeners[event], false)
+    (this.options.eventsListenerElement || this.svg)
+      .removeEventListener(event, this.eventListeners[event], false)
   }
 
   // Unbind wheelListener
