@@ -28,6 +28,7 @@ var optionsDefaults = {
 , beforePan: null
 , onPan: null
 , customEventsHandler: null
+, eventsListenerElement: null
 }
 
 SvgPanZoom.prototype.init = function(svg, options) {
@@ -157,7 +158,9 @@ SvgPanZoom.prototype.setupHandlers = function() {
 
   // Bind eventListeners
   for (var event in this.eventListeners) {
-    this.svg.addEventListener(event, this.eventListeners[event], false)
+    // Attach event to eventsListenerElement or SVG if not available
+    (this.options.eventsListenerElement || this.svg)
+      .addEventListener(event, this.eventListeners[event], false)
   }
 
   // Zoom using mouse wheel
@@ -180,7 +183,7 @@ SvgPanZoom.prototype.enableMouseWheelZoom = function() {
     }
 
     // Bind wheelListener
-    Wheel.on(this.svg, this.wheelListener, false)
+    Wheel.on(this.options.eventsListenerElement || this.svg, this.wheelListener, false)
 
     this.options.mouseWheelZoomEnabled = true
   }

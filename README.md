@@ -111,6 +111,7 @@ svgPanZoom('#demo-tiger', {
 , beforePan: function(){}
 , onPan: function(){}
 , customEventsHandler: {}
+, eventsListenerElement: null
 });
 ```
 
@@ -134,6 +135,7 @@ If any arguments are specified, they must have the following value types:
 * 'beforePan' must be a callback function to be called before pan changes.
 * 'onPan' must be a callback function to be called when pan changes.
 * 'customEventsHandler' must be an object with `init` and `destroy` arguments as functions.
+* 'eventsListenerElement' must be an SVGElement or null.
 
 `beforeZoom` will be called with 2 float attributes: oldZoom and newZoom.
 If `beforeZoom` will return `false` then zooming will be halted.
@@ -194,6 +196,11 @@ svgPanZoom('#demo-tiger', {
   viewportSelector: viewportGroupElement
 });
 ```
+
+Listening for pan/zoom events on a child SVG element
+----------------------------------------------------
+
+If you want to listen for user interaction events from a child SVG element then use `eventsListenerElement` option. An example is available in [demo/layers.html](http://ariutta.github.io/svg-pan-zoom/demo/layers.html).
 
 Use with browserify
 -------------------
