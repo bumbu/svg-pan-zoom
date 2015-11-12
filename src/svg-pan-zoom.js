@@ -142,6 +142,7 @@ SvgPanZoom.prototype.setupHandlers = function() {
   if (this.options.customEventsHandler != null) { // jshint ignore:line
     this.options.customEventsHandler.init({
       svgElement: this.svg
+    , eventsListenerElement: this.options.eventsListenerElement
     , instance: this.getPublicInstance()
     })
 
@@ -194,7 +195,7 @@ SvgPanZoom.prototype.enableMouseWheelZoom = function() {
  */
 SvgPanZoom.prototype.disableMouseWheelZoom = function() {
   if (this.options.mouseWheelZoomEnabled) {
-    Wheel.off(this.svg, this.wheelListener, false)
+    Wheel.off(this.options.eventsListenerElement || this.svg, this.wheelListener, false)
     this.options.mouseWheelZoomEnabled = false
   }
 }
@@ -588,13 +589,15 @@ SvgPanZoom.prototype.destroy = function() {
   if (this.options.customEventsHandler != null) { // jshint ignore:line
     this.options.customEventsHandler.destroy({
       svgElement: this.svg
+    , eventsListenerElement: this.options.eventsListenerElement
     , instance: this.getPublicInstance()
     })
   }
 
   // Unbind eventListeners
   for (var event in this.eventListeners) {
-    this.svg.removeEventListener(event, this.eventListeners[event], false)
+    (this.options.eventsListenerElement || this.svg)
+      .removeEventListener(event, this.eventListeners[event], false)
   }
 
   // Unbind wheelListener
