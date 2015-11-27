@@ -1,6 +1,6 @@
 {
   "name": "svg-pan-zoom",
-  "version": "3.2.5",
+  "version": "3.2.6",
   "homepage": "https://github.com/ariutta/svg-pan-zoom",
   "authors": [
     "Andrea Leofreddi <a.leofreddi@itcharm.com>",
@@ -28,7 +28,7 @@
     "pan",
     "zoom"
   ],
-  "license": "BSD",
+  "license": "BSD-2-Clause",
   "ignore": [
     "**/.*",
     "node_modules",

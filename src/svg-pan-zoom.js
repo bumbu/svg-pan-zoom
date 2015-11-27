@@ -324,6 +324,32 @@ SvgPanZoom.prototype.publicZoomAtPoint = function(scale, point, absolute) {
 }
 
 /**
+ * Rotate
+ *
+ * @param  {Float} angle
+ */
+SvgPanZoom.prototype.rotate = function(angle) {
+  this.viewport.rotate(angle)
+}
+
+/**
+ * Rotate relative
+ *
+ * @param  {Float} relative angle
+ */
+SvgPanZoom.prototype.rotateRelative = function(angle) {
+  this.rotate(this.getRotate() + angle)
+}
+
+/**
+ * Get rotate for public usage
+ *
+ * @return {Float} rotate
+ */
+SvgPanZoom.prototype.getRotate = function() {
+  return this.viewport.getRotate()
+}
+/**
  * Get zoom scale
  *
  * @return {Float} zoom scale
@@ -368,11 +394,19 @@ SvgPanZoom.prototype.resetPan = function() {
 }
 
 /**
+ * Set pan to initial state
+ */
+SvgPanZoom.prototype.resetRotate = function() {
+  this.rotate(this.viewport.getOriginalState().rotate);
+}
+
+/**
  * Set pan and zoom to initial state
  */
 SvgPanZoom.prototype.reset = function() {
   this.resetZoom()
   this.resetPan()
+  this.resetRotate()
 }
 
 /**
@@ -688,9 +722,14 @@ SvgPanZoom.prototype.getPublicInstance = function() {
     , zoomIn: function() {this.zoomBy(1 + that.options.zoomScaleSensitivity); return that.pi}
     , zoomOut: function() {this.zoomBy(1 / (1 + that.options.zoomScaleSensitivity)); return that.pi}
     , getZoom: function() {return that.getRelativeZoom()}
+      // Rotate
+    , rotate: function(angle) {that.rotate(angle); return that.pi}  
+    , rotateRelative: function(angle) {that.rotateRelative(angle); return that.pi}  
+    , getRotate: function() {return that.getRotate()}  
       // Reset
     , resetZoom: function() {that.resetZoom(); return that.pi}
     , resetPan: function() {that.resetPan(); return that.pi}
+    , resetRotate: function() {that.resetPan(); return that.pi}
     , reset: function() {that.reset(); return that.pi}
       // Fit, Contain and Center
     , fit: function() {that.fit(); return that.pi}
@@ -705,6 +744,7 @@ SvgPanZoom.prototype.getPublicInstance = function() {
         , height: that.height
         , realZoom: that.getZoom()
         , viewBox: that.viewport.getViewBox()
+        , rotate: that.getRotate()
         }
       }
       // Destroy

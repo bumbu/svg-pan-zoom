@@ -14,7 +14,7 @@ var gulp   = require('gulp')
   , sync       = require('gulp-config-sync')
   , header     = require('gulp-header')
   , pkg        = require('./package.json')
-  , banner     = "// svg-pan-zoom v<%= pkg.version %>" + "\n" + "// https://github.com/ariutta/svg-pan-zoom" + "\n"
+  , banner     = "svg-pan-zoom v<%= pkg.version %>" + "\n" + "// https://github.com/ariutta/svg-pan-zoom" + "\n"
   ;
 
 /**
@@ -28,11 +28,11 @@ gulp.task('browserify', function() {
       this.emit("end")
     })
     .pipe(source('svg-pan-zoom.js'))
-    .pipe(header(banner, {pkg: pkg}))
+    //.pipe(header(banner, {pkg: pkg}))
     .pipe(gulp.dest('./dist/'))
     .pipe(streamify(rename('svg-pan-zoom.min.js')))
     .pipe(streamify(uglify()))
-    .pipe(header(banner, {pkg: pkg}))
+    //.pipe(header(banner, {pkg: pkg}))
     .pipe(gulp.dest('./dist/'))
 });
 
