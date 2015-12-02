@@ -162,6 +162,30 @@ You can alter panning on X and Y axes by providing alternative values through re
 
 `fit` takes preceeding to `contain`. So if you set `fit: true` then `contain`'s value doesn't matter.
 
+Embeding remote files
+---------------------
+
+If you're embeding a remote file like this
+```html
+<embed type="image/svg+xml" src="/path/to/my/file.svg" />
+<object type="image/svg+xml" data="/path/to/my/file.svg">Your browser does not support SVG</object>
+```
+
+or you're rendering the SVG after page loads then you'll have to call svgPanZoom library after your SVG is loaded.
+
+One way to do so is by listening to load event:
+```html
+<embed type="image/svg+xml" src="/path/to/my/file.svg" id="my-embed"/>
+
+<script>
+document.getElementById('my-embed').addEventListener('load', function(){
+  // Will get called after embed element was loaded
+  svgPanZoom(document.getElementById('my-embed')); 
+})
+</script>
+```
+
+
 Using a custom viewport
 -----------------------
 
