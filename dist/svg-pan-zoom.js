@@ -1,5 +1,3 @@
-// svg-pan-zoom v3.2.5
-// https://github.com/ariutta/svg-pan-zoom
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var svgPanZoom = require('./svg-pan-zoom.js');
 
@@ -165,8 +163,8 @@ ShadowViewport.prototype.init = function(viewport, options) {
   this.options = options
 
   // State cache
-  this.originalState = {zoom: 1, x: 0, y: 0}
-  this.activeState = {zoom: 1, x: 0, y: 0}
+  this.originalState = {zoom: 1, x: 0, y: 0, rotate: 0}
+  this.activeState = {zoom: 1, x: 0, y: 0, rotate: 0}
 
   this.updateCTMCached = Utils.proxy(this.updateCTM, this)
 
@@ -339,6 +337,38 @@ ShadowViewport.prototype.getPan = function() {
 }
 
 /**
+ * Get rotate
+ *
+ * @return {Float} angle
+ */
+ShadowViewport.prototype.getRotate = function() {
+  return this.activeState.rotate
+}
+
+/**
+ * Get rotate transformation
+ *
+ * @return {Object} angle and point of rotation
+ */
+ShadowViewport.prototype.getRotateTransform = function() {
+  return {
+    angle: this.getRotate(),
+    x: this.getViewBox().width / 2,
+    y: this.getViewBox().height / 2
+  }
+}
+
+/**
+ * Set rotate
+ *
+ * @param {Float} angle
+ */
+ShadowViewport.prototype.rotate = function(angle) {
+  this.activeState.rotate = angle;
+  this.updateCTMOnNextFrame()
+}
+
+/**
  * Return cached viewport CTM value that can be safely modified
  *
  * @return {SVGMatrix}
@@ -347,12 +377,12 @@ ShadowViewport.prototype.getCTM = function() {
   var safeCTM = this.options.svg.createSVGMatrix()
 
   // Copy values manually as in FF they are not itterable
-  safeCTM.a = this.activeState.zoom
+  safeCTM.a = this.activeState.zoom.toFixed(6)
   safeCTM.b = 0
   safeCTM.c = 0
-  safeCTM.d = this.activeState.zoom
-  safeCTM.e = this.activeState.x
-  safeCTM.f = this.activeState.y
+  safeCTM.d = this.activeState.zoom.toFixed(6)
+  safeCTM.e = this.activeState.x.toFixed(6)
+  safeCTM.f = this.activeState.y.toFixed(6)
 
   return safeCTM
 }
@@ -471,7 +501,7 @@ ShadowViewport.prototype.updateCTMOnNextFrame = function() {
  */
 ShadowViewport.prototype.updateCTM = function() {
   // Updates SVG element
-  SvgUtils.setCTM(this.viewport, this.getCTM(), this.defs)
+  SvgUtils.setCTM(this.viewport, this.getCTM(), this.defs, this.getRotateTransform())
 
   // Free the lock
   this.pendingUpdate = false
@@ -808,6 +838,32 @@ SvgPanZoom.prototype.publicZoomAtPoint = function(scale, point, absolute) {
 }
 
 /**
+ * Rotate
+ *
+ * @param  {Float} angle
+ */
+SvgPanZoom.prototype.rotate = function(angle) {
+  this.viewport.rotate(angle)
+}
+
+/**
+ * Rotate relative
+ *
+ * @param  {Float} relative angle
+ */
+SvgPanZoom.prototype.rotateRelative = function(angle) {
+  this.rotate(this.getRotate() + angle)
+}
+
+/**
+ * Get rotate for public usage
+ *
+ * @return {Float} rotate
+ */
+SvgPanZoom.prototype.getRotate = function() {
+  return this.viewport.getRotate()
+}
+/**
  * Get zoom scale
  *
  * @return {Float} zoom scale
@@ -852,11 +908,19 @@ SvgPanZoom.prototype.resetPan = function() {
 }
 
 /**
+ * Set pan to initial state
+ */
+SvgPanZoom.prototype.resetRotate = function() {
+  this.rotate(this.viewport.getOriginalState().rotate);
+}
+
+/**
  * Set pan and zoom to initial state
  */
 SvgPanZoom.prototype.reset = function() {
   this.resetZoom()
   this.resetPan()
+  this.resetRotate()
 }
 
 /**
@@ -1172,9 +1236,14 @@ SvgPanZoom.prototype.getPublicInstance = function() {
     , zoomIn: function() {this.zoomBy(1 + that.options.zoomScaleSensitivity); return that.pi}
     , zoomOut: function() {this.zoomBy(1 / (1 + that.options.zoomScaleSensitivity)); return that.pi}
     , getZoom: function() {return that.getRelativeZoom()}
+      // Rotate
+    , rotate: function(angle) {that.rotate(angle); return that.pi}  
+    , rotateRelative: function(angle) {that.rotateRelative(angle); return that.pi}  
+    , getRotate: function() {return that.getRotate()}  
       // Reset
     , resetZoom: function() {that.resetZoom(); return that.pi}
     , resetPan: function() {that.resetPan(); return that.pi}
+    , resetRotate: function() {that.resetPan(); return that.pi}
     , reset: function() {that.reset(); return that.pi}
       // Fit, Contain and Center
     , fit: function() {that.fit(); return that.pi}
@@ -1189,6 +1258,7 @@ SvgPanZoom.prototype.getPublicInstance = function() {
         , height: that.height
         , realZoom: that.getZoom()
         , viewBox: that.viewport.getViewBox()
+        , rotate: that.getRotate()
         }
       }
       // Destroy
@@ -1379,11 +1449,14 @@ module.exports = {
    * @param {SVGElement} element
    * @param {SVGMatrix} matrix  CTM
    * @param {SVGElement} defs
+   * @param {Object} rotate
    */
-, setCTM: function(element, matrix, defs) {
+, setCTM: function(element, matrix, defs, rotate) {
     var that = this
       , s = 'matrix(' + matrix.a + ',' + matrix.b + ',' + matrix.c + ',' + matrix.d + ',' + matrix.e + ',' + matrix.f + ')';
-
+    if (rotate.angle !== 0) {
+      s += ' rotate(' + rotate.angle + ',' + rotate.x + ',' + rotate.y + ')';
+    }
     element.setAttributeNS(null, 'transform', s);
 
     // IE has a bug that makes markers disappear on zoom (when the matrix "a" and/or "d" elements change)
