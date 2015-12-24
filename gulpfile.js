@@ -32,7 +32,6 @@ gulp.task('browserify', function() {
     .pipe(header(banner, {pkg: pkg}))
     .pipe(gulp.dest('./dist/'))
     .pipe(rename('svg-pan-zoom.min.js'))
-    .pipe(buffer())
     .pipe(uglify())
     .pipe(header(banner, {pkg: pkg}))
     .pipe(gulp.dest('./dist/'))
