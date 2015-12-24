@@ -312,12 +312,13 @@ SvgPanZoom.prototype.publicZoomAtPoint = function(scale, point, absolute) {
     scale = this.computeFromRelativeZoom(scale)
   }
 
-  // If not a SVGPoint but has x and y than create a SVGPoint
-  if (Utils.getType(point) !== 'SVGPoint' && 'x' in point && 'y' in point) {
-    point = SvgUtils.createSVGPoint(this.svg, point.x, point.y)
-  } else {
-    throw new Error('Given point is invalid')
-    return
+  // If not a SVGPoint but has x and y then create a SVGPoint
+  if (Utils.getType(point) !== 'SVGPoint') {
+    if('x' in point && 'y' in point) {
+      point = SvgUtils.createSVGPoint(this.svg, point.x, point.y)
+    } else {
+      throw new Error('Given point is invalid')
+    }
   }
 
   this.zoomAtPoint(scale, point, absolute)
