@@ -311,6 +311,20 @@ test('zoom at point by', function() {
   deepEqual(instance.getPan(), {x: -300, y: -600})
 });
 
+test('zoom at point by (with SVG point)', function() {
+  expect(2);
+  instance = initSvgPanZoom({fit: false})
+
+  var svgPoint = $(svgSelector)[0].createSVGPoint();
+  svgPoint.x = 200;
+  svgPoint.y = 100;
+
+  instance.zoomAtPointBy(2, svgPoint)
+
+  close(instance.getZoom(), 2)
+  deepEqual(instance.getPan(), {x: -300, y: -600})
+});
+
 test('zoom in', function() {
   expect(3);
   instance = initSvgPanZoom({fit: false})
