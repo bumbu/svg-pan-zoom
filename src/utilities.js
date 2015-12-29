@@ -43,6 +43,16 @@ module.exports = {
   }
 
   /**
+   * Checks if an object is an Array
+   *
+   * @param  {Object}  o Object to check
+   * @return {Boolean}   returns true if object is an Array
+   */
+, isArray: function(o){
+    return Object.prototype.toString.call(o) === '[object Array]';
+  }
+
+  /**
    * Checks if variable is Number
    *
    * @param  {Integer|Float}  n
