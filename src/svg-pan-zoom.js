@@ -23,12 +23,9 @@ var optionsDefaults = {
 , contain: false // enable or disable viewport contain the svg (default false)
 , center: true // enable or disable viewport centering in SVG (default true)
 , refreshRate: 'auto' // Maximum number of frames per second (altering SVG's viewport)
-, beforeZoom: null
-, onZoom: null
-, beforePan: null
-, onPan: null
 , customEventsHandler: null
 , eventsListenerElement: null
+, plugins: null
 }
 
 SvgPanZoom.prototype.init = function(svg, options) {
@@ -42,6 +39,12 @@ SvgPanZoom.prototype.init = function(svg, options) {
 
   // Set options
   this.options = Utils.extend(Utils.extend({}, optionsDefaults), options)
+
+  // Init events
+  this.initEvents()
+
+  // Init plugins
+  this.initPlugins()
 
   // Set default state
   this.state = 'none'
@@ -60,27 +63,8 @@ SvgPanZoom.prototype.init = function(svg, options) {
   , contain: this.options.contain
   , center: this.options.center
   , refreshRate: this.options.refreshRate
-  // Put callbacks into functions as they can change through time
-  , beforeZoom: function(oldScale, newScale) {
-      if (that.viewport && that.options.beforeZoom) {return that.options.beforeZoom(oldScale, newScale)}
-    }
-  , onZoom: function(scale) {
-      if (that.viewport && that.options.onZoom) {return that.options.onZoom(scale)}
-    }
-  , beforePan: function(oldPoint, newPoint) {
-      if (that.viewport && that.options.beforePan) {return that.options.beforePan(oldPoint, newPoint)}
-    }
-  , onPan: function(point) {
-      if (that.viewport && that.options.onPan) {return that.options.onPan(point)}
-    }
+  , trigger: Utils.proxy(this.trigger, this)
   })
-
-  // Wrap callbacks into public API context
-  var publicInstance = this.getPublicInstance()
-  publicInstance.setBeforeZoom(this.options.beforeZoom)
-  publicInstance.setOnZoom(this.options.onZoom)
-  publicInstance.setBeforePan(this.options.beforePan)
-  publicInstance.setOnPan(this.options.onPan)
 
   if (this.options.controlIconsEnabled) {
     ControlIcons.enable(this)
@@ -89,6 +73,152 @@ SvgPanZoom.prototype.init = function(svg, options) {
   // Init events handlers
   this.lastMouseWheelEventTime = Date.now()
   this.setupHandlers()
+}
+
+/**
+ * Init events and middlewares
+ */
+SvgPanZoom.prototype.initEvents = function() {
+  this.events = {}
+  this.middlewares = {}
+}
+
+/**
+ * Add an event listener
+ *
+ * @param  {String}   name         Events name
+ * @param  {Function} fn           Event callback
+ * @param  {Object}   [ctx]        Callback context
+ * @param  {String}   [pluginName] Plugin name
+ */
+SvgPanZoom.prototype.on = function(name, fn, ctx, pluginName) {
+  // Create events list if it doesn't exist
+  if (!(name in this.events)) {
+    this.events[name] = []
+  }
+
+  this.events[name].push({
+    fn: fn
+  , ctx: ctx
+  , pluginName: pluginName
+  })
+}
+
+/**
+ * Remove event listener
+ * Specifying only the name will remove all event listeners
+ * Users and plugins can only remove events defined by them
+ *
+ * @param  {String}   name         Event name
+ * @param  {Function} [fn]         Event callback
+ * @param  {Oblect}   [ctx]        Callback context
+ * @param  {String}   [pluginName] Plugin name
+ */
+SvgPanZoom.prototype.off = function(name, fn, ctx, pluginName) {
+  var i, sameFn, sameCtx, samePlugin
+
+  if (name in this.events) {
+    for (i = this.events[name].length - 1; i >= 0; i--) {
+      sameFn = fn == null || fn === this.events[name][i].fn
+      sameCtx = ctx == null || ctx === this.events[name][i].ctx
+      samePlugin = pluginName == null || pluginName === this.events[name][i].pluginName
+
+      if (sameFn && sameCtx && samePlugin) {
+        this.events[name].splice(i, 1)
+      }
+    }
+  }
+}
+
+/**
+ * Trigger an event. All the arguments except first will be passed to event listeners
+ *
+ * @param  {String} name Event name. Plugins should namespace their events as pluginName:eventName
+ */
+SvgPanZoom.prototype.trigger = function(name) {
+  // console.log('event:', name)
+  var arg = Array.prototype.slice.call(arguments, 1)
+
+  if (name in this.events) {
+    for (var i = 0; i < this.events[name].length; i++) {
+      this.events[name][i].fn.apply(this.events[name][i].ctx, arg)
+    }
+  }
+}
+
+SvgPanZoom.prototype.use = function(name, fn, ctx, pluginName) {
+
+}
+
+SvgPanZoom.prototype.unuse = function(name, fn, ctx, pluginName) {
+
+}
+
+SvgPanZoom.prototype.through = function(name, evt, cb) {
+
+}
+
+/**
+ * Init plugins
+ */
+SvgPanZoom.prototype.initPlugins = function() {
+  this.plugins = []
+
+  if (Utils.isArray(this.options.plugins)) {
+    for (var i = 0; i < this.options.plugins.length; i++) {
+      this.addPlugin(this.options.plugins[i])
+    }
+  } else {
+    // Load all plugins
+    for (var key in this.pluginsStore) {
+      this.addPlugin(key)
+    }
+  }
+}
+
+/**
+ * Add plugin
+ *
+ * @param {String} name Plugin name
+ */
+SvgPanZoom.prototype.addPlugin = function(name) {
+  if (name in this.pluginsStore) {
+    var pluginApi = this.getPluginApi(name)
+
+    this.plugins.push({
+      name: name
+    , plugin: this.pluginsStore[name](pluginApi)
+    , api: pluginApi
+    })
+  } else {
+    throw new Error('Following plugin is not available: ' + name)
+  }
+}
+
+/**
+ * Remove all plugins with a given name
+ *
+ * @param {String} name Plugin name
+ */
+SvgPanZoom.prototype.removePlugin = function(name) {
+  var i, event
+
+  this.trigger('before:plugin:remove', name)
+
+  // Remove all events of this plugin
+  for (event in this.events) {
+    this.off(event, null, null, name)
+  }
+
+  // TODO Remove middlewares
+
+  for (i = this.plugins.length - 1; i >= 0; i--) {
+    if (this.plugins[i].name === name) {
+      this.plugins.splice(i, 1)
+    }
+  }
+
+  this.trigger('plugin:remove', name)
 }
 
 /**
@@ -143,7 +273,7 @@ SvgPanZoom.prototype.setupHandlers = function() {
     this.options.customEventsHandler.init({
       svgElement: this.svg
     , eventsListenerElement: this.options.eventsListenerElement
-    , instance: this.getPublicInstance()
+    , instance: this.getPublicApi()
     })
 
     // Custom event handler may halt builtin listeners
@@ -512,7 +642,7 @@ SvgPanZoom.prototype.center = function() {
     , offsetX = (this.width - (viewBox.width + viewBox.x * 2) * this.getZoom()) * 0.5
     , offsetY = (this.height - (viewBox.height + viewBox.y * 2) * this.getZoom()) * 0.5
 
-  this.getPublicInstance().pan({x: offsetX, y: offsetY})
+  this.getPublicApi().pan({x: offsetX, y: offsetY})
 }
 
 /**
@@ -569,8 +699,8 @@ SvgPanZoom.prototype.resize = function() {
 
   // Reposition control icons by re-enabling them
   if (this.options.controlIconsEnabled) {
-    this.getPublicInstance().disableControlIcons()
-    this.getPublicInstance().enableControlIcons()
+    this.getPublicApi().disableControlIcons()
+    this.getPublicApi().enableControlIcons()
   }
 }
 
@@ -580,18 +710,17 @@ SvgPanZoom.prototype.resize = function() {
 SvgPanZoom.prototype.destroy = function() {
   var that = this
 
-  // Free callbacks
-  this.beforeZoom = null
-  this.onZoom = null
-  this.beforePan = null
-  this.onPan = null
+  // Remove all plugins
+  while (this.plugins.length) {
+    this.removePlugin(this.plugins[0].name)
+  }
 
   // Destroy custom event handlers
   if (this.options.customEventsHandler != null) { // jshint ignore:line
     this.options.customEventsHandler.destroy({
       svgElement: this.svg
     , eventsListenerElement: this.options.eventsListenerElement
-    , instance: this.getPublicInstance()
+    , instance: this.getPublicApi()
     })
   }
 
@@ -605,10 +734,15 @@ SvgPanZoom.prototype.destroy = function() {
   this.disableMouseWheelZoom()
 
   // Remove control icons
-  this.getPublicInstance().disableControlIcons()
+  this.getPublicApi().disableControlIcons()
 
   // Reset zoom and pan
   this.reset()
+
+  // Remove all events
+  this.events = {}
+
+  // TODO unhook middlewares
 
   // Remove instance from instancesStore
   instancesStore = instancesStore.filter(function(instance){
@@ -618,25 +752,25 @@ SvgPanZoom.prototype.destroy = function() {
   // Delete options and its contents
   delete this.options
 
-  // Destroy public instance and rewrite getPublicInstance
-  delete this.publicInstance
+  // Destroy public instance and rewrite getPublicApi
+  delete this.publicApi
   delete this.pi
-  this.getPublicInstance = function(){
+  this.getPublicApi = function(){
     return null
   }
 }
 
 /**
- * Returns a public instance object
+ * Returns a public API object
  *
- * @return {Object} Public instance object
+ * @return {Object} Public API object
  */
-SvgPanZoom.prototype.getPublicInstance = function() {
+SvgPanZoom.prototype.getPublicApi = function() {
   var that = this
 
   // Create cache
-  if (!this.publicInstance) {
-    this.publicInstance = this.pi = {
+  if (!this.publicApi) {
+    this.publicApi = this.pi = {
       // Pan
       enablePan: function() {that.options.panEnabled = true; return that.pi}
     , disablePan: function() {that.options.panEnabled = false; return that.pi}
@@ -644,9 +778,6 @@ SvgPanZoom.prototype.getPublicInstance = function() {
     , pan: function(point) {that.pan(point); return that.pi}
     , panBy: function(point) {that.panBy(point); return that.pi}
     , getPan: function() {return that.getPan()}
-      // Pan event
-    , setBeforePan: function(fn) {that.options.beforePan = fn === null ? null : Utils.proxy(fn, that.publicInstance); return that.pi}
-    , setOnPan: function(fn) {that.options.onPan = fn === null ? null : Utils.proxy(fn, that.publicInstance); return that.pi}
       // Zoom and Control Icons
     , enableZoom: function() {that.options.zoomEnabled = true; return that.pi}
     , disableZoom: function() {that.options.zoomEnabled = false; return that.pi}
@@ -678,9 +809,6 @@ SvgPanZoom.prototype.getPublicInstance = function() {
     , setZoomScaleSensitivity: function(scale) {that.options.zoomScaleSensitivity = scale; return that.pi}
     , setMinZoom: function(zoom) {that.options.minZoom = zoom; return that.pi}
     , setMaxZoom: function(zoom) {that.options.maxZoom = zoom; return that.pi}
-      // Zoom event
-    , setBeforeZoom: function(fn) {that.options.beforeZoom = fn === null ? null : Utils.proxy(fn, that.publicInstance); return that.pi}
-    , setOnZoom: function(fn) {that.options.onZoom = fn === null ? null : Utils.proxy(fn, that.publicInstance); return that.pi}
       // Zooming
     , zoom: function(scale) {that.publicZoom(scale, true); return that.pi}
     , zoomBy: function(scale) {that.publicZoom(scale, false); return that.pi}
@@ -708,13 +836,50 @@ SvgPanZoom.prototype.getPublicInstance = function() {
         , viewBox: that.viewport.getViewBox()
         }
       }
+      // Plugins
+    , addPlugin: function(name) {that.addPlugin(name); return that.pi}
+    , removePlugin: function(name) {that.removePlugin(name); return that.pi}
       // Destroy
     , destroy: function() {that.destroy(); return that.pi}
+      // Events handling
+    , on: function(name, fn, ctx) {
+        if (typeof ctx === 'undefined') ctx = that.pi // Automatically inject public context
+        that.on(name, fn, ctx, '__user')
+        return that.pi
+      }
+    , off: function(name, fn, ctx) {that.off(name, fn, ctx, '__user'); return that.pi}
+    , use: function(name, fn, ctx) {that.use(name, fn, ctx, '__user'); return that.pi}
+    , unuse: function(name, fn, ctx) {that.unuse(name, fn, ctx, '__user'); return that.pi}
     }
   }
 
-  return this.publicInstance
+  return this.publicApi
 }
+
+SvgPanZoom.prototype.getPluginApi = function(pluginName) {
+  var publicApi = this.getPublicApi()
+    , that = this
+
+  // Same API as for public use but with slight differences
+  var pluginApi = Object.create(publicApi)
+  pluginApi.on = function(name, fn, ctx) {
+    if (typeof ctx === 'undefined') ctx = publicApi // Automatically inject plugin context
+    that.on(name, fn, ctx, pluginName)
+    return pluginApi
+  }
+  pluginApi.off = function(name, fn, ctx) {that.off(name, fn, ctx, pluginName); return pluginApi}
+  pluginApi.use = function(name, fn, ctx) {that.use(name, fn, ctx, pluginName); return pluginApi}
+  pluginApi.unuse = function(name, fn, ctx) {that.unuse(name, fn, ctx, pluginName); return pluginApi}
+
+  return pluginApi
+}
+
+/**
+ * Keeps all plugins
+ *
+ * @type {Object}
+ */
+SvgPanZoom.prototype.pluginsStore = {}
 
 /**
  * Stores pairs of instances of SvgPanZoom and SVG
@@ -733,7 +898,7 @@ var svgPanZoom = function(elementOrSelector, options){
     // Look for existent instance
     for(var i = instancesStore.length - 1; i >= 0; i--) {
       if (instancesStore[i].svg === svg) {
-        return instancesStore[i].instance.getPublicInstance()
+        return instancesStore[i].instance.getPublicApi()
       }
     }
 
@@ -744,7 +909,37 @@ var svgPanZoom = function(elementOrSelector, options){
     })
 
     // Return just pushed instance
-    return instancesStore[instancesStore.length - 1].instance.getPublicInstance()
+    return instancesStore[instancesStore.length - 1].instance.getPublicApi()
+  }
+}
+
+/**
+ * Register a plugin
+ *
+ * @param  {String}   name Plugin name
+ * @param  {Function} fn   Plugin function that returns plugin instance
+ */
+svgPanZoom.register = function(name, fn) {
+  if (name.indexOf('__') === 0) {
+    throw new Error('Plugin name can\'t start with __')
+  } else {
+    SvgPanZoom.prototype.pluginsStore[name] = fn
+  }
+}
+
+/**
+ * Deregister a plugin
+ *
+ * @param  {String} name Plugin name
+ */
+svgPanZoom.deregister = function(name) {
+  if (name in SvgPanZoom.prototype.pluginsStore) {
+    // Go through each instance and remove this pugin
+    for (var i in instancesStore) {
+      instancesStore[i].instance.removePlugin(name)
+    }
+
+    delete SvgPanZoom.prototype.pluginsStore[name]
   }
 }
 

@@ -216,6 +216,28 @@ ShadowViewport.prototype.getCTM = function() {
  * @param {SVGMatrix} newCTM
  */
 ShadowViewport.prototype.setCTM = function(newCTM) {
+  if (this.isZoomDifferent(newCTM) || this.isPanDifferent(newCTM)) {
+    // Before panzoom
+    this.options.trigger('before:panzoom', {
+      zoom: this.computeRelativeZoom(newCTM.a)
+    , x: newCTM.e
+    , y: newCTM.f
+    })
+
+    // Update
+    this.updateCache(newCTM)
+    this.updateCTMOnNextFrame()
+
+    // After panzoom
+    this.options.trigger('panzoom', {
+      zoom: this.getRelativeZoom()
+    , x: this.activeState.x
+    , y: this.activeState.y
+    })
+  }
+}
+
+ShadowViewport.prototype.setCTM_ = function(newCTM) {
   var willZoom = this.isZoomDifferent(newCTM)
     , willPan = this.isPanDifferent(newCTM)
 
@@ -323,11 +345,15 @@ ShadowViewport.prototype.updateCTMOnNextFrame = function() {
  * Update viewport CTM with cached CTM
  */
 ShadowViewport.prototype.updateCTM = function() {
+  this.options.trigger('before:render')
+
   // Updates SVG element
   SvgUtils.setCTM(this.viewport, this.getCTM(), this.defs)
 
   // Free the lock
   this.pendingUpdate = false
+
+  this.options.trigger('render')
 }
 
 module.exports = function(viewport, options){

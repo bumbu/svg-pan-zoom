@@ -5,7 +5,7 @@ svg-pan-zoom library
 
 Simple pan/zoom solution for SVGs in HTML. It adds events listeners for mouse scroll, double-click and pan, plus it optionally offers:
 * JavaScript API for control of pan and zoom behavior
-* onPan and onZoom event handlers
+* Pan, Zoom, Render and other events
 * On-screen zoom controls
 
 It works cross-browser and supports both inline SVGs and SVGs in HTML 'object' or 'embed' elements.
@@ -106,10 +106,6 @@ svgPanZoom('#demo-tiger', {
 , contain: false
 , center: true
 , refreshRate: 'auto'
-, beforeZoom: function(){}
-, onZoom: function(){}
-, beforePan: function(){}
-, onPan: function(){}
 , customEventsHandler: {}
 , eventsListenerElement: null
 });
@@ -130,33 +126,8 @@ If any arguments are specified, they must have the following value types:
 * 'contain' must be true or false. Default is false.
 * 'center' must be true or false. Default is true.
 * 'refreshRate' must be a number or 'auto'
-* 'beforeZoom' must be a callback function to be called before zoom changes.
-* 'onZoom' must be a callback function to be called when zoom changes.
-* 'beforePan' must be a callback function to be called before pan changes.
-* 'onPan' must be a callback function to be called when pan changes.
 * 'customEventsHandler' must be an object with `init` and `destroy` arguments as functions.
 * 'eventsListenerElement' must be an SVGElement or null.
-
-`beforeZoom` will be called with 2 float attributes: oldZoom and newZoom.
-If `beforeZoom` will return `false` then zooming will be halted.
-
-`onZoom` callbacks will be called with one float attribute representing new zoom scale.
-
-`beforePan` will be called with 2 attributes:
-* `oldPan`
-* `newPan`
-
-Each of this objects has two attributes (x and y) representing current pan (on X and Y axes).
-
-If `beforePan` will return `false` or an object `{x: true, y: true}` then panning will be halted.
-If you want to prevent panning only on one axis then return an object of type `{x: true, y: false}`.
-You can alter panning on X and Y axes by providing alternative values through return `{x: 10, y: 20}`.
-
-> *Caution!* If you alter panning by returning custom values `{x: 10, y: 20}` it will update only current pan step. If panning is done by mouse/touch you have to take in account that next pan step (after the one that you altered) will be performed with values that do not consider altered values (as they even did not existed).
-
-`onPan` callback will be called with one attribute: `newPan`.
-
-> *Caution!* Calling zoom or pan API methods form inside of `beforeZoom`, `onZoom`, `beforePan` and `onPan` callbacks may lead to infinite loop.
 
 `panEnabled` and `zoomEnabled` are related only to user interaction. If any of this options are disabled - you still can zoom and pan via API.
 
@@ -296,8 +267,6 @@ Keep content visible/Limit pan
 
 You may want to keep SVG content visible by not allowing panning over SVG borders.
 
-To do so you may prevent or alter panning from `beforePan` callback. For more details take a look at `demo/limit-pan.html` example.
-
 Public API
 ----------
 
@@ -308,8 +277,6 @@ When you call `svgPanZoom` method it returns an object with following methods:
 * pan
 * panBy
 * getPan
-* setBeforePan
-* setOnPan
 * enableZoom
 * disableZoom
 * isZoomEnabled
@@ -325,8 +292,6 @@ When you call `svgPanZoom` method it returns an object with following methods:
 * setZoomScaleSensitivity
 * setMinZoom
 * setMaxZoom
-* setBeforeZoom
-* setOnZoom
 * zoom
 * zoomBy
 * zoomAtPoint
