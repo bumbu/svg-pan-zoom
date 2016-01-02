@@ -106,35 +106,13 @@ ShadowViewport.prototype.getViewBox = function() {
 ShadowViewport.prototype.processCTM = function() {
   var newCTM = this.getCTM()
 
-  if (this.options.fit || this.options.contain) {
-    var newScale;
-    if (this.options.fit) {
-      newScale = Math.min(this.options.width/this.viewBox.width, this.options.height/this.viewBox.height);
-    } else {
-      newScale = Math.max(this.options.width/this.viewBox.width, this.options.height/this.viewBox.height);
-    }
-
-    newCTM.a = newScale; //x-scale
-    newCTM.d = newScale; //y-scale
-    newCTM.e = -this.viewBox.x * newScale; //x-transform
-    newCTM.f = -this.viewBox.y * newScale; //y-transform
-  }
-
-  if (this.options.center) {
-    var offsetX = (this.options.width - (this.viewBox.width + this.viewBox.x * 2) * newCTM.a) * 0.5
-      , offsetY = (this.options.height - (this.viewBox.height + this.viewBox.y * 2) * newCTM.a) * 0.5
-
-    newCTM.e = offsetX
-    newCTM.f = offsetY
-  }
-
-  // Cache initial values. Based on activeState and fix+center opitons
+  // Cache initial values
   this.originalState.zoom = newCTM.a
   this.originalState.x = newCTM.e
   this.originalState.y = newCTM.f
 
   // Update viewport CTM and cache zoom and pan
-  this.setCTM(newCTM);
+  this.setCTM(newCTM, '__system');
 }
 
 /**
@@ -183,6 +161,15 @@ ShadowViewport.prototype.computeRelativeZoom = function(scale) {
 }
 
 /**
+ * Compute zoom scale from pubilc usage to inner use
+ *
+ * @return {Float} zoom scale
+ */
+ShadowViewport.prototype.computeRealZoom = function(scale) {
+  return scale * this.originalState.zoom
+}
+
+/**
  * Get pan
  *
  * @return {Object}
@@ -215,93 +202,19 @@ ShadowViewport.prototype.getCTM = function() {
  *
  * @param {SVGMatrix} newCTM
  */
-ShadowViewport.prototype.setCTM = function(newCTM) {
+ShadowViewport.prototype.setCTM = function(newCTM, namespace) {
   if (this.isZoomDifferent(newCTM) || this.isPanDifferent(newCTM)) {
-    // Before panzoom
-    this.options.trigger('before:panzoom', {
-      zoom: this.computeRelativeZoom(newCTM.a)
-    , x: newCTM.e
-    , y: newCTM.f
-    })
+    var panZoom = this.convertCTMToPanZoom(newCTM)
+    panZoom.namespace = namespace
 
-    // Update
-    this.updateCache(newCTM)
-    this.updateCTMOnNextFrame()
+    // Render only if event is not prevented
+    if (this.options.trigger('panzoom', panZoom)) {
+      // Copy panZoom values in case they were modified
+      this.copyPanZoomToCTM(panZoom, newCTM)
 
-    // After panzoom
-    this.options.trigger('panzoom', {
-      zoom: this.getRelativeZoom()
-    , x: this.activeState.x
-    , y: this.activeState.y
-    })
-  }
-}
-
-ShadowViewport.prototype.setCTM_ = function(newCTM) {
-  var willZoom = this.isZoomDifferent(newCTM)
-    , willPan = this.isPanDifferent(newCTM)
-
-  if (willZoom || willPan) {
-    // Before zoom
-    if (willZoom) {
-      // If returns false then cancel zooming
-      if (this.options.beforeZoom(this.getRelativeZoom(), this.computeRelativeZoom(newCTM.a)) === false) {
-        newCTM.a = newCTM.d = this.activeState.zoom
-        willZoom = false
-      }
-    }
-
-    // Before pan
-    if (willPan) {
-      var preventPan = this.options.beforePan(this.getPan(), {x: newCTM.e, y: newCTM.f})
-          // If prevent pan is an object
-        , preventPanX = false
-        , preventPanY = false
-
-      // If prevent pan is Boolean false
-      if (preventPan === false) {
-        // Set x and y same as before
-        newCTM.e = this.getPan().x
-        newCTM.f = this.getPan().y
-
-        preventPanX = preventPanY = true
-      } else if (Utils.isObject(preventPan)) {
-        // Check for X axes attribute
-        if (preventPan.x === false) {
-          // Prevent panning on x axes
-          newCTM.e = this.getPan().x
-          preventPanX = true
-        } else if (Utils.isNumber(preventPan.x)) {
-          // Set a custom pan value
-          newCTM.e = preventPan.x
-        }
-
-        // Check for Y axes attribute
-        if (preventPan.y === false) {
-          // Prevent panning on x axes
-          newCTM.f = this.getPan().y
-          preventPanY = true
-        } else if (Utils.isNumber(preventPan.y)) {
-          // Set a custom pan value
-          newCTM.f = preventPan.y
-        }
-      }
-
-      // Update willPan flag
-      if (preventPanX && preventPanY) {
-        willPan = false
-      }
-    }
-
-    // Check again if should zoom or pan
-    if (willZoom || willPan) {
+      // Update
       this.updateCache(newCTM)
-
       this.updateCTMOnNextFrame()
-
-      // After callbacks
-      if (willZoom) {this.options.onZoom(this.getRelativeZoom())}
-      if (willPan) {this.options.onPan(this.getPan())}
     }
   }
 }
@@ -345,15 +258,48 @@ ShadowViewport.prototype.updateCTMOnNextFrame = function() {
  * Update viewport CTM with cached CTM
  */
 ShadowViewport.prototype.updateCTM = function() {
-  this.options.trigger('before:render')
+  var CTM = this.getCTM()
+    , panZoom = this.convertCTMToPanZoom(CTM)
 
-  // Updates SVG element
-  SvgUtils.setCTM(this.viewport, this.getCTM(), this.defs)
+  // Render only if event is not prevented
+  if (this.options.trigger('render', panZoom)) {
+    // Copy panZoom values in case they were modified
+    this.copyPanZoomToCTM(panZoom, CTM)
+
+    // Updates SVG element
+    SvgUtils.setCTM(this.viewport, CTM, this.defs)
+  }
 
   // Free the lock
   this.pendingUpdate = false
+}
 
-  this.options.trigger('render')
+/**
+ * Converts a CTM object into a PanZoom object with relative zoom
+ *
+ * @param  {SVGMatrix} CTM CTM point to convert from
+ * @return {PanZoom}     PanZoom object
+ */
+ShadowViewport.prototype.convertCTMToPanZoom = function(CTM) {
+  return {
+    x: CTM.e
+  , y: CTM.f
+  , zoom: this.computeRelativeZoom(CTM.a)
+  }
+}
+
+  /**
+   * Copies panZoom object values into a CTM object
+   *
+   * @param  {PanZoom} panZoom Source object
+   * @param  {SVGMatrix} CTM     Destination object
+   * @return {SVGMatrix}         Destination object
+   */
+ShadowViewport.prototype.copyPanZoomToCTM = function(panZoom, CTM) {
+  CTM.e = panZoom.x
+  CTM.f = panZoom.y
+  CTM.a = CTM.d = this.computeRealZoom(panZoom.zoom)
+  return CTM
 }
 
 module.exports = function(viewport, options){

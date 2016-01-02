@@ -4,13 +4,16 @@ module.exports = {
    *
    * @param  {Object} target object to extend
    * @param  {Object} source object to take properties from
+   * @param  {Boolean} goRecursive Should the object be extented recursively
    * @return {Object}        extended object
    */
-  extend: function(target, source) {
+  extend: function(target, source, goRecursive) {
     target = target || {};
+    goRecursive == null && (goRecursive = true)
+
     for (var prop in source) {
       // Go recursively
-      if (this.isObject(source[prop])) {
+      if (this.isObject(source[prop]) && goRecursive) {
         target[prop] = this.extend(target[prop], source[prop])
       } else {
         target[prop] = source[prop]
@@ -171,32 +174,6 @@ module.exports = {
         }
       }
     }
-  }
-
-  /**
-   * Check if an event is a double click/tap
-   * TODO: For touch gestures use a library (hammer.js) that takes in account other events
-   * (touchmove and touchend). It should take in account tap duration and traveled distance
-   *
-   * @param  {Event}  evt
-   * @param  {Event}  prevEvt Previous Event
-   * @return {Boolean}
-   */
-, isDblClick: function(evt, prevEvt) {
-    // Double click detected by browser
-    if (evt.detail === 2) {
-      return true;
-    }
-    // Try to compare events
-    else if (prevEvt !== void 0 && prevEvt !== null) {
-      var timeStampDiff = evt.timeStamp - prevEvt.timeStamp // should be lower than 250 ms
-        , touchesDistance = Math.sqrt(Math.pow(evt.clientX - prevEvt.clientX, 2) + Math.pow(evt.clientY - prevEvt.clientY, 2))
-
-      return timeStampDiff < 250 && touchesDistance < 10
-    }
-
-    // Nothing found
-    return false;
   }
 
   /**
