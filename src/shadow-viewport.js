@@ -205,10 +205,9 @@ ShadowViewport.prototype.getCTM = function() {
 ShadowViewport.prototype.setCTM = function(newCTM, namespace) {
   if (this.isZoomDifferent(newCTM) || this.isPanDifferent(newCTM)) {
     var panZoom = this.convertCTMToPanZoom(newCTM)
-    panZoom.namespace = namespace
 
     // Render only if event is not prevented
-    if (this.options.trigger('panzoom', panZoom)) {
+    if (this.options.trigger('panzoom', panZoom, namespace)) {
       // Copy panZoom values in case they were modified
       this.copyPanZoomToCTM(panZoom, newCTM)
 
@@ -262,6 +261,7 @@ ShadowViewport.prototype.updateCTM = function() {
     , panZoom = this.convertCTMToPanZoom(CTM)
 
   // Render only if event is not prevented
+  // Has no namespace as it is unknown whos change triggered this render
   if (this.options.trigger('render', panZoom)) {
     // Copy panZoom values in case they were modified
     this.copyPanZoomToCTM(panZoom, CTM)

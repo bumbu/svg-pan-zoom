@@ -17,6 +17,16 @@ var SvgPanZoomEvent = {
 , data: null
 
   /**
+   * Event namespace
+   * Default is `__system`
+   * Public API uses `__user`
+   * Plugins use `pluginName`
+   *
+   * @type {String}
+   */
+, namespace: '__system'
+
+  /**
    * Event propagation allowance through middlewares
    *
    * @type {Boolean}
@@ -56,11 +66,12 @@ var SvgPanZoomEvent = {
 }
 
 module.exports = {
-  create: function(data, originalEvent) {
+  create: function(data, namespace, originalEvent) {
     var event = Object.create(SvgPanZoomEvent)
 
     // Add data attributes
     data != null && (event.data = data)
+    namespace != null && (event.namespace = namespace)
     originalEvent != null && (event.originalEvent = originalEvent)
 
     return event

@@ -2,6 +2,7 @@ var Utils = require('./utilities')
   , SvgUtils = require('./svg-utilities')
   , ShadowViewport = require('./shadow-viewport')
   , SvgPanZoomEvent = require('./event')
+  , Api = require('./api')
 
 var SvgPanZoom = function(svg, options) {
   this.init(svg, options)
@@ -97,13 +98,13 @@ SvgPanZoom.prototype.off = function(name, fn, ctx, pluginName) {
  * @param  {String} name Event name. Plugins should namespace their events as pluginName:eventName
  * @return {Boolean} True if default event action should be done
  */
-SvgPanZoom.prototype.trigger = function(name, data, originalEvent) {
+SvgPanZoom.prototype.trigger = function(name, data, namespace, originalEvent) {
   var event
 
   // Only if there are listening events
   if (name in this.events && this.events[name].length) {
     // Create event
-    event = SvgPanZoomEvent.create(data, originalEvent)
+    event = SvgPanZoomEvent.create(data, namespace, originalEvent)
 
 
     for (var i = 0; i < this.events[name].length; i++) {
@@ -144,7 +145,7 @@ SvgPanZoom.prototype.loadPlugins = function() {
  */
 SvgPanZoom.prototype.addPlugin = function(name) {
   if (name in this.pluginsStore) {
-    var pluginApi = this.getPluginApi(name)
+    var pluginApi = Api.createApi(this, name)
 
     this.plugins.push({
       name: name
@@ -188,8 +189,9 @@ SvgPanZoom.prototype.removePlugin = function(name) {
  * @param  {Float} zoomScale    Number representing how much to zoom
  * @param  {Boolean} zoomAbsolute Default false. If true, zoomScale is treated as an absolute value.
  *                                Otherwise, zoomScale is treated as a multiplied (e.g. 1.10 would zoom in 10%)
+ * @param  {String} namespace Method namespace
  */
-SvgPanZoom.prototype.zoomAtPoint = function(zoomScale, point, zoomAbsolute) {
+SvgPanZoom.prototype.zoomAtPoint = function(zoomScale, point, zoomAbsolute, namespace) {
   var originalState = this.viewport.getOriginalState()
 
   if (zoomAbsolute) {
@@ -203,7 +205,7 @@ SvgPanZoom.prototype.zoomAtPoint = function(zoomScale, point, zoomAbsolute) {
     , newCTM = oldCTM.multiply(modifier)
 
   if (newCTM.a !== oldCTM.a) {
-    this.viewport.setCTM(newCTM)
+    this.viewport.setCTM(newCTM, namespace)
   }
 }
 
@@ -212,9 +214,10 @@ SvgPanZoom.prototype.zoomAtPoint = function(zoomScale, point, zoomAbsolute) {
  *
  * @param  {Float} scale
  * @param  {Boolean} absolute Marks zoom scale as relative or absolute
+ * @param  {String} namespace Method namespace
  */
-SvgPanZoom.prototype.zoom = function(scale, absolute) {
-  this.zoomAtPoint(scale, SvgUtils.getSvgCenterPoint(this.svg, this.width, this.height), absolute)
+SvgPanZoom.prototype.zoom = function(scale, absolute, namespace) {
+  this.zoomAtPoint(scale, SvgUtils.getSvgCenterPoint(this.svg, this.width, this.height), absolute, namespace)
 }
 
 /**
@@ -222,13 +225,14 @@ SvgPanZoom.prototype.zoom = function(scale, absolute) {
  *
  * @param  {Float} scale
  * @param  {Boolean} absolute Marks zoom scale as relative or absolute
+ * @param  {string} namespace Method namespace
  */
-SvgPanZoom.prototype.publicZoom = function(scale, absolute) {
+SvgPanZoom.prototype.pluginZoom = function(scale, absolute, namespace) {
   if (absolute) {
     scale = this.computeFromRelativeZoom(scale)
   }
 
-  this.zoom(scale, absolute)
+  this.zoom(scale, absolute, namespace)
 }
 
 /**
@@ -237,8 +241,9 @@ SvgPanZoom.prototype.publicZoom = function(scale, absolute) {
  * @param  {Float} scale
  * @param  {SVGPoint|Object} point    An object that has x and y attributes
  * @param  {Boolean} absolute Marks zoom scale as relative or absolute
+ * @param  {String} namespace Method namespace
  */
-SvgPanZoom.prototype.publicZoomAtPoint = function(scale, point, absolute) {
+SvgPanZoom.prototype.pluginZoomAtPoint = function(scale, point, absolute, namespace) {
   if (absolute) {
     // Transform zoom into a relative value
     scale = this.computeFromRelativeZoom(scale)
@@ -253,7 +258,7 @@ SvgPanZoom.prototype.publicZoomAtPoint = function(scale, point, absolute) {
     }
   }
 
-  this.zoomAtPoint(scale, point, absolute)
+  this.zoomAtPoint(scale, point, absolute, namespace)
 }
 
 /**
@@ -287,25 +292,25 @@ SvgPanZoom.prototype.computeFromRelativeZoom = function(zoom) {
 /**
  * Set zoom to initial state
  */
-SvgPanZoom.prototype.resetZoom = function() {
+SvgPanZoom.prototype.resetZoom = function(namespace) {
   var originalState = this.viewport.getOriginalState()
 
-  this.zoom(originalState.zoom, true);
+  this.zoom(originalState.zoom, true, namespace);
 }
 
 /**
  * Set pan to initial state
  */
-SvgPanZoom.prototype.resetPan = function() {
-  this.pan(this.viewport.getOriginalState());
+SvgPanZoom.prototype.resetPan = function(namespace) {
+  this.pan(this.viewport.getOriginalState(), namespace);
 }
 
 /**
  * Set pan and zoom to initial state
  */
-SvgPanZoom.prototype.reset = function() {
-  this.resetZoom()
-  this.resetPan()
+SvgPanZoom.prototype.reset = function(namespace) {
+  this.resetZoom(namespace)
+  this.resetPan(namespace)
 }
 
 /**
@@ -320,24 +325,26 @@ SvgPanZoom.prototype.updateBBox = function() {
  * Pan to a rendered position
  *
  * @param  {Object} point {x: 0, y: 0}
+ * @param  {String} namespace Method namespace
  */
-SvgPanZoom.prototype.pan = function(point) {
+SvgPanZoom.prototype.pan = function(point, namespace) {
   var viewportCTM = this.viewport.getCTM()
   viewportCTM.e = point.x
   viewportCTM.f = point.y
-  this.viewport.setCTM(viewportCTM)
+  this.viewport.setCTM(viewportCTM, namespace)
 }
 
 /**
  * Relatively pan the graph by a specified rendered position vector
  *
  * @param  {Object} point {x: 0, y: 0}
+ * @param  {String} namespace Method namespace
  */
-SvgPanZoom.prototype.panBy = function(point) {
+SvgPanZoom.prototype.panBy = function(point, namespace) {
   var viewportCTM = this.viewport.getCTM()
   viewportCTM.e += point.x
   viewportCTM.f += point.y
-  this.viewport.setCTM(viewportCTM)
+  this.viewport.setCTM(viewportCTM, namespace)
 }
 
 /**
@@ -367,15 +374,11 @@ SvgPanZoom.prototype.resize = function() {
 SvgPanZoom.prototype.destroy = function() {
   var that = this
 
+  this.trigger('before:destroy', null)
+
   // Remove all plugins
   while (this.plugins.length) {
     this.removePlugin(this.plugins[0].name)
-  }
-
-  // Unbind eventListeners
-  for (var event in this.eventListeners) {
-    (this.options.eventsListenerElement || this.svg)
-      .removeEventListener(event, this.eventListeners[event], false)
   }
 
   // Reset zoom and pan
@@ -392,12 +395,9 @@ SvgPanZoom.prototype.destroy = function() {
   // Delete options and its contents
   delete this.options
 
-  // Destroy public instance and rewrite getPublicApi
+  // Destroy public instance and getPublicApi method
   delete this.publicApi
-  delete this.pi
-  this.getPublicApi = function(){
-    return null
-  }
+  delete this.getPublicApi
 }
 
 /**
@@ -406,76 +406,12 @@ SvgPanZoom.prototype.destroy = function() {
  * @return {Object} Public API object
  */
 SvgPanZoom.prototype.getPublicApi = function() {
-  var that = this
-
-  // Create cache
+  // Cache
   if (!this.publicApi) {
-    this.publicApi = this.pi = {
-      // Pan
-      pan: function(point) {that.pan(point); return that.pi}
-    , panBy: function(point) {that.panBy(point); return that.pi}
-    , getPan: function() {return that.getPan()}
-      // Zooming
-    , zoom: function(scale) {that.publicZoom(scale, true); return that.pi}
-    , zoomBy: function(scale) {that.publicZoom(scale, false); return that.pi}
-    , zoomAtPoint: function(scale, point) {that.publicZoomAtPoint(scale, point, true); return that.pi}
-    , zoomAtPointBy: function(scale, point) {that.publicZoomAtPoint(scale, point, false); return that.pi}
-    , getZoom: function() {return that.getRelativeZoom()}
-      // Reset
-    , resetZoom: function() {that.resetZoom(); return that.pi}
-    , resetPan: function() {that.resetPan(); return that.pi}
-    , reset: function() {that.reset(); return that.pi}
-      // Size and Resize
-    , updateBBox: function() {that.updateBBox(); return that.pi}
-    , resize: function() {that.resize(); return that.pi}
-    , getSizes: function() {
-        return {
-          width: that.width
-        , height: that.height
-        , realZoom: that.getZoom()
-        , viewBox: that.viewport.getViewBox()
-        }
-      }
-      // Events handling
-    , on: function(name, fn, ctx) {
-        if (typeof ctx === 'undefined') ctx = that.pi // Automatically inject public context
-        that.on(name, fn, ctx, '__user')
-        return that.pi
-      }
-    , off: function(name, fn, ctx) {that.off(name, fn, ctx, '__user'); return that.pi}
-    , trigger: function(name, data, oE) {return that.trigger(name, data, oE)}
-      // Plugins
-    , addPlugin: function(name) {that.addPlugin(name); return that.pi}
-    , removePlugin: function(name) {that.removePlugin(name); return that.pi}
-      // Destroy
-    , destroy: function() {that.destroy(); return that.pi}
-    }
+    this.publicApi = Api.createApi(this, '__user')
   }
 
   return this.publicApi
-}
-
-/**
- * Creates similar to public API but namespaced to given plugin
- *
- * @param  {[type]} pluginName [description]
- * @return {[type]}            [description]
- */
-SvgPanZoom.prototype.getPluginApi = function(pluginName) {
-  var publicApi = this.getPublicApi()
-    , that = this
-
-  // Same API as for public use but with slight differences
-  var pluginApi = Object.create(publicApi)
-
-  pluginApi.on = function(name, fn, ctx) {
-    if (typeof ctx === 'undefined') ctx = pluginApi // Automatically inject plugin context
-    that.on(name, fn, ctx, pluginName)
-    return pluginApi
-  }
-  pluginApi.off = function(name, fn, ctx) {that.off(name, fn, ctx, pluginName); return pluginApi}
-
-  return pluginApi
 }
 
 /**
