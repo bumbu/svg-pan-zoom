@@ -116,12 +116,12 @@ module.exports = {
   }
 
   /**
-   * Attach a given context to a function
+   * Bind a given context to a function
    * @param  {Function} fn      Function
    * @param  {Object}   context Context
    * @return {Function}           Function with certain context
    */
-, proxy: function(fn, context) {
+, bind: function(fn, context) {
     return function() {
       return fn.apply(context, arguments)
     }

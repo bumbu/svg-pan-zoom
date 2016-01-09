@@ -41,7 +41,7 @@ SvgPanZoom.prototype.init = function(svg, options) {
   , width: this.width
   , height: this.height
   , refreshRate: this.options.refreshRate
-  , trigger: Utils.proxy(this.trigger, this)
+  , trigger: Utils.bind(this.trigger, this)
   })
 }
 

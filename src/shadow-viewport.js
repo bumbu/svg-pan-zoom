@@ -21,7 +21,7 @@ ShadowViewport.prototype.init = function(viewport, options) {
   this.originalState = {zoom: 1, x: 0, y: 0}
   this.activeState = {zoom: 1, x: 0, y: 0}
 
-  this.updateCTMCached = Utils.proxy(this.updateCTM, this)
+  this.updateCTMCached = Utils.bind(this.updateCTM, this)
 
   // Create a custom requestAnimationFrame taking in account refreshRate
   this.requestAnimationFrame = Utils.createRequestAnimationFrame(this.options.refreshRate)
