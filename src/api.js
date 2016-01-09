@@ -1,3 +1,6 @@
+var Utils = require('./utilities')
+  , SvgUtils = require('./svg-utilities')
+
 /**
  * Api attribute
  * Set it like this so it will not be accessible from outside
@@ -106,7 +109,7 @@ PluginApi.prototype.reset = function() {
   return this
 }
 
-// Size and Resize
+// Sizes and utils
 // ===============
 
 // Not namespaced
@@ -129,6 +132,21 @@ PluginApi.prototype.getSizes = function() {
   , realZoom: this[apiAttr].getZoom()
   , viewBox: this[apiAttr].viewport.getViewBox()
   }
+}
+
+// Not namespaced
+PluginApi.prototype.getSvg = function() {
+  return this[apiAttr].svg
+}
+
+// Not namespaced
+PluginApi.prototype.getUtils = function() {
+  return Utils
+}
+
+// Not namespaced
+PluginApi.prototype.getSvgUtils = function() {
+  return SvgUtils
 }
 
 // Plugins
