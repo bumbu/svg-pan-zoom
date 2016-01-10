@@ -260,6 +260,9 @@ ShadowViewport.prototype.updateCTM = function() {
   var CTM = this.getCTM()
     , panZoom = this.convertCTMToPanZoom(CTM)
 
+  // Before render event
+  this.options.trigger('before:render')
+
   // Render only if event is not prevented
   // Has no namespace as it is unknown whos change triggered this render
   if (this.options.trigger('render', panZoom)) {
@@ -272,6 +275,9 @@ ShadowViewport.prototype.updateCTM = function() {
 
   // Free the lock
   this.pendingUpdate = false
+
+  // After render event
+  this.options.trigger('after:render')
 }
 
 /**
