@@ -146,10 +146,11 @@ SvgPanZoom.prototype.loadPlugins = function() {
 SvgPanZoom.prototype.addPlugin = function(name) {
   if (name in this.pluginsStore) {
     var pluginApi = Api.createApi(this, name)
+      , options = name in this.options ? this.options[name] : {}
 
     this.plugins.push({
       name: name
-    , plugin: this.pluginsStore[name](pluginApi)
+    , plugin: this.pluginsStore[name](pluginApi, options)
     , api: pluginApi
     })
   } else {

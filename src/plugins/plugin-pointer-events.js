@@ -3,8 +3,13 @@
   var IDLE = 0
     , PANNING = 1
 
-  function PluginPointerEvents(api) {
+  var defaultOptions = {
+    eventsListenerElement: null
+  }
+
+  function PluginPointerEvents(api, options) {
     this.api = api
+    this.options = api.getUtils().extend(api.getUtils().extend({}, defaultOptions), options)
     this.lastPoint = {
       clientX: 0
     , clientY: 0
@@ -15,17 +20,26 @@
   }
 
   PluginPointerEvents.prototype.initHooks = function() {
-    var svg = this.api.getSvg()
+    var target = this.options.eventsListenerElement || this.api.getSvg()
+      , that = this
 
     this.start = this.api.getUtils().bind(this._start, this)
     this.move = this.api.getUtils().bind(this._move, this)
     this.end = this.api.getUtils().bind(this._end, this)
 
-    // TODO allow setting an element to be listened for events
-
+    // Hook events
     for (var event in this.events) {
-      svg.addEventListener(event, this[this.events[event]], false)
+      target.addEventListener(event, this[this.events[event]], false)
     }
+
+    // Unhook events on plugin destruction
+    this.api.on('before:plugin:remove', function(ev) {
+      if (ev.data.name === 'pointer-events') {
+        for (var event in that.events) {
+          target.removeEventListener(event, that[that.events[event]], false)
+        }
+      }
+    })
   }
 
   PluginPointerEvents.prototype.events = {
@@ -94,9 +108,9 @@
   // Plugin entry point
   // ==================
 
-  function pluginPointerEvents(api) {
-    return new PluginPointerEvents(api)
+  function pluginPointerEvents(api, options) {
+    return new PluginPointerEvents(api, options)
   }
 
-  svgPanZoom.register('browser-events', pluginPointerEvents)
+  svgPanZoom.register('pointer-events', pluginPointerEvents)
 })();
