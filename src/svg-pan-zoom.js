@@ -132,8 +132,8 @@ SvgPanZoom.prototype.loadPlugins = function() {
     }
   } else {
     // Load all plugins
-    for (var key in this.pluginsStore) {
-      this.addPlugin(key)
+    for (var i = 0; i < this.pluginsOrder.length; i++) {
+      this.addPlugin(this.pluginsOrder[i])
     }
   }
 }
@@ -421,6 +421,14 @@ SvgPanZoom.prototype.getPublicApi = function() {
  */
 SvgPanZoom.prototype.pluginsStore = {}
 
+
+/**
+ * Keeps plugins order
+ *
+ * @type {Array<String>}
+ */
+SvgPanZoom.prototype.pluginsOrder = []
+
 /**
  * Stores pairs of instances of SvgPanZoom and SVG
  * Each pair is represented by an object {svg: SVGSVGElement, instance: SvgPanZoom}
@@ -463,7 +471,12 @@ svgPanZoom.register = function(name, fn) {
   if (name.indexOf('__') === 0) {
     throw new Error('Plugin name can\'t start with __')
   } else {
-    SvgPanZoom.prototype.pluginsStore[name] = fn
+    if (name in SvgPanZoom.prototype.pluginsStore) {
+      throw new Error('Plugin can be registered just once')
+    } else {
+      SvgPanZoom.prototype.pluginsStore[name] = fn
+      SvgPanZoom.prototype.pluginsOrder.push(name)
+    }
   }
 }
 
@@ -480,6 +493,7 @@ svgPanZoom.deregister = function(name) {
     }
 
     delete SvgPanZoom.prototype.pluginsStore[name]
+    SvgPanZoom.prototype.pluginsOrder.splice(SvgPanZoom.prototype.pluginsOrder.indexOf(name), 1)
   }
 }
 
