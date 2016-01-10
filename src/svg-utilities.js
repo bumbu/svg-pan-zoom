@@ -208,4 +208,18 @@ module.exports = {
 
     return point
   }
+
+  /**
+   * If scale is a number then convert it to a zoom object
+   *
+   * @param  {Number|Object} scale
+   * @return {{zoomX: Float, zoomY: Float}}
+   */
+, convertToZoomScale: function(scale) {
+    if (Utils.isNumber(scale)) {
+      return {zoomX: scale, zoomY: scale}
+    } else {
+      return scale
+    }
+  }
 }

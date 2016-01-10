@@ -186,25 +186,28 @@ SvgPanZoom.prototype.removePlugin = function(name) {
  * Zoom in at a SVG point
  *
  * @param  {SVGPoint} point
- * @param  {Float} zoomScale    Number representing how much to zoom
+ * @param  {Float|Object} zoomScale    Number representing how much to zoom
  * @param  {Boolean} zoomAbsolute Default false. If true, zoomScale is treated as an absolute value.
  *                                Otherwise, zoomScale is treated as a multiplied (e.g. 1.10 would zoom in 10%)
  * @param  {String} namespace Method namespace
  */
 SvgPanZoom.prototype.zoomAtPoint = function(zoomScale, point, zoomAbsolute, namespace) {
+  zoomScale = SvgUtils.convertToZoomScale(zoomScale)
+
   var originalState = this.viewport.getOriginalState()
 
   if (zoomAbsolute) {
     // Find relative scale to achieve desired scale
-    zoomScale = zoomScale/this.getZoom()
+    zoomScale.zoomX = zoomScale.zoomX / this.viewport.getZooms().zoomX
+    zoomScale.zoomY = zoomScale.zoomY / this.viewport.getZooms().zoomY
   }
 
   var oldCTM = this.viewport.getCTM()
     , relativePoint = point.matrixTransform(oldCTM.inverse())
-    , modifier = this.svg.createSVGMatrix().translate(relativePoint.x, relativePoint.y).scale(zoomScale).translate(-relativePoint.x, -relativePoint.y)
+    , modifier = this.svg.createSVGMatrix().translate(relativePoint.x, relativePoint.y).scaleNonUniform(zoomScale.zoomX, zoomScale.zoomY).translate(-relativePoint.x, -relativePoint.y)
     , newCTM = oldCTM.multiply(modifier)
 
-  if (newCTM.a !== oldCTM.a) {
+  if (newCTM.a !== oldCTM.a || newCTM.d !== oldCTM.d) {
     this.viewport.setCTM(newCTM, namespace)
   }
 }
@@ -221,7 +224,7 @@ SvgPanZoom.prototype.zoom = function(scale, absolute, namespace) {
 }
 
 /**
- * Zoom used by public instance
+ * Zoom used by API instance
  *
  * @param  {Float} scale
  * @param  {Boolean} absolute Marks zoom scale as relative or absolute
@@ -262,40 +265,26 @@ SvgPanZoom.prototype.pluginZoomAtPoint = function(scale, point, absolute, namesp
 }
 
 /**
- * Get zoom scale
- *
- * @return {Float} zoom scale
- */
-SvgPanZoom.prototype.getZoom = function() {
-  return this.viewport.getZoom()
-}
-
-/**
- * Get zoom scale for public usage
- *
- * @return {Float} zoom scale
- */
-SvgPanZoom.prototype.getRelativeZoom = function() {
-  return this.viewport.getRelativeZoom()
-}
-
-/**
  * Compute actual zoom from public zoom
  *
  * @param  {Float} zoom
  * @return {Float} zoom scale
  */
-SvgPanZoom.prototype.computeFromRelativeZoom = function(zoom) {
-  return zoom * this.viewport.getOriginalState().zoom
+SvgPanZoom.prototype.computeFromRelativeZoom = function(scale) {
+  scale = SvgUtils.convertToZoomScale(scale)
+  var originalState = this.viewport.getOriginalState()
+
+  return {
+    zoomX: scale.zoomX * originalState.zoomX
+  , zoomY: scale.zoomY * originalState.zoomY
+  }
 }
 
 /**
  * Set zoom to initial state
  */
 SvgPanZoom.prototype.resetZoom = function(namespace) {
-  var originalState = this.viewport.getOriginalState()
-
-  this.zoom(originalState.zoom, true, namespace);
+  this.zoom(this.viewport.getOriginalState(), true, namespace);
 }
 
 /**

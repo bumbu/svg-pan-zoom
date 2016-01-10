@@ -87,8 +87,8 @@ PluginApi.prototype.zoomAtPointBy = function(scale, point) {
 }
 
 // Not namespaced
-PluginApi.prototype.getZoom = function() {
-  return this[apiAttr].getRelativeZoom()
+PluginApi.prototype.getZooms = function() {
+  return this[apiAttr].viewport.getRelativeZooms()
 }
 
 // Resetting
@@ -129,7 +129,7 @@ PluginApi.prototype.getSizes = function() {
   return {
     width: this[apiAttr].width
   , height: this[apiAttr].height
-  , realZoom: this[apiAttr].getZoom()
+  , realZooms: this[apiAttr].viewport.getZooms()
   , viewBox: this[apiAttr].viewport.getViewBox()
   }
 }

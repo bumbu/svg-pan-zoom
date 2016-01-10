@@ -18,8 +18,8 @@ ShadowViewport.prototype.init = function(viewport, options) {
   this.options = options
 
   // State cache
-  this.originalState = {zoom: 1, x: 0, y: 0}
-  this.activeState = {zoom: 1, x: 0, y: 0}
+  this.originalState = {zoomX: 1, zoomY: 1, x: 0, y: 0}
+  this.activeState = {zoomX: 1, zoomY: 1, x: 0, y: 0}
 
   this.updateCTMCached = Utils.bind(this.updateCTM, this)
 
@@ -56,7 +56,8 @@ ShadowViewport.prototype.cacheViewBox = function() {
     var zoom = Math.min(this.options.width / this.viewBox.width, this.options.height / this.viewBox.height)
 
     // Update active state
-    this.activeState.zoom = zoom
+    this.activeState.zoomX = zoom
+    this.activeState.zoomY = zoom
     this.activeState.x = (this.options.width - this.viewBox.width * zoom) / 2
     this.activeState.y = (this.options.height - this.viewBox.height * zoom) / 2
 
@@ -80,8 +81,8 @@ ShadowViewport.prototype.cacheViewBox = function() {
  */
 ShadowViewport.prototype.recacheViewBox = function() {
   var boundingClientRect = this.viewport.getBoundingClientRect()
-    , viewBoxWidth = boundingClientRect.width / this.getZoom()
-    , viewBoxHeight = boundingClientRect.height / this.getZoom()
+    , viewBoxWidth = boundingClientRect.width / this.getZooms().zoomX
+    , viewBoxHeight = boundingClientRect.height / this.getZooms().zoomY
 
   // Cache viewbox
   this.viewBox.x = 0
@@ -107,7 +108,8 @@ ShadowViewport.prototype.processCTM = function() {
   var newCTM = this.getCTM()
 
   // Cache initial values
-  this.originalState.zoom = newCTM.a
+  this.originalState.zoomX = newCTM.a
+  this.originalState.zoomY = newCTM.d
   this.originalState.x = newCTM.e
   this.originalState.y = newCTM.f
 
@@ -134,39 +136,24 @@ ShadowViewport.prototype.getState = function() {
 }
 
 /**
- * Get zoom scale
+ * Get zoom scales
  *
- * @return {Float} zoom scale
+ * @return {{zoomX: Float, zoomY: Float}} zoom scale
  */
-ShadowViewport.prototype.getZoom = function() {
-  return this.activeState.zoom
+ShadowViewport.prototype.getZooms = function() {
+  return {zoomX: this.activeState.zoomX, zoomY: this.activeState.zoomY}
 }
 
 /**
  * Get zoom scale for pubilc usage
  *
- * @return {Float} zoom scale
+ * @return {{zoomX: Float, zoomY: Float}} zoom scale
  */
-ShadowViewport.prototype.getRelativeZoom = function() {
-  return this.activeState.zoom / this.originalState.zoom
-}
-
-/**
- * Compute zoom scale for pubilc usage
- *
- * @return {Float} zoom scale
- */
-ShadowViewport.prototype.computeRelativeZoom = function(scale) {
-  return scale / this.originalState.zoom
-}
-
-/**
- * Compute zoom scale from pubilc usage to inner use
- *
- * @return {Float} zoom scale
- */
-ShadowViewport.prototype.computeRealZoom = function(scale) {
-  return scale * this.originalState.zoom
+ShadowViewport.prototype.getRelativeZooms = function() {
+  return {
+    zoomX: this.activeState.zoomX / this.originalState.zoomX
+  , zoomY: this.activeState.zoomY / this.originalState.zoomY
+  }
 }
 
 /**
@@ -187,10 +174,10 @@ ShadowViewport.prototype.getCTM = function() {
   var safeCTM = this.options.svg.createSVGMatrix()
 
   // Copy values manually as in FF they are not itterable
-  safeCTM.a = this.activeState.zoom
+  safeCTM.a = this.activeState.zoomX
   safeCTM.b = 0
   safeCTM.c = 0
-  safeCTM.d = this.activeState.zoom
+  safeCTM.d = this.activeState.zoomY
   safeCTM.e = this.activeState.x
   safeCTM.f = this.activeState.y
 
@@ -219,7 +206,7 @@ ShadowViewport.prototype.setCTM = function(newCTM, namespace) {
 }
 
 ShadowViewport.prototype.isZoomDifferent = function(newCTM) {
-  return this.activeState.zoom !== newCTM.a
+  return this.activeState.zoomX !== newCTM.a && this.activeState.zoomY !== newCTM.d
 }
 
 ShadowViewport.prototype.isPanDifferent = function(newCTM) {
@@ -233,7 +220,8 @@ ShadowViewport.prototype.isPanDifferent = function(newCTM) {
  * @param {SVGMatrix} newCTM
  */
 ShadowViewport.prototype.updateCache = function(newCTM) {
-  this.activeState.zoom = newCTM.a
+  this.activeState.zoomX = newCTM.a
+  this.activeState.zoomY = newCTM.d
   this.activeState.x = newCTM.e
   this.activeState.y = newCTM.f
 }
@@ -290,7 +278,8 @@ ShadowViewport.prototype.convertCTMToPanZoom = function(CTM) {
   return {
     x: CTM.e
   , y: CTM.f
-  , zoom: this.computeRelativeZoom(CTM.a)
+  , zoomX: CTM.a / this.originalState.zoomX
+  , zoomY: CTM.d / this.originalState.zoomY
   }
 }
 
@@ -304,7 +293,8 @@ ShadowViewport.prototype.convertCTMToPanZoom = function(CTM) {
 ShadowViewport.prototype.copyPanZoomToCTM = function(panZoom, CTM) {
   CTM.e = panZoom.x
   CTM.f = panZoom.y
-  CTM.a = CTM.d = this.computeRealZoom(panZoom.zoom)
+  CTM.a = panZoom.zoomX * this.originalState.zoomX
+  CTM.d = panZoom.zoomY * this.originalState.zoomY
   return CTM
 }
 
