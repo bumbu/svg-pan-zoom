@@ -481,7 +481,7 @@ Supported Browsers
 
 Related Work
 ------------
-This library used the [SVGPan](https://code.google.com/p/svgpan/) library as a starting point. SVGPan is intended for use with the [SVG 'script' element](http://www.w3.org/TR/SVG/script.html), whereas svg-pan-zoom is intended for use with the [HTML 'script' element](http://www.w3.org/TR/html401/interact/scripts.html).
+This library used the [SVGPan](https://github.com/aleofreddi/svgpan) library as a starting point. SVGPan is intended for use with the [SVG 'script' element](http://www.w3.org/TR/SVG/script.html), whereas svg-pan-zoom is intended for use with the [HTML 'script' element](http://www.w3.org/TR/html401/interact/scripts.html).
 
 License
 -------
