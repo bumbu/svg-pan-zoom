@@ -8,7 +8,7 @@ Simple pan/zoom solution for SVGs in HTML. It adds events listeners for mouse sc
 * onPan and onZoom event handlers
 * On-screen zoom controls
 
-It works cross-browser and supports both inline SVGs and SVGs in HTML 'object' or 'embed' elements.
+It works cross-browser and supports both inline SVGs and SVGs in HTML `object` or `embed` elements.
 
 > If you're looking for version 2.3.x you can find it in [v2.3.x branch](https://github.com/ariutta/svg-pan-zoom/tree/v2.3.x)
 
@@ -19,8 +19,8 @@ Support
 
 If you found a bug or have a suggestion first check if there is a similar [open](https://github.com/ariutta/svg-pan-zoom/issues) or [closed](https://github.com/ariutta/svg-pan-zoom/issues?q=is%3Aissue+is%3Aclosed) issue. If there are none then create a new one.
 
-When oppening a new issue **please provide a reproducible example**:
-- Share it so we could get directly to the problem. You can use [this starter jsfiddle setup](http://jsfiddle.net/bumbu/167usffr/) to provide your example. Or upload your own [jsfiddle.net](http://jsfiddle.net) (or any other live) example.
+When opening a new issue **please provide a reproducible example**:
+- Share it so we can get directly to the problem. You can use [this starter jsfiddle setup](http://jsfiddle.net/bumbu/167usffr/) to provide your example. Or upload your own [jsfiddle.net](http://jsfiddle.net) (or any other live) example.
 - Mention your library version (located in library file in header)
 - Mention your browser name, version and operating system
 - Mention any other important for debug details
@@ -31,7 +31,7 @@ If you solved a bug or implemented a feature that may be useful for others then 
 
 ### Questions, How To's, Need Help
 
-If you have any other type of questions, problems, your code is not working or you want to critique the library - you can use StackOverflow. Just tag you question with [`svgpanzoom`](http://stackoverflow.com/questions/tagged/svgpanzoom).
+If you have any other type of questions, problems, your code is not working or you want to critique the library - you can use StackOverflow. Just tag your question with [`svgpanzoom`](http://stackoverflow.com/questions/tagged/svgpanzoom).
 
 ### Contributions/Pull Requests
 
@@ -59,12 +59,12 @@ Demos
 Pan and zoom the SVG tiger on github pages:
 * [Single Inline SVG](http://ariutta.github.io/svg-pan-zoom/demo/inline.html)
 * [Multiple Inline SVGs](http://ariutta.github.io/svg-pan-zoom/demo/multi-instance.html)
-* [SVG Inserted with 'Embed' Element](http://ariutta.github.io/svg-pan-zoom/demo/embed.html)
-* [SVG Inserted with 'Object' Element](http://ariutta.github.io/svg-pan-zoom/demo/object.html)
-* [SVG Inserted with 'Img' Element](http://ariutta.github.io/svg-pan-zoom/demo/img.html) (These cannot be panned/zoomed.)
+* [SVG Inserted with `Embed` Element](http://ariutta.github.io/svg-pan-zoom/demo/embed.html)
+* [SVG Inserted with `Object` Element](http://ariutta.github.io/svg-pan-zoom/demo/object.html)
+* [SVG Inserted with `Img` Element](http://ariutta.github.io/svg-pan-zoom/demo/img.html) (These cannot be panned/zoomed.)
 * [SVG With custom controls](http://ariutta.github.io/svg-pan-zoom/demo/custom-controls.html)
 * [Resize SVG container on document resize](http://ariutta.github.io/svg-pan-zoom/demo/resize.html)
-* [Two SVGs with sinchronized zooming and panning](http://ariutta.github.io/svg-pan-zoom/demo/sinchronized.html)
+* [Two SVGs with synchronized zooming and panning](http://ariutta.github.io/svg-pan-zoom/demo/sinchronized.html)
 * [Custom events: Touch events support: pan, double tap, pinch](http://ariutta.github.io/svg-pan-zoom/demo/mobile.html)
 * [Custom events: Enable zooming only on click, disable on mouse out](http://ariutta.github.io/svg-pan-zoom/demo/custom-event-handlers.html)
 * [Limit pan](http://ariutta.github.io/svg-pan-zoom/demo/limit-pan.html)
@@ -146,7 +146,7 @@ If `beforeZoom` will return `false` then zooming will be halted.
 * `oldPan`
 * `newPan`
 
-Each of this objects has two attributes (x and y) representing current pan (on X and Y axes).
+Each of these objects has two attributes (x and y) representing current pan (on X and Y axes).
 
 If `beforePan` will return `false` or an object `{x: true, y: true}` then panning will be halted.
 If you want to prevent panning only on one axis then return an object of type `{x: true, y: false}`.
@@ -160,18 +160,18 @@ You can alter panning on X and Y axes by providing alternative values through re
 
 `panEnabled` and `zoomEnabled` are related only to user interaction. If any of this options are disabled - you still can zoom and pan via API.
 
-`fit` takes preceeding to `contain`. So if you set `fit: true` then `contain`'s value doesn't matter.
+`fit` takes precedence over `contain`. So if you set `fit: true` then `contain`'s value doesn't matter.
 
-Embeding remote files
+Embedding remote files
 ---------------------
 
-If you're embeding a remote file like this
+If you're embedding a remote file like this
 ```html
 <embed type="image/svg+xml" src="/path/to/my/file.svg" />
 <object type="image/svg+xml" data="/path/to/my/file.svg">Your browser does not support SVG</object>
 ```
 
-or you're rendering the SVG after page loads then you'll have to call svgPanZoom library after your SVG is loaded.
+or you're rendering the SVG after the page loads then you'll have to call svgPanZoom library after your SVG is loaded.
 
 One way to do so is by listening to load event:
 ```html
@@ -229,7 +229,7 @@ If you want to listen for user interaction events from a child SVG element then 
 Use with browserify
 -------------------
 
-If you do use browserify in your project you may do it by:
+To use with browserify, follow these steps:
 * Add the package as node module `npm install --save ariutta/svg-pan-zoom`
 * Require _svg-pan-zoom_ in your source file `svgPanZoom = require('svg-pan-zoom')`
 * Use in the same way as you would do with global svgPanZoom: `instance = svgPanZoom('#demo-tiger')`
@@ -250,7 +250,7 @@ It is possible by setting `customEventsHandler` configuration option.
 * `init`: function
 * `destroy`: function
 
-`haltEventListeners` specifies which default event listeners should be disabled (in order to avoid conflicts as svg-pan-zoom supports by default panning using touch events).
+`haltEventListeners` specifies which default event listeners should be disabled (in order to avoid conflicts as svg-pan-zoom by default supports panning using touch events).
 
 `init` is a function that is called when svg-pan-zoom is initialized. An object is passed into this function.
 Passed object has following attributes:
@@ -377,7 +377,7 @@ panZoomTiger.zoomAtPoint(2, {x: 50, y: 50})
 panZoomTiger.zoomAtPointBy(1.3, {x: 50, y: 50})
 ```
 
-> Zoom is relative to initial SVG internal zoom level. If your SVG was fit at the begging (option fit: true) and thus zoomed in or out to fit available space - initial scale will be anyway 1.
+> Zoom is relative to initial SVG internal zoom level. If your SVG was fit at the beginning (option `fit: true`) and thus zoomed in or out to fit available space - initial scale will be 1 anyway.
 
 Or you can use the zoomIn or zoomOut methods:
 
@@ -426,7 +426,7 @@ panZoomTiger.fit();
 panZoomTiger.center();
 ```
 
-If you update SVG (viewport) contents so its border box (virtual box that contains all elements) changes you have to call `updateBBox`:
+If you update SVG (viewport) contents so its border box (virtual box that contains all elements) changes, you have to call `updateBBox`:
 
 ```js
 var panZoomTiger = svgPanZoom('#demo-tiger');
