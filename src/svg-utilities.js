@@ -149,6 +149,13 @@ module.exports = {
       , s = 'matrix(' + matrix.a + ',' + matrix.b + ',' + matrix.c + ',' + matrix.d + ',' + matrix.e + ',' + matrix.f + ')';
 
     element.setAttributeNS(null, 'transform', s);
+    if ('transform' in element.style) {
+      element.style.transform = s;
+    } else if ('-ms-transform' in element.style) {
+      element.style['-ms-transform'] = s;
+    } else if ('-webkit-transform' in element.style) {
+      element.style['-webkit-transform'] = s;
+    }
 
     // IE has a bug that makes markers disappear on zoom (when the matrix "a" and/or "d" elements change)
     // see http://stackoverflow.com/questions/17654578/svg-marker-does-not-work-in-ie9-10
