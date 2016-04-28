@@ -148,7 +148,6 @@ module.exports = {
     var that = this
       , s = 'matrix(' + matrix.a + ',' + matrix.b + ',' + matrix.c + ',' + matrix.d + ',' + matrix.e + ',' + matrix.f + ')';
 
-    element.setAttributeNS(null, 'transform', s);
     if ('transform' in element.style) {
       element.style.transform = s;
     } else if ('-ms-transform' in element.style) {
