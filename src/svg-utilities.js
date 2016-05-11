@@ -148,12 +148,16 @@ module.exports = {
     var that = this
       , s = 'matrix(' + matrix.a + ',' + matrix.b + ',' + matrix.c + ',' + matrix.d + ',' + matrix.e + ',' + matrix.f + ')';
 
-    if ('transform' in element.style) {
-      element.style.transform = s;
-    } else if ('-ms-transform' in element.style) {
-      element.style['-ms-transform'] = s;
-    } else if ('-webkit-transform' in element.style) {
-      element.style['-webkit-transform'] = s;
+    // IE/Edge doesn't work CSS transforms on SVG elements, but claims that it does
+    // see https://connect.microsoft.com/IE/feedback/details/811744/ie11-bug-with-implementation-of-css-transforms-in-svg 
+    if (_browser === 'ie') {
+      element.setAttributeNS(null, 'transform', s);
+    } else {
+      if ('transform' in element.style) {
+        element.style.transform = s;
+      } else if ('-webkit-transform' in element.style) {
+        element.style['-webkit-transform'] = s;
+      }
     }
 
     // IE has a bug that makes markers disappear on zoom (when the matrix "a" and/or "d" elements change)
