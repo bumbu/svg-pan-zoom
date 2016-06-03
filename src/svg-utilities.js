@@ -3,7 +3,7 @@ var Utils = require('./utilities')
   ;
 
 // http://stackoverflow.com/questions/9847580/how-to-detect-safari-chrome-ie-firefox-and-opera-browser
-if (/*@cc_on!@*/false || !!document.documentMode) { // internet explorer
+if (/*@cc_on!@*/false || !!document.documentMode || navigator.userAgent.match(/Edge\/\d+/))) { // internet explorer + MS Edge
   _browser = 'ie';
 }
 
