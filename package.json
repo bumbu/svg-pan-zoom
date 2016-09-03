@@ -5,6 +5,11 @@
   "browser": "src/browserify.js",
   "license": "BSD-2-Clause",
   "description": "JavaScript library for panning and zooming an SVG image from the mouse, touches and programmatically.",
+  "scripts": {
+    "start": "gulp",
+    "test": "gulp test",
+    "build": "gulp build"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/ariutta/svg-pan-zoom"
