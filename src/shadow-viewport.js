@@ -65,13 +65,7 @@ ShadowViewport.prototype.cacheViewBox = function() {
 
     this.options.svg.removeAttribute('viewBox')
   } else {
-    var bBox = this.viewport.getBBox();
-
-    // Cache viewbox sizes
-    this.viewBox.x = bBox.x;
-    this.viewBox.y = bBox.y;
-    this.viewBox.width = bBox.width
-    this.viewBox.height = bBox.height
+    this.recacheViewBox();
   }
 }
 
@@ -79,15 +73,13 @@ ShadowViewport.prototype.cacheViewBox = function() {
  * Recalculate viewport sizes and update viewBox cache
  */
 ShadowViewport.prototype.recacheViewBox = function() {
-  var boundingClientRect = this.viewport.getBoundingClientRect()
-    , viewBoxWidth = boundingClientRect.width / this.getZoom()
-    , viewBoxHeight = boundingClientRect.height / this.getZoom()
+  var bBox = this.viewport.getBBox();
 
-  // Cache viewbox
-  this.viewBox.x = 0
-  this.viewBox.y = 0
-  this.viewBox.width = viewBoxWidth
-  this.viewBox.height = viewBoxHeight
+  // Cache viewbox sizes
+  this.viewBox.x = bBox.x;
+  this.viewBox.y = bBox.y;
+  this.viewBox.width = bBox.width
+  this.viewBox.height = bBox.height
 }
 
 /**
