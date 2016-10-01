@@ -8,11 +8,12 @@ module.exports = {
       defs = document.createElementNS(SvgUtils.svgNS, 'defs')
       instance.svg.appendChild(defs)
     }
-
-    var style = instance.svg.querySelector('style')
+    
+    var style = instance.svg.querySelector('#svg-pan-zomm-styles')
     if (!style) {
     	// Create style element
     	style = document.createElementNS(SvgUtils.svgNS, 'style')
+    	style.setAttribute('id', 'svg-pan-zomm-styles')
     	style.setAttribute('type', 'text/css')
     	style.textContent = '.svg-pan-zoom-control { cursor: pointer; fill: #e69d00; fill-opacity: 0.9; } .svg-pan-zoom-control:hover { fill-opacity: 1.0; } .svg-pan-zoom-control-background { fill: white; fill-opacity: 0.5; } .svg-pan-zoom-control-background { fill-opacity: 0.8; }'
 		defs.appendChild(style)
