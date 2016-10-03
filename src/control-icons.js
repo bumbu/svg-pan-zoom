@@ -9,12 +9,15 @@ module.exports = {
       instance.svg.appendChild(defs)
     }
 
-    // Create style element
-    var style = document.createElementNS(SvgUtils.svgNS, 'style')
-    style.setAttribute('type', 'text/css')
-    style.textContent = '.svg-pan-zoom-control { cursor: pointer; fill: black; fill-opacity: 0.333; } .svg-pan-zoom-control:hover { fill-opacity: 0.8; } .svg-pan-zoom-control-background { fill: white; fill-opacity: 0.5; } .svg-pan-zoom-control-background { fill-opacity: 0.8; }'
-    defs.appendChild(style)
-
+    // Check for style element, and create it if it doesn't exist
+    var styleEl = defs.querySelector('style#svg-pan-zoom-controls-styles');
+    if (!styleEl) {
+      var style = document.createElementNS(SvgUtils.svgNS, 'style')
+      style.setAttribute('id', 'svg-pan-zoom-controls-styles')
+      style.setAttribute('type', 'text/css')
+      style.textContent = '.svg-pan-zoom-control { cursor: pointer; fill: black; fill-opacity: 0.333; } .svg-pan-zoom-control:hover { fill-opacity: 0.8; } .svg-pan-zoom-control-background { fill: white; fill-opacity: 0.5; } .svg-pan-zoom-control-background { fill-opacity: 0.8; }'
+      defs.appendChild(style)
+    }
 
     // Zoom Group
     var zoomGroup = document.createElementNS(SvgUtils.svgNS, 'g');
