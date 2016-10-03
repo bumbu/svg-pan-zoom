@@ -522,7 +522,7 @@ SvgPanZoom.prototype.center = function() {
  * Use when viewport contents change
  */
 SvgPanZoom.prototype.updateBBox = function() {
-  this.viewport.recacheViewBox()
+  this.viewport.simpleViewBoxCache()
 }
 
 /**
