@@ -110,6 +110,7 @@ svgPanZoom('#demo-tiger', {
 , onZoom: function(){}
 , beforePan: function(){}
 , onPan: function(){}
+, onUpdatedCTM: function(){}
 , customEventsHandler: {}
 , eventsListenerElement: null
 });
@@ -157,6 +158,8 @@ You can alter panning on X and Y axes by providing alternative values through re
 `onPan` callback will be called with one attribute: `newPan`.
 
 > *Caution!* Calling zoom or pan API methods form inside of `beforeZoom`, `onZoom`, `beforePan` and `onPan` callbacks may lead to infinite loop.
+
+`onUpdatedCTM` will get called after the CTM will get updated. That happens asynchronously from pan and zoom events.
 
 `panEnabled` and `zoomEnabled` are related only to user interaction. If any of this options are disabled - you still can zoom and pan via API.
 
@@ -333,6 +336,7 @@ When you call `svgPanZoom` method it returns an object with following methods:
 * zoomAtPointBy
 * zoomIn
 * zoomOut
+* setOnUpdatedCTM
 * getZoom
 * resetZoom
 * resetPan
