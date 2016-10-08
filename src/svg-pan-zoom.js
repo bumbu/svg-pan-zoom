@@ -29,6 +29,7 @@ var optionsDefaults = {
 , onPan: null
 , customEventsHandler: null
 , eventsListenerElement: null
+, onUpdatedCTM: null
 }
 
 SvgPanZoom.prototype.init = function(svg, options) {
@@ -73,6 +74,10 @@ SvgPanZoom.prototype.init = function(svg, options) {
   , onPan: function(point) {
       if (that.viewport && that.options.onPan) {return that.options.onPan(point)}
     }
+  , onUpdatedCTM: function(ctm) {
+      // that.options becomes undefined here under some circumstances
+      if (that.viewport && that.options && that.options.onUpdatedCTM) {return that.options.onUpdatedCTM(ctm)}
+    }
   })
 
   // Wrap callbacks into public API context
@@ -81,6 +86,7 @@ SvgPanZoom.prototype.init = function(svg, options) {
   publicInstance.setOnZoom(this.options.onZoom)
   publicInstance.setBeforePan(this.options.beforePan)
   publicInstance.setOnPan(this.options.onPan)
+  publicInstance.setOnUpdatedCTM(this.options.onUpdatedCTM)
 
   if (this.options.controlIconsEnabled) {
     ControlIcons.enable(this)
@@ -587,6 +593,7 @@ SvgPanZoom.prototype.destroy = function() {
   this.onZoom = null
   this.beforePan = null
   this.onPan = null
+  this.onUpdatedCTM = null
 
   // Destroy custom event handlers
   if (this.options.customEventsHandler != null) { // jshint ignore:line
@@ -710,6 +717,7 @@ SvgPanZoom.prototype.getPublicInstance = function() {
         , viewBox: that.viewport.getViewBox()
         }
       }
+    , setOnUpdatedCTM: function(fn) {that.options.onUpdatedCTM = fn === null ? null : Utils.proxy(fn, that.publicInstance); return that.pi}
       // Destroy
     , destroy: function() {that.destroy(); return that.pi}
     }
