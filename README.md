@@ -483,6 +483,12 @@ Related Work
 ------------
 This library used the [SVGPan](https://github.com/aleofreddi/svgpan) library as a starting point. SVGPan is intended for use with the [SVG 'script' element](http://www.w3.org/TR/SVG/script.html), whereas svg-pan-zoom is intended for use with the [HTML 'script' element](http://www.w3.org/TR/html401/interact/scripts.html).
 
+Wrapper Libraries (feel free to add to this -- pull requests welcome!)
+* [AngularJS 1.x](https://www.npmjs.com/package/angular-svg-pan-zoom)
+* [Meteor](https://github.com/jossoco/meteor-svg-pan-zoom/)
+* [R](https://github.com/timelyportfolio/svgPanZoom)
+* [Ruby](https://rubygems.org/gems/svg_pan_zoom)
+
 License
 -------
 The code from the SVGPan library is licensed under the following BSD license:
