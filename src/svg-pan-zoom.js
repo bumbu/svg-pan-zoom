@@ -569,6 +569,12 @@ SvgPanZoom.prototype.resize = function() {
   this.width = boundingClientRectNormalized.width
   this.height = boundingClientRectNormalized.height
 
+  // Recalculate original state
+  var viewport = this.viewport
+  viewport.options.width = this.width
+  viewport.options.height = this.height
+  viewport.processCTM()
+
   // Reposition control icons by re-enabling them
   if (this.options.controlIconsEnabled) {
     this.getPublicInstance().disableControlIcons()
