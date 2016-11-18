@@ -2,6 +2,7 @@
   "name": "svg-pan-zoom",
   "version": "3.3.0",
   "main": "dist/svg-pan-zoom.js",
+  "types": "dist/svg-pan-zoom.d.ts",
   "browser": "src/browserify.js",
   "license": "BSD-2-Clause",
   "description": "JavaScript library for panning and zooming an SVG image from the mouse, touches and programmatically.",
@@ -34,7 +35,8 @@
     "Barry Coughlan (https://github.com/bcoughlan)",
     "Ionică Bizău (http://ionicabizau.net/)",
     "Ciprian Placintă (https://github.com/CiprianPlacinta)",
-    "Riccardo Santoro (https://github.com/VeNoMiS)"
+    "Riccardo Santoro (https://github.com/VeNoMiS)",
+    "César Vidril (https://github.com/Yimiprod)"
   ],
   "keywords": [
     "svg",
