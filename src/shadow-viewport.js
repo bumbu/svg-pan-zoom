@@ -31,7 +31,10 @@ ShadowViewport.prototype.init = function(viewport, options) {
   this.cacheViewBox()
 
   // Process CTM
-  this.processCTM()
+  var newCTM = this.processCTM()
+
+  // Update viewport CTM and cache zoom and pan
+  this.setCTM(newCTM)
 
   // Update CTM in this frame
   this.updateCTM()
@@ -124,8 +127,7 @@ ShadowViewport.prototype.processCTM = function() {
   this.originalState.x = newCTM.e
   this.originalState.y = newCTM.f
 
-  // Update viewport CTM and cache zoom and pan
-  this.setCTM(newCTM);
+  return newCTM
 }
 
 /**
