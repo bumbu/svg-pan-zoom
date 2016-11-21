@@ -96,6 +96,8 @@ ShadowViewport.prototype.getViewBox = function() {
 /**
  * Get initial zoom and pan values. Save them into originalState
  * Parses viewBox attribute to alter initial sizes
+ *
+ * @return {CTM} CTM object based on options
  */
 ShadowViewport.prototype.processCTM = function() {
   var newCTM = this.getCTM()

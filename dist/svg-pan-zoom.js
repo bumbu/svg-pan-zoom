@@ -1,4 +1,4 @@
-// svg-pan-zoom v3.3.0
+// svg-pan-zoom v3.4.0
 // https://github.com/ariutta/svg-pan-zoom
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var svgPanZoom = require('./svg-pan-zoom.js');
@@ -181,7 +181,10 @@ ShadowViewport.prototype.init = function(viewport, options) {
   this.cacheViewBox()
 
   // Process CTM
-  this.processCTM()
+  var newCTM = this.processCTM()
+
+  // Update viewport CTM and cache zoom and pan
+  this.setCTM(newCTM)
 
   // Update CTM in this frame
   this.updateCTM()
@@ -243,6 +246,8 @@ ShadowViewport.prototype.getViewBox = function() {
 /**
  * Get initial zoom and pan values. Save them into originalState
  * Parses viewBox attribute to alter initial sizes
+ *
+ * @return {CTM} CTM object based on options
  */
 ShadowViewport.prototype.processCTM = function() {
   var newCTM = this.getCTM()
@@ -274,8 +279,7 @@ ShadowViewport.prototype.processCTM = function() {
   this.originalState.x = newCTM.e
   this.originalState.y = newCTM.f
 
-  // Update viewport CTM and cache zoom and pan
-  this.setCTM(newCTM);
+  return newCTM
 }
 
 /**
@@ -1046,6 +1050,12 @@ SvgPanZoom.prototype.resize = function() {
   var boundingClientRectNormalized = SvgUtils.getBoundingClientRectNormalized(this.svg)
   this.width = boundingClientRectNormalized.width
   this.height = boundingClientRectNormalized.height
+
+  // Recalculate original state
+  var viewport = this.viewport
+  viewport.options.width = this.width
+  viewport.options.height = this.height
+  viewport.processCTM()
 
   // Reposition control icons by re-enabling them
   if (this.options.controlIconsEnabled) {
