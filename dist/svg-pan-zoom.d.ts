@@ -1,4 +1,4 @@
-// Type definitions for svg-pan-zoom v3.3.0
+// Type definitions for svg-pan-zoom v3.4.1
 // Project: https://github.com/ariutta/svg-pan-zoom
 // Definitions by: César Vidril <https://github.com/Yimiprod>
 // Definitions: https://github.com/ariutta/svg-pan-zoom
@@ -28,14 +28,14 @@ declare namespace SvgPanZoom {
   }
 
   interface CustomEventHandler {
-    haltEventListeners: string[],
-    init: (options: CustomEventOptions) => void,
-    destroy: Function
+    init: (options: CustomEventOptions) => void;
+    haltEventListeners: string[];
+    destroy: Function;
   }
 
   interface CustomEventOptions {
-    svgElement: SVGSVGElement,
-    instance: Instance
+    svgElement: SVGSVGElement;
+    instance: Instance;
   }
 
   interface Point {
@@ -46,6 +46,16 @@ declare namespace SvgPanZoom {
   interface PointModifier {
     x: number|boolean;
     y: number|boolean;
+  }
+
+  interface Sizes {
+    width: number;
+    height: number;
+    realZoom: number;
+    viewBox: {
+      width: number;
+      height: number;
+    }
   }
 
   interface Instance {
@@ -191,6 +201,13 @@ declare namespace SvgPanZoom {
      * @return {Instance}    Current instance
      */
     resize(): Instance;
+
+    /**
+     * Get all calculate svg dimensions
+     *
+     * @return {Object} {width: 0, height: 0, realZoom: 0, viewBox: { width: 0, height: 0 }}
+     */
+    getSizes(): Sizes;
 
     reset(): Instance;
 
