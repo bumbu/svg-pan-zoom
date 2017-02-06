@@ -106,6 +106,7 @@ svgPanZoom('#demo-tiger', {
 , contain: false
 , center: true
 , refreshRate: 'auto'
+, subpixel: true
 , beforeZoom: function(){}
 , onZoom: function(){}
 , beforePan: function(){}
@@ -130,6 +131,7 @@ If any arguments are specified, they must have the following value types:
 * 'contain' must be true or false. Default is false.
 * 'center' must be true or false. Default is true.
 * 'refreshRate' must be a number or 'auto'
+* 'subpixel' must be true or false. Default is true.
 * 'beforeZoom' must be a callback function to be called before zoom changes.
 * 'onZoom' must be a callback function to be called when zoom changes.
 * 'beforePan' must be a callback function to be called before pan changes.
