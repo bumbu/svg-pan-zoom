@@ -221,6 +221,9 @@ ShadowViewport.prototype.setCTM = function(newCTM) {
       if (this.options.beforeZoom(this.getRelativeZoom(), this.computeRelativeZoom(newCTM.a)) === false) {
         newCTM.a = newCTM.d = this.activeState.zoom
         willZoom = false
+      } else {
+        this.updateCache(newCTM);
+        this.options.onZoom(this.getRelativeZoom())
       }
     }
 
@@ -263,18 +266,15 @@ ShadowViewport.prototype.setCTM = function(newCTM) {
       // Update willPan flag
       if (preventPanX && preventPanY) {
         willPan = false
+      } else {
+        this.updateCache(newCTM);
+        this.options.onPan(this.getPan());
       }
     }
 
     // Check again if should zoom or pan
     if (willZoom || willPan) {
-      this.updateCache(newCTM)
-
       this.updateCTMOnNextFrame()
-
-      // After callbacks
-      if (willZoom) {this.options.onZoom(this.getRelativeZoom())}
-      if (willPan) {this.options.onPan(this.getPan())}
     }
   }
 }
