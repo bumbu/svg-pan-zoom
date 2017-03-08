@@ -29,6 +29,7 @@ var optionsDefaults = {
 , onPan: null
 , customEventsHandler: null
 , eventsListenerElement: null
+, onUpdatedCTM: null
 }
 
 SvgPanZoom.prototype.init = function(svg, options) {
@@ -73,6 +74,9 @@ SvgPanZoom.prototype.init = function(svg, options) {
   , onPan: function(point) {
       if (that.viewport && that.options.onPan) {return that.options.onPan(point)}
     }
+  , onUpdatedCTM: function(ctm) {
+      if (that.viewport && that.options.onUpdatedCTM) {return that.options.onUpdatedCTM(ctm)}
+    }
   })
 
   // Wrap callbacks into public API context
@@ -81,6 +85,7 @@ SvgPanZoom.prototype.init = function(svg, options) {
   publicInstance.setOnZoom(this.options.onZoom)
   publicInstance.setBeforePan(this.options.beforePan)
   publicInstance.setOnPan(this.options.onPan)
+  publicInstance.setOnUpdatedCTM(this.options.onUpdatedCTM)
 
   if (this.options.controlIconsEnabled) {
     ControlIcons.enable(this)
@@ -593,6 +598,7 @@ SvgPanZoom.prototype.destroy = function() {
   this.onZoom = null
   this.beforePan = null
   this.onPan = null
+  this.onUpdatedCTM = null
 
   // Destroy custom event handlers
   if (this.options.customEventsHandler != null) { // jshint ignore:line
@@ -625,6 +631,9 @@ SvgPanZoom.prototype.destroy = function() {
 
   // Delete options and its contents
   delete this.options
+
+  // Delete viewport to make public shadow viewport functions uncallable
+  delete this.viewport
 
   // Destroy public instance and rewrite getPublicInstance
   delete this.publicInstance
@@ -697,6 +706,8 @@ SvgPanZoom.prototype.getPublicInstance = function() {
     , zoomIn: function() {this.zoomBy(1 + that.options.zoomScaleSensitivity); return that.pi}
     , zoomOut: function() {this.zoomBy(1 / (1 + that.options.zoomScaleSensitivity)); return that.pi}
     , getZoom: function() {return that.getRelativeZoom()}
+      // CTM update
+    , setOnUpdatedCTM: function(fn) {that.options.onUpdatedCTM = fn === null ? null : Utils.proxy(fn, that.publicInstance); return that.pi}
       // Reset
     , resetZoom: function() {that.resetZoom(); return that.pi}
     , resetPan: function() {that.resetPan(); return that.pi}

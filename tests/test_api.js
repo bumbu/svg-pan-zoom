@@ -575,6 +575,27 @@ test('center when zoom is 0.5', function() {
 
 // TODO resize
 
+
+/**
+ * On updated CTM callback
+ */
+
+asyncTest('onUpdatedCTM is called', function() {
+  // onUpdatedCTM will get called once on init and once after panBy
+  expect(2)
+
+  instance = initSvgPanZoom()
+  instance.setOnUpdatedCTM(function() {
+    QUnit.ok( true, "onUpdatedCTM got called" );
+  });
+  instance.panBy({x: 100, y: 300})
+
+  setTimeout(function() {
+    start()
+  }, 100)
+})
+
+
 /**
  * Destroy
  */

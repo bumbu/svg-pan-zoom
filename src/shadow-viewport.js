@@ -318,11 +318,18 @@ ShadowViewport.prototype.updateCTMOnNextFrame = function() {
  * Update viewport CTM with cached CTM
  */
 ShadowViewport.prototype.updateCTM = function() {
+  var ctm = this.getCTM()
+
   // Updates SVG element
-  SvgUtils.setCTM(this.viewport, this.getCTM(), this.defs)
+  SvgUtils.setCTM(this.viewport, ctm, this.defs)
 
   // Free the lock
   this.pendingUpdate = false
+
+  // Notify about the update
+  if(this.options.onUpdatedCTM) {
+    this.options.onUpdatedCTM(ctm)
+  }
 }
 
 module.exports = function(viewport, options){
