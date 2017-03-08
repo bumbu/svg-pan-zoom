@@ -19,10 +19,11 @@ declare namespace SvgPanZoom {
     contain?: boolean; // (default true)
     center?: boolean; // enable or disable viewport centering in SVG (default true)
     refreshRate?: number | 'auto'; // (default 'auto')
-    beforeZoom?: (oldScale:number, newScale:number) => boolean;
+    beforeZoom?: (oldScale:number, newScale:number) => void | boolean;
     onZoom?: (newScale:number) => void;
-    beforePan?: (oldPan:Point, newPan:Point) => boolean | PointModifier;
+    beforePan?: (oldPan:Point, newPan:Point) => void | boolean | PointModifier;
     onPan?: (newPan:Point) => void;
+    onUpdatedCTM?: (newCTM:SVGMatrix) => void;
     customEventsHandler?: CustomEventHandler; // (default null)
     eventsListenerElement?: SVGElement; // (default null)
   }
@@ -86,9 +87,9 @@ declare namespace SvgPanZoom {
      */
     isPanEnabled(): boolean;
 
-    setBeforePan(fn: (point: Point)=> void): Instance;
+    setBeforePan(fn: (oldPoint: Point, newPoint: Point)=> void | boolean | PointModifier): Instance;
 
-    setOnPan(fn: (x: number, y: number)=> void): Instance;
+    setOnPan(fn: (point: Point)=> void): Instance;
 
     /**
      * Pan to a rendered position
@@ -146,7 +147,7 @@ declare namespace SvgPanZoom {
 
     setMaxZoom(zoom: number): Instance;
 
-    setBeforeZoom(fn: (scale: number) => void): Instance;
+    setBeforeZoom(fn: (oldScale: number, newScale: number) => void | boolean): Instance;
 
     setOnZoom(fn: (scale: number) => void): Instance;
 
@@ -170,6 +171,8 @@ declare namespace SvgPanZoom {
      * @return {float} zoom scale
      */
     getZoom(): number;
+
+    setOnUpdatedCTM(fn: (newCTM: SVGMatrix) => void): Instance;
 
     /**
      * Adjust viewport size (only) so it will fit in SVG
