@@ -596,3 +596,18 @@ test('after destroy calling svgPanZoom again should return a new instance', func
   instance2.destroy()
   instance2 = null
 });
+
+/**
+ * Other
+ */
+
+asyncTest('onUpdatedCTM is called', function() {
+  expect(0)
+  instance = initSvgPanZoom()
+  setTimeout(function() {
+    instance.setOnUpdatedCTM(function() {
+      QUnit.start()
+    });
+    instance.panBy({x: 100, y: 300})
+  }, 0)
+})
