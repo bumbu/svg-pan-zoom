@@ -110,8 +110,8 @@ panZoomTiger.getSizes();
 
 panZoomTiger.updateBBox();
 
-panZoomTiger.fit().center(); // can chain method
+panZoomTiger.fit().center().zoomBy(5); // can chain method
 
 panZoomTiger.destroy(); // destroy instance
 
-delete panZoomTiger;
+panZoomTiger = null;

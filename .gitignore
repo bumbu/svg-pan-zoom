@@ -2,3 +2,4 @@ node_modules/
 ./server.js
 **/*.orig
 .DS_Store
+npm-debug.log

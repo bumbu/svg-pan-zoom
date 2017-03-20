@@ -1,17 +1,18 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "UMD",
     "target": "es5",
+    "diagnostics": true,
+    "noEmit": true,
     "noImplicitAny": true,
     "noImplicitThis": true,
     "strictNullChecks": false,
+    "forceConsistentCasingInFileNames": true,
     "baseUrl": "./",
     "typeRoots": [
       "./"
     ],
-    "types": [],
-    "noEmit": true,
-    "forceConsistentCasingInFileNames": true
+    "types": []
   },
   "files": [
     "dist/svg-pan-zoom.d.ts",

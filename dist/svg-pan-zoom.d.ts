@@ -5,25 +5,53 @@
 
 declare namespace SvgPanZoom {
   interface Options {
-    viewportSelector?: string|HTMLElement|SVGElement; // can be querySelector string or SVGElement (default enabled)
-    panEnabled?: boolean; // enable or disable panning (default enabled)
-    controlIconsEnabled?: boolean; // insert icons to give user an option in addition to mouse events to control pan/zoom (default disabled)
-    zoomEnabled?: boolean; // enable or disable zooming (default enabled)
-    dblClickZoomEnabled?: boolean; // enable or disable zooming by double clicking (default enabled)
-    mouseWheelZoomEnabled?: boolean; // (default enabled)
-    preventMouseEventsDefault?: boolean; // (default enabled)
+    /**
+     * can be querySelector string or SVGElement (default enabled)
+     * @type {string|HTMLElement|SVGElement}
+     */
+    viewportSelector?: string|HTMLElement|SVGElement;
+    /**
+     * enable or disable panning (default enabled)
+     * @type {boolean}
+     */
+    panEnabled?: boolean;
+    /**
+     * insert icons to give user an option in addition to mouse events to control pan/zoom (default disabled)
+     * @type {boolean}
+     */
+    controlIconsEnabled?: boolean;
+    /**
+     * enable or disable zooming (default enabled)
+     * @type {boolean}
+     */
+    zoomEnabled?: boolean;
+    /**
+     * enable or disable zooming by double clicking (default enabled)
+     * @type {boolean}
+     */
+    dblClickZoomEnabled?: boolean;
+    /**
+     * enable or disable zooming by scrolling (default enabled)
+     * @type {boolean}
+     */
+    mouseWheelZoomEnabled?: boolean;
+    /**
+     * prevent mouse events to bubble up (default enabled)
+     * @type {boolean}
+     */
+    preventMouseEventsDefault?: boolean;
     zoomScaleSensitivity?: number; // Zoom sensitivity (Default 0.2)
     minZoom?: number; // Minimum Zoom level (Default 0.5)
     maxZoom?: number; // Maximum Zoom level  (Default 10)
     fit?: boolean; // enable or disable viewport fit in SVG (default true)
     contain?: boolean; // (default true)
     center?: boolean; // enable or disable viewport centering in SVG (default true)
-    refreshRate?: number | 'auto'; // (default 'auto')
-    beforeZoom?: (oldScale:number, newScale:number) => void | boolean;
-    onZoom?: (newScale:number) => void;
-    beforePan?: (oldPan:Point, newPan:Point) => void | boolean | PointModifier;
-    onPan?: (newPan:Point) => void;
-    onUpdatedCTM?: (newCTM:SVGMatrix) => void;
+    refreshRate?: number | "auto"; // (default 'auto')
+    beforeZoom?: (oldScale: number, newScale: number) => void | boolean;
+    onZoom?: (newScale: number) => void;
+    beforePan?: (oldPan: Point, newPan: Point) => void | boolean | PointModifier;
+    onPan?: (newPan: Point) => void;
+    onUpdatedCTM?: (newCTM: SVGMatrix) => void;
     customEventsHandler?: CustomEventHandler; // (default null)
     eventsListenerElement?: SVGElement; // (default null)
   }
@@ -56,7 +84,7 @@ declare namespace SvgPanZoom {
     viewBox: {
       width: number;
       height: number;
-    }
+    };
   }
 
   interface Instance {
@@ -87,9 +115,9 @@ declare namespace SvgPanZoom {
      */
     isPanEnabled(): boolean;
 
-    setBeforePan(fn: (oldPoint: Point, newPoint: Point)=> void | boolean | PointModifier): Instance;
+    setBeforePan(fn: (oldPoint: Point, newPoint: Point) => void | boolean | PointModifier): Instance;
 
-    setOnPan(fn: (point: Point)=> void): Instance;
+    setOnPan(fn: (point: Point) => void): Instance;
 
     /**
      * Pan to a rendered position
@@ -151,7 +179,7 @@ declare namespace SvgPanZoom {
 
     setOnZoom(fn: (scale: number) => void): Instance;
 
-    zoom(scale: number):void;
+    zoom(scale: number): void;
 
     zoomIn(): Instance;
 
@@ -159,9 +187,9 @@ declare namespace SvgPanZoom {
 
     zoomBy(scale: number): Instance;
 
-    zoomAtPoint(scale:number, point:Point): Instance;
+    zoomAtPoint(scale: number, point: Point): Instance;
 
-    zoomAtPointBy(scale:number, point:Point): Instance;
+    zoomAtPointBy(scale: number, point: Point): Instance;
 
     resetZoom(): Instance;
 
@@ -226,8 +254,8 @@ declare namespace SvgPanZoom {
   }
 }
 
-declare const svgPanZoom:SvgPanZoom.Instance;
+declare const svgPanZoom: SvgPanZoom.Instance;
 
-declare module 'svg-pan-zoom' {
+declare module "svg-pan-zoom" {
   export = svgPanZoom;
 }
