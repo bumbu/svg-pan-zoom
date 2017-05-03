@@ -16,13 +16,15 @@
         // Expose variable to use for testing
         window.zoomTiger = svgPanZoom('#demo-tiger', {
           zoomEnabled: true,
-          controlIconsEnabled: true
+          controlIconsEnabled: true,
+          // Uncomment this in order to get Y asis synchronized pan
+          beforePan: function(oldP, newP) {return {y:false}},
         });
 
         // Expose variable to use for testing
         window.zoomTiger2 = svgPanZoom('#demo-tiger2', {
           zoomEnabled: true,
-          controlIconsEnabled: true
+          controlIconsEnabled: true,
         });
 
         zoomTiger.setOnZoom(function(level){

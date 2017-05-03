@@ -264,7 +264,8 @@ ShadowViewport.prototype.setCTM = function(newCTM) {
       }
 
       // Update willPan flag
-      if (preventPanX && preventPanY) {
+      // Check if newCTM is still different
+      if ((preventPanX && preventPanY) || !this.isPanDifferent(newCTM)) {
         willPan = false
       } else {
         this.updateCache(newCTM);

@@ -249,6 +249,50 @@ test('before pan', function() {
   instance.pan({x: 50, y: 150})
 });
 
+test('don\'t trigger on pan if canceld by before pan', function() {
+  expect(1)
+  instance = initSvgPanZoom({
+    onPan: function() {QUnit.ok(true, "onUpdatedCTM got called")}
+  })
+
+  instance.panBy({x: 100, y: 300})
+
+  instance.setBeforePan(function(oldPan, newPan) {
+    return false
+  })
+
+  instance.panBy({x: 100, y: 300})
+});
+
+test('don\'t trigger on pan if canceld by before pan for each axis separately', function() {
+  expect(1)
+  instance = initSvgPanZoom({
+    onPan: function() {QUnit.ok(true, "onUpdatedCTM got called")}
+  })
+
+  instance.panBy({x: 100, y: 300})
+
+  instance.setBeforePan(function(oldPan, newPan) {
+    return {x: false, y: false}
+  })
+
+  instance.panBy({x: 100, y: 300})
+});
+
+test('don\'t trigger on pan if canceld by before pan for each axis separately', function() {
+  expect(1)
+  instance = initSvgPanZoom({
+    onPan: function() {QUnit.ok(true, "onUpdatedCTM got called")}
+  })
+
+  instance.panBy({x: 100, y: 300})
+
+  instance.setBeforePan(function(oldPan, newPan) {
+    return {x: false, y: false}
+  })
+
+  instance.panBy({x: 100, y: 300})
+});
 
 test('on pan', function() {
   expect(1);
@@ -265,6 +309,61 @@ test('on pan', function() {
 
   // Pan one more time to test if it is really removed
   instance.pan({x: 50, y: 150})
+});
+
+test('change only X axis when Y axis change is prevented with before pan', function() {
+  expect(2)
+  instance = initSvgPanZoom()
+  var initialPan = instance.getPan()
+
+  instance.setOnPan(function(newPan){
+    notEqual(newPan.x, initialPan.x)
+    equal(newPan.y, initialPan.y)
+  })
+
+  instance.setBeforePan(function(oldPan, newPan) {
+    return {y: false}
+  })
+
+  instance.panBy({x: 100, y: 300})
+
+  // Remove onPan as it will be called on destroy
+  instance.setOnPan(null)
+});
+
+test('change pan values from before pan', function() {
+  expect(1)
+  instance = initSvgPanZoom()
+
+  instance.setOnPan(function(newPan){
+    deepEqual(newPan, {x: 1, y: 2})
+  })
+
+  instance.setBeforePan(function(oldPan, newPan) {
+    return {x: 1, y: 2}
+  })
+
+  instance.panBy({x: 100, y: 300})
+
+  // Remove onPan as it will be called on destroy
+  instance.setOnPan(null)
+});
+
+test('don\'t pan if before pan makes the pan unnecessary', function() {
+  expect(0)
+  instance = initSvgPanZoom()
+  var initialPan = instance.getPan()
+
+  instance.setOnPan(function() {QUnit.ok(true, "onUpdatedCTM got called")})
+
+  instance.setBeforePan(function(oldPan, newPan) {
+    return {x: false, y: initialPan.y}
+  })
+
+  instance.panBy({x: 100, y: 300})
+
+  // Remove onPan as it will be called on destroy
+  instance.setOnPan(null)
 });
 
 /**
