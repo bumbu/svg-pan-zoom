@@ -483,6 +483,14 @@ Supported Browsers
 * Opera
 * Internet Explorer 9+ _(works badly if viewBox attribute is set)_
 
+CDN
+---
+You can use (jsdelivr)[http://www.jsdelivr.com/] as a CDN. It supports automatic pulling from NPM and GitHub.
+
+For example use `https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.5.0/dist/svg-pan-zoom.min.js` to load version `3.5.0`.
+
+For more usage examples check (jsdelivr usage)[https://github.com/jsdelivr/jsdelivr#usage].
+
 Related Work
 ------------
 This library used the [SVGPan](https://github.com/aleofreddi/svgpan) library as a starting point. SVGPan is intended for use with the [SVG 'script' element](http://www.w3.org/TR/SVG/script.html), whereas svg-pan-zoom is intended for use with the [HTML 'script' element](http://www.w3.org/TR/html401/interact/scripts.html).
