@@ -199,8 +199,14 @@ ShadowViewport.prototype.getCTM = function() {
   safeCTM.b = 0
   safeCTM.c = 0
   safeCTM.d = this.activeState.zoom
-  safeCTM.e = this.activeState.x
-  safeCTM.f = this.activeState.y
+
+  if (this.options.subpixel) {
+    safeCTM.e = this.activeState.x
+    safeCTM.f = this.activeState.y
+  } else {
+    safeCTM.e = Math.round(this.activeState.x)
+    safeCTM.f = Math.round(this.activeState.y)
+  }
 
   return safeCTM
 }
