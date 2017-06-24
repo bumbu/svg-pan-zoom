@@ -26,9 +26,16 @@ module.exports = {
     zoomGroup.setAttribute('class', 'svg-pan-zoom-control');
 
     // Control elements
+    // zoom elements
     zoomGroup.appendChild(this._createZoomIn(instance))
     zoomGroup.appendChild(this._createZoomReset(instance))
     zoomGroup.appendChild(this._createZoomOut(instance))
+
+    //pan elements
+    zoomGroup.appendChild(this._createPanLeft(instance))
+    zoomGroup.appendChild(this._createPanRight(instance))
+    zoomGroup.appendChild(this._createPanUp(instance))
+    zoomGroup.appendChild(this._createPanDown(instance))
 
     // Finally append created element
     instance.svg.appendChild(zoomGroup)
@@ -114,6 +121,109 @@ module.exports = {
     zoomOut.appendChild(zoomOutShape);
 
     return zoomOut
+  }
+
+  , _createPanLeft: function(instance){
+    // zoom out
+    var panLeft = document.createElementNS(SvgUtils.svgNS, 'g');
+    panLeft.setAttribute('id', 'svg-pan-zoom-pan-left');
+    panLeft.setAttribute('transform', 'translate(10 -58) scale(0.015)');
+    panLeft.setAttribute('class', 'svg-pan-zoom-control');
+    panLeft.addEventListener('click', function() {instance.getPublicInstance().panBy({x: -50, y: 0})}, false);
+    panLeft.addEventListener('touchstart', function() {instance.getPublicInstance().panBy({x: -50, y: 0})}, false);
+
+    var panLeftBackground = document.createElementNS(SvgUtils.svgNS, 'rect'); // TODO change these background space fillers to rounded rectangles so they look prettier
+    panLeftBackground.setAttribute('x', '0');
+    panLeftBackground.setAttribute('y', '0');
+    panLeftBackground.setAttribute('width', '1500'); // larger than expected because the whole group is transformed to scale down
+    panLeftBackground.setAttribute('height', '1400');
+    panLeftBackground.setAttribute('class', 'svg-pan-zoom-control-background');
+    panLeft.appendChild(panLeftBackground);
+
+    var panLeftShape = document.createElementNS(SvgUtils.svgNS, 'path');
+    panLeftShape.setAttribute('d', 'M1451.5-43.5C1395.2-99.8,1327.3-128,1248-128H288c-79.3,0-147.2,28.2-203.5,84.5C28.2,12.8,0,80.7,0,160 v960c0,79.3,28.2,147.2,84.5,203.5c56.3,56.3,124.2,84.5,203.5,84.5h960c79.3,0,147.2-28.2,203.5-84.5 c56.3-56.3,84.5-124.2,84.5-203.5V160C1536,80.7,1507.8,12.8,1451.5-43.5z M1120.2,1073.7c10.9,10.9,16.3,24.3,16.3,40.2 c0,15.9-5.4,29.3-16.3,40.2l-80.4,80.4c-10.9,10.9-24.3,16.3-40.2,16.3c-15.9,0-29.3-5.4-40.2-16.3L397,671.9 c-10.9-10.9-16.3-24.3-16.3-40.2c0-15.9,5.4-29.3,16.3-40.2L959.5,29c10.9-10.9,24.3-16.3,40.2-16.3c15.9,0,29.3,5.4,40.2,16.3 l80.4,80.4c10.9,10.9,16.3,24.3,16.3,40.2c0,15.9-5.4,29.3-16.3,40.2l-442,442L1120.2,1073.7z');
+    panLeftShape.setAttribute('class', 'svg-pan-zoom-control-element');
+    panLeft.appendChild(panLeftShape);
+
+    return panLeft
+  }
+
+    , _createPanRight: function(instance){
+    // zoom out
+    var panRight = document.createElementNS(SvgUtils.svgNS, 'g');
+    panRight.setAttribute('id', 'svg-pan-zoom-pan-right');
+    panRight.setAttribute('transform', 'translate(51 -58) scale(0.015)');
+    panRight.setAttribute('class', 'svg-pan-zoom-control');
+    panRight.addEventListener('click', function() {instance.getPublicInstance().panBy({x: 50, y: 0})}, false);
+    panRight.addEventListener('touchstart', function() {instance.getPublicInstance().panBy({x: 50, y: 0})}, false);
+
+    var panRightBackground = document.createElementNS(SvgUtils.svgNS, 'rect'); // TODO change these background space fillers to rounded rectangles so they look prettier
+    panRightBackground.setAttribute('x', '0');
+    panRightBackground.setAttribute('y', '0');
+    panRightBackground.setAttribute('width', '1500'); // larger than expected because the whole group is transformed to scale down
+    panRightBackground.setAttribute('height', '1400');
+    panRightBackground.setAttribute('class', 'svg-pan-zoom-control-background');
+    panRight.appendChild(panRightBackground);
+
+    var panRightShape = document.createElementNS(SvgUtils.svgNS, 'path');
+    panRightShape.setAttribute('d', 'M1451.5-43.5C1395.2-99.8,1327.3-128,1248-128H288c-79.3,0-147.2,28.2-203.5,84.5C28.2,12.8,0,80.7,0,160 v960c0,79.3,28.2,147.2,84.5,203.5c56.3,56.3,124.2,84.5,203.5,84.5h960c79.3,0,147.2-28.2,203.5-84.5 c56.3-56.3,84.5-124.2,84.5-203.5V160C1536,80.7,1507.8,12.8,1451.5-43.5z M1120.2,1073.7c10.9,10.9,16.3,24.3,16.3,40.2 c0,15.9-5.4,29.3-16.3,40.2l-80.4,80.4c-10.9,10.9-24.3,16.3-40.2,16.3c-15.9,0-29.3-5.4-40.2-16.3L397,671.9 c-10.9-10.9-16.3-24.3-16.3-40.2c0-15.9,5.4-29.3,16.3-40.2L959.5,29c10.9-10.9,24.3-16.3,40.2-16.3c15.9,0,29.3,5.4,40.2,16.3 l80.4,80.4c10.9,10.9,16.3,24.3,16.3,40.2c0,15.9-5.4,29.3-16.3,40.2l-442,442L1120.2,1073.7z');
+    panRightShape.setAttribute('class', 'svg-pan-zoom-control-element');
+    panRightShape.setAttribute('transform', 'rotate(180 768 640)');
+    panRight.appendChild(panRightShape);
+
+    return panRight
+  }
+
+  , _createPanUp: function(instance){
+    // zoom out
+    var panUp = document.createElementNS(SvgUtils.svgNS, 'g');
+    panUp.setAttribute('id', 'svg-pan-zoom-pan-up');
+    panUp.setAttribute('transform', 'translate(30.5 -80) scale(0.015)');
+    panUp.setAttribute('class', 'svg-pan-zoom-control');
+    panUp.addEventListener('click', function() {instance.getPublicInstance().panBy({x: 0, y: -50})}, false);
+    panUp.addEventListener('touchstart', function() {instance.getPublicInstance().panBy({x: 0, y: -50})}, false);
+
+    var panUpBackground = document.createElementNS(SvgUtils.svgNS, 'rect'); // TODO change these background space fillers to rounded rectangles so they look prettier
+    panUpBackground.setAttribute('x', '0');
+    panUpBackground.setAttribute('y', '0');
+    panUpBackground.setAttribute('width', '1500'); // larger than expected because the whole group is transformed to scale down
+    panUpBackground.setAttribute('height', '1400');
+    panUpBackground.setAttribute('class', 'svg-pan-zoom-control-background');
+    panUp.appendChild(panUpBackground);
+
+    var panUpShape = document.createElementNS(SvgUtils.svgNS, 'path');
+    panUpShape.setAttribute('d', 'M1451.5-43.5C1395.2-99.8,1327.3-128,1248-128H288c-79.3,0-147.2,28.2-203.5,84.5C28.2,12.8,0,80.7,0,160 v960c0,79.3,28.2,147.2,84.5,203.5c56.3,56.3,124.2,84.5,203.5,84.5h960c79.3,0,147.2-28.2,203.5-84.5 c56.3-56.3,84.5-124.2,84.5-203.5V160C1536,80.7,1507.8,12.8,1451.5-43.5z M1120.2,1073.7c10.9,10.9,16.3,24.3,16.3,40.2 c0,15.9-5.4,29.3-16.3,40.2l-80.4,80.4c-10.9,10.9-24.3,16.3-40.2,16.3c-15.9,0-29.3-5.4-40.2-16.3L397,671.9 c-10.9-10.9-16.3-24.3-16.3-40.2c0-15.9,5.4-29.3,16.3-40.2L959.5,29c10.9-10.9,24.3-16.3,40.2-16.3c15.9,0,29.3,5.4,40.2,16.3 l80.4,80.4c10.9,10.9,16.3,24.3,16.3,40.2c0,15.9-5.4,29.3-16.3,40.2l-442,442L1120.2,1073.7z');
+    panUpShape.setAttribute('class', 'svg-pan-zoom-control-element');
+    panUpShape.setAttribute('transform', 'rotate(90 768 640)');
+    panUp.appendChild(panUpShape);
+
+    return panUp
+  }
+
+  , _createPanDown: function(instance){
+    // zoom out
+    var panDown = document.createElementNS(SvgUtils.svgNS, 'g');
+    panDown.setAttribute('id', 'svg-pan-zoom-pan-down');
+    panDown.setAttribute('transform', 'translate(30.5 -36) scale(0.015)');
+    panDown.setAttribute('class', 'svg-pan-zoom-control');
+    panDown.addEventListener('click', function() {instance.getPublicInstance().panBy({x: 0, y: 50})}, false);
+    panDown.addEventListener('touchstart', function() {instance.getPublicInstance().panBy({x: 0, y: 50})}, false);
+
+    var panDownBackground = document.createElementNS(SvgUtils.svgNS, 'rect'); // TODO change these background space fillers to rounded rectangles so they look prettier
+    panDownBackground.setAttribute('x', '0');
+    panDownBackground.setAttribute('y', '0');
+    panDownBackground.setAttribute('width', '1500'); // larger than expected because the whole group is transformed to scale down
+    panDownBackground.setAttribute('height', '1400');
+    panDownBackground.setAttribute('class', 'svg-pan-zoom-control-background');
+    panDown.appendChild(panDownBackground);
+
+    var panDownShape = document.createElementNS(SvgUtils.svgNS, 'path');
+    panDownShape.setAttribute('d', 'M1451.5-43.5C1395.2-99.8,1327.3-128,1248-128H288c-79.3,0-147.2,28.2-203.5,84.5C28.2,12.8,0,80.7,0,160 v960c0,79.3,28.2,147.2,84.5,203.5c56.3,56.3,124.2,84.5,203.5,84.5h960c79.3,0,147.2-28.2,203.5-84.5 c56.3-56.3,84.5-124.2,84.5-203.5V160C1536,80.7,1507.8,12.8,1451.5-43.5z M1120.2,1073.7c10.9,10.9,16.3,24.3,16.3,40.2 c0,15.9-5.4,29.3-16.3,40.2l-80.4,80.4c-10.9,10.9-24.3,16.3-40.2,16.3c-15.9,0-29.3-5.4-40.2-16.3L397,671.9 c-10.9-10.9-16.3-24.3-16.3-40.2c0-15.9,5.4-29.3,16.3-40.2L959.5,29c10.9-10.9,24.3-16.3,40.2-16.3c15.9,0,29.3,5.4,40.2,16.3 l80.4,80.4c10.9,10.9,16.3,24.3,16.3,40.2c0,15.9-5.4,29.3-16.3,40.2l-442,442L1120.2,1073.7z');
+    panDownShape.setAttribute('class', 'svg-pan-zoom-control-element');
+    panDownShape.setAttribute('transform', 'rotate(270 768 640)');
+    panDown.appendChild(panDownShape);
+
+    return panDown
   }
 
 , disable: function(instance) {
