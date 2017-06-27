@@ -125,6 +125,17 @@ module.exports = {
 , getType: function(o) {
     return Object.prototype.toString.apply(o).replace(/^\[object\s/, '').replace(/\]$/, '')
   }
+  
+  /**
+   * Checks if an event is considered multitouch
+   *
+   * @param  {Event} evt
+   * @return {Boolean} returns true if the event is part of a multitouch event (but not the first)
+   */
+, isMultiTouchEvent: function(evt) {
+    // If it is a touch event, with changed touches and the first changed touch is not the first registered touch, it is a multitouch
+    return (evt.changedTouches !== void 0 && evt.changedTouches.length && evt.changedTouches[0].identifier !== evt.touches[0].identifier)
+}
 
   /**
    * If it is a touch event than add clientX and clientY to event object
@@ -133,7 +144,7 @@ module.exports = {
    * @param  {SVGSVGElement} svg
    */
 , mouseAndTouchNormalize: function(evt, svg) {
-    // If no cilentX and but touch objects are available
+    // If no clientX and but touch objects are available
     if (evt.clientX === void 0 || evt.clientX === null) {
       // Fallback
       evt.clientX = 0

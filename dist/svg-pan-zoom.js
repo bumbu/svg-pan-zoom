@@ -520,6 +520,7 @@ var optionsDefaults = {
 , customEventsHandler: null
 , eventsListenerElement: null
 , onUpdatedCTM: null
+, multiTouchEnabled: true // enable or disable multi touch for panning
 }
 
 SvgPanZoom.prototype.init = function(svg, options) {
@@ -921,17 +922,18 @@ SvgPanZoom.prototype.handleMouseDown = function(evt, prevEvt) {
       evt.returnValue = false
     }
   }
+  if (this.options.multiTouchEnabled || !Utils.isMultiTouchEvent(evt)){
+	  Utils.mouseAndTouchNormalize(evt, this.svg)
 
-  Utils.mouseAndTouchNormalize(evt, this.svg)
-
-  // Double click detection; more consistent than ondblclick
-  if (this.options.dblClickZoomEnabled && Utils.isDblClick(evt, prevEvt)){
-    this.handleDblClick(evt)
-  } else {
-    // Pan mode
-    this.state = 'pan'
-    this.firstEventCTM = this.viewport.getCTM()
-    this.stateOrigin = SvgUtils.getEventPoint(evt, this.svg).matrixTransform(this.firstEventCTM.inverse())
+	  // Double click detection; more consistent than ondblclick
+	  if (this.options.dblClickZoomEnabled && Utils.isDblClick(evt, prevEvt)){
+		this.handleDblClick(evt)
+	  } else {
+		// Pan mode
+		this.state = 'pan'
+		this.firstEventCTM = this.viewport.getCTM()
+		this.stateOrigin = SvgUtils.getEventPoint(evt, this.svg).matrixTransform(this.firstEventCTM.inverse())
+	  }
   }
 }
 
@@ -951,10 +953,12 @@ SvgPanZoom.prototype.handleMouseMove = function(evt) {
 
   if (this.state === 'pan' && this.options.panEnabled) {
     // Pan mode
-    var point = SvgUtils.getEventPoint(evt, this.svg).matrixTransform(this.firstEventCTM.inverse())
-      , viewportCTM = this.firstEventCTM.translate(point.x - this.stateOrigin.x, point.y - this.stateOrigin.y)
+	if (this.options.multiTouchEnabled || !Utils.isMultiTouchEvent(evt)){
+		var point = SvgUtils.getEventPoint(evt, this.svg).matrixTransform(this.firstEventCTM.inverse())
+		, viewportCTM = this.firstEventCTM.translate(point.x - this.stateOrigin.x, point.y - this.stateOrigin.y)
 
-    this.viewport.setCTM(viewportCTM)
+		this.viewport.setCTM(viewportCTM)
+	}
   }
 }
 
@@ -1751,6 +1755,17 @@ module.exports = {
 , getType: function(o) {
     return Object.prototype.toString.apply(o).replace(/^\[object\s/, '').replace(/\]$/, '')
   }
+  
+  /**
+   * Checks if an event is considered multitouch
+   *
+   * @param  {Event} evt
+   * @return {Boolean} returns true if the event is part of a multitouch event (but not the first)
+   */
+, isMultiTouchEvent: function(evt) {
+    // If it is a touch event, with changed touches and the first changed touch is not the first registered touch, it is a multitouch
+    return (evt.changedTouches !== void 0 && evt.changedTouches.length && evt.changedTouches[0].identifier !== evt.touches[0].identifier)
+}
 
   /**
    * If it is a touch event than add clientX and clientY to event object
@@ -1759,7 +1774,7 @@ module.exports = {
    * @param  {SVGSVGElement} svg
    */
 , mouseAndTouchNormalize: function(evt, svg) {
-    // If no cilentX and but touch objects are available
+    // If no clientX and but touch objects are available
     if (evt.clientX === void 0 || evt.clientX === null) {
       // Fallback
       evt.clientX = 0
