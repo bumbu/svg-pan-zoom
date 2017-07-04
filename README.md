@@ -111,7 +111,6 @@ svgPanZoom('#demo-tiger', {
 , beforePan: function(){}
 , onPan: function(){}
 , onUpdatedCTM: function(){}
-, multiTouchEnabled: true
 , customEventsHandler: {}
 , eventsListenerElement: null
 });
@@ -138,7 +137,6 @@ If any arguments are specified, they must have the following value types:
 * 'onPan' must be a callback function to be called when pan changes.
 * 'customEventsHandler' must be an object with `init` and `destroy` arguments as functions.
 * 'eventsListenerElement' must be an SVGElement or null.
-* 'multiTouchEnabled' must be true or false. Default is true.
 
 `beforeZoom` will be called with 2 float attributes: oldZoom and newZoom.
 If `beforeZoom` will return `false` then zooming will be halted.

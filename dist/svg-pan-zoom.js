@@ -520,7 +520,6 @@ var optionsDefaults = {
 , customEventsHandler: null
 , eventsListenerElement: null
 , onUpdatedCTM: null
-, multiTouchEnabled: true // enable or disable multi touch for panning
 }
 
 SvgPanZoom.prototype.init = function(svg, options) {
@@ -922,7 +921,7 @@ SvgPanZoom.prototype.handleMouseDown = function(evt, prevEvt) {
       evt.returnValue = false
     }
   }
-  if (this.options.multiTouchEnabled || !Utils.isMultiTouchEvent(evt)){
+  if (!Utils.isMultiTouchEvent(evt)){
 	  Utils.mouseAndTouchNormalize(evt, this.svg)
 
 	  // Double click detection; more consistent than ondblclick
@@ -953,7 +952,7 @@ SvgPanZoom.prototype.handleMouseMove = function(evt) {
 
   if (this.state === 'pan' && this.options.panEnabled) {
     // Pan mode
-	if (this.options.multiTouchEnabled || !Utils.isMultiTouchEvent(evt)){
+	if (!Utils.isMultiTouchEvent(evt)){
 		var point = SvgUtils.getEventPoint(evt, this.svg).matrixTransform(this.firstEventCTM.inverse())
 		, viewportCTM = this.firstEventCTM.translate(point.x - this.stateOrigin.x, point.y - this.stateOrigin.y)
 
