@@ -431,17 +431,18 @@ SvgPanZoom.prototype.handleMouseDown = function(evt, prevEvt) {
       evt.returnValue = false
     }
   }
-	Utils.mouseAndTouchNormalize(evt, this.svg)
 
-	// Double click detection; more consistent than ondblclick
-	if (this.options.dblClickZoomEnabled && Utils.isDblClick(evt, prevEvt)){
-		this.handleDblClick(evt)
-	} else {
-		// Pan mode
-		this.state = 'pan'
-		this.firstEventCTM = this.viewport.getCTM()
-		this.stateOrigin = SvgUtils.getEventPoint(evt, this.svg).matrixTransform(this.firstEventCTM.inverse())
-	}
+  Utils.mouseAndTouchNormalize(evt, this.svg)
+
+  // Double click detection; more consistent than ondblclick
+  if (this.options.dblClickZoomEnabled && Utils.isDblClick(evt, prevEvt)){
+    this.handleDblClick(evt)
+  } else {
+    // Pan mode
+    this.state = 'pan'
+    this.firstEventCTM = this.viewport.getCTM()
+    this.stateOrigin = SvgUtils.getEventPoint(evt, this.svg).matrixTransform(this.firstEventCTM.inverse())
+  }
 }
 
 /**
@@ -460,10 +461,10 @@ SvgPanZoom.prototype.handleMouseMove = function(evt) {
 
   if (this.state === 'pan' && this.options.panEnabled) {
     // Pan mode
-		var point = SvgUtils.getEventPoint(evt, this.svg).matrixTransform(this.firstEventCTM.inverse())
-		, viewportCTM = this.firstEventCTM.translate(point.x - this.stateOrigin.x, point.y - this.stateOrigin.y)
+    var point = SvgUtils.getEventPoint(evt, this.svg).matrixTransform(this.firstEventCTM.inverse())
+    , viewportCTM = this.firstEventCTM.translate(point.x - this.stateOrigin.x, point.y - this.stateOrigin.y)
 
-	  this.viewport.setCTM(viewportCTM)
+    this.viewport.setCTM(viewportCTM)
   }
 }
 
