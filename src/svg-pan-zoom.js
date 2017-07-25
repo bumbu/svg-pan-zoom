@@ -431,19 +431,17 @@ SvgPanZoom.prototype.handleMouseDown = function(evt, prevEvt) {
       evt.returnValue = false
     }
   }
-  if (!Utils.isMultiTouchEvent(evt)){
-	  Utils.mouseAndTouchNormalize(evt, this.svg)
+	Utils.mouseAndTouchNormalize(evt, this.svg)
 
-	  // Double click detection; more consistent than ondblclick
-	  if (this.options.dblClickZoomEnabled && Utils.isDblClick(evt, prevEvt)){
+	// Double click detection; more consistent than ondblclick
+	if (this.options.dblClickZoomEnabled && Utils.isDblClick(evt, prevEvt)){
 		this.handleDblClick(evt)
-	  } else {
+	} else {
 		// Pan mode
 		this.state = 'pan'
 		this.firstEventCTM = this.viewport.getCTM()
 		this.stateOrigin = SvgUtils.getEventPoint(evt, this.svg).matrixTransform(this.firstEventCTM.inverse())
-	  }
-  }
+	}
 }
 
 /**
@@ -462,12 +460,10 @@ SvgPanZoom.prototype.handleMouseMove = function(evt) {
 
   if (this.state === 'pan' && this.options.panEnabled) {
     // Pan mode
-	if (!Utils.isMultiTouchEvent(evt)){
 		var point = SvgUtils.getEventPoint(evt, this.svg).matrixTransform(this.firstEventCTM.inverse())
 		, viewportCTM = this.firstEventCTM.translate(point.x - this.stateOrigin.x, point.y - this.stateOrigin.y)
 
-		this.viewport.setCTM(viewportCTM)
-	}
+	  this.viewport.setCTM(viewportCTM)
   }
 }
 

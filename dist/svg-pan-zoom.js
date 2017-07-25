@@ -921,19 +921,17 @@ SvgPanZoom.prototype.handleMouseDown = function(evt, prevEvt) {
       evt.returnValue = false
     }
   }
-  if (!Utils.isMultiTouchEvent(evt)){
-	  Utils.mouseAndTouchNormalize(evt, this.svg)
+	Utils.mouseAndTouchNormalize(evt, this.svg)
 
-	  // Double click detection; more consistent than ondblclick
-	  if (this.options.dblClickZoomEnabled && Utils.isDblClick(evt, prevEvt)){
+	// Double click detection; more consistent than ondblclick
+	if (this.options.dblClickZoomEnabled && Utils.isDblClick(evt, prevEvt)){
 		this.handleDblClick(evt)
-	  } else {
+	} else {
 		// Pan mode
 		this.state = 'pan'
 		this.firstEventCTM = this.viewport.getCTM()
 		this.stateOrigin = SvgUtils.getEventPoint(evt, this.svg).matrixTransform(this.firstEventCTM.inverse())
-	  }
-  }
+	}
 }
 
 /**
@@ -952,12 +950,10 @@ SvgPanZoom.prototype.handleMouseMove = function(evt) {
 
   if (this.state === 'pan' && this.options.panEnabled) {
     // Pan mode
-	if (!Utils.isMultiTouchEvent(evt)){
 		var point = SvgUtils.getEventPoint(evt, this.svg).matrixTransform(this.firstEventCTM.inverse())
 		, viewportCTM = this.firstEventCTM.translate(point.x - this.stateOrigin.x, point.y - this.stateOrigin.y)
 
-		this.viewport.setCTM(viewportCTM)
-	}
+	  this.viewport.setCTM(viewportCTM)
   }
 }
 
@@ -1754,17 +1750,6 @@ module.exports = {
 , getType: function(o) {
     return Object.prototype.toString.apply(o).replace(/^\[object\s/, '').replace(/\]$/, '')
   }
-  
-  /**
-   * Checks if an event is considered multitouch
-   *
-   * @param  {Event} evt
-   * @return {Boolean} returns true if the event is part of a multitouch event (but not the first)
-   */
-, isMultiTouchEvent: function(evt) {
-    // If it is a touch event, with changed touches and the first changed touch is not the first registered touch, it is a multitouch
-    return (evt.changedTouches !== void 0 && evt.changedTouches.length && evt.changedTouches[0].identifier !== evt.touches[0].identifier)
-}
 
   /**
    * If it is a touch event than add clientX and clientY to event object
@@ -1780,18 +1765,18 @@ module.exports = {
       evt.clientY = 0
 
       // If it is a touch event
-      if (evt.changedTouches !== void 0 && evt.changedTouches.length) {
-        // If touch event has changedTouches
-        if (evt.changedTouches[0].clientX !== void 0) {
-          evt.clientX = evt.changedTouches[0].clientX
-          evt.clientY = evt.changedTouches[0].clientY
+      if (evt.touches !== void 0 && evt.touches.length) {
+        // If touch event has a touche
+        if (evt.touches[0].clientX !== void 0) {
+          evt.clientX = evt.touches[0].clientX
+          evt.clientY = evt.touches[0].clientY
         }
-        // If changedTouches has pageX attribute
-        else if (evt.changedTouches[0].pageX !== void 0) {
+        // If touches has pageX attribute
+        else if (evt.touches[0].pageX !== void 0) {
           var rect = svg.getBoundingClientRect();
 
-          evt.clientX = evt.changedTouches[0].pageX - rect.left
-          evt.clientY = evt.changedTouches[0].pageY - rect.top
+          evt.clientX = evt.touches[0].pageX - rect.left
+          evt.clientY = evt.touches[0].pageY - rect.top
         }
       // If it is a custom event
       } else if (evt.originalEvent !== void 0) {
