@@ -462,7 +462,7 @@ SvgPanZoom.prototype.handleMouseMove = function(evt) {
   if (this.state === 'pan' && this.options.panEnabled) {
     // Pan mode
     var point = SvgUtils.getEventPoint(evt, this.svg).matrixTransform(this.firstEventCTM.inverse())
-    , viewportCTM = this.firstEventCTM.translate(point.x - this.stateOrigin.x, point.y - this.stateOrigin.y)
+      , viewportCTM = this.firstEventCTM.translate(point.x - this.stateOrigin.x, point.y - this.stateOrigin.y)
 
     this.viewport.setCTM(viewportCTM)
   }
