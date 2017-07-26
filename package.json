@@ -1,6 +1,6 @@
 {
   "name": "svg-pan-zoom",
-  "version": "3.5.1",
+  "version": "3.5.2",
   "main": "dist/svg-pan-zoom.js",
   "types": "dist/svg-pan-zoom.d.ts",
   "browser": "src/browserify.js",
@@ -37,7 +37,10 @@
     "Ionică Bizău (http://ionicabizau.net/)",
     "Ciprian Placintă (https://github.com/CiprianPlacinta)",
     "Riccardo Santoro (https://github.com/VeNoMiS)",
-    "César Vidril (https://github.com/Yimiprod)"
+    "César Vidril (https://github.com/Yimiprod)",
+    "Androl Genhald (https://github.com/AndrolGenhald)",
+    "James Newell (https://github.com/musicfuel)",
+    "KoenkookpotPlasmans (https://github.com/KoenkookpotPlasmans)"
   ],
   "keywords": [
     "svg",
