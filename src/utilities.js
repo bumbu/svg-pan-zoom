@@ -133,25 +133,22 @@ module.exports = {
    * @param  {SVGSVGElement} svg
    */
 , mouseAndTouchNormalize: function(evt, svg) {
-    // If no cilentX and but touch objects are available
+    // If no clientX then fallback
     if (evt.clientX === void 0 || evt.clientX === null) {
       // Fallback
       evt.clientX = 0
       evt.clientY = 0
 
       // If it is a touch event
-      if (evt.changedTouches !== void 0 && evt.changedTouches.length) {
-        // If touch event has changedTouches
-        if (evt.changedTouches[0].clientX !== void 0) {
-          evt.clientX = evt.changedTouches[0].clientX
-          evt.clientY = evt.changedTouches[0].clientY
-        }
-        // If changedTouches has pageX attribute
-        else if (evt.changedTouches[0].pageX !== void 0) {
+      if (evt.touches !== void 0 && evt.touches.length) {
+        if (evt.touches[0].clientX !== void 0) {
+          evt.clientX = evt.touches[0].clientX
+          evt.clientY = evt.touches[0].clientY
+        } else if (evt.touches[0].pageX !== void 0) {
           var rect = svg.getBoundingClientRect();
 
-          evt.clientX = evt.changedTouches[0].pageX - rect.left
-          evt.clientY = evt.changedTouches[0].pageY - rect.top
+          evt.clientX = evt.touches[0].pageX - rect.left
+          evt.clientY = evt.touches[0].pageY - rect.top
         }
       // If it is a custom event
       } else if (evt.originalEvent !== void 0) {
