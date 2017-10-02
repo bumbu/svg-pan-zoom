@@ -135,7 +135,7 @@ module.exports = {
       var thisDefs = allDefs[i];
       thisDefs.parentNode.insertBefore(thisDefs, thisDefs);
     }
-  }, this.internetExplorerRedisplayInterval)
+  }, this ? this.internetExplorerRedisplayInterval : null)
 
   /**
    * Sets the current transform matrix of an element
