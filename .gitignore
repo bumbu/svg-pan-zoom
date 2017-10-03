@@ -3,4 +3,3 @@ node_modules/
 **/*.orig
 .DS_Store
 npm-debug.log
-package-lock.json
