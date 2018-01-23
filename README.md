@@ -497,6 +497,7 @@ This library used the [SVGPan](https://github.com/aleofreddi/svgpan) library as 
 
 Wrapper Libraries (feel free to add to this -- pull requests welcome!)
 * [AngularJS 1.x](https://www.npmjs.com/package/angular-svg-pan-zoom)
+* [Vue.js component](https://github.com/yanick/vue-svg-pan-zoom)
 * [Meteor](https://github.com/jossoco/meteor-svg-pan-zoom/)
 * [R](https://github.com/timelyportfolio/svgPanZoom)
 * [Ruby](https://rubygems.org/gems/svg_pan_zoom)
