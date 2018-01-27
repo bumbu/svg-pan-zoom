@@ -183,7 +183,7 @@ One way to do so is by listening to load event:
 <script>
 document.getElementById('my-embed').addEventListener('load', function(){
   // Will get called after embed element was loaded
-  svgPanZoom(document.getElementById('my-embed')); 
+  svgPanZoom(document.getElementById('my-embed'));
 })
 </script>
 ```
@@ -474,6 +474,38 @@ Before committing you should check your code style by running `gulp check`.
 If you made a change then first build the library. Open `./tests/index.html` in your browser. All tests should pass.
 
 If you have PhantomJS installed then you can run `gulp test`.
+
+Common Issues & FAQ
+-------------------
+
+### SVG height is broken
+
+Because the library removes `viewBox` attribute from the SVG element - you may experience that the height of your SVG changed (usually to 150px). In order to fix that you have to add height to the `SVG` or `object`/`embed`.
+
+### Calling library methods throw errors when SVG is hidden
+
+This library does not support working with SVGs that are hidden as some browsers detach child documents from the DOM when those are hidden. See #279 for more details.
+
+### Performance issues on initialization
+
+If performance is bad only on initialization of the library, then consider wrapping all SVG's child elements into a `<g>` beforehand. This way the library will not have to create it and move all children into it (which is the root cause of the issue). See [#146 comment](https://github.com/ariutta/svg-pan-zoom/issues/146#issuecomment-137873358).
+
+### Performance issues while panning/zooming
+
+Most often those are caused by big SVG files. And in those cases it's browsers not being able to handle those SVGs fast enough.
+See #277 for more details.
+
+### How to limit zooming/panning
+
+For zooming there is `minZoom` and `maxZoom` zoom config options.
+
+For panning and custom zoom experiences take a look at [limit-pan example](http://ariutta.github.io/svg-pan-zoom/demo/limit-pan.html).
+
+### Errors for `object`/`embed` or dynamically loaded SVGs
+
+You have to ensure that the SVG is loaded and available in DOM before initializing the library.
+
+Check [dymanic-load demo](http://ariutta.github.io/svg-pan-zoom/demo/dynamic-load.html).
 
 Supported Browsers
 ------------------
