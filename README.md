@@ -484,7 +484,7 @@ Because the library removes `viewBox` attribute from the SVG element - you may e
 
 ### Calling library methods throw errors when SVG is hidden
 
-This library does not support working with SVGs that are hidden as some browsers detach child documents from the DOM when those are hidden. See #279 for more details.
+This library does not support working with SVGs that are hidden as some browsers detach child documents from the DOM when those are hidden. See [#279](https://github.com/ariutta/svg-pan-zoom/issues/279) for more details.
 
 ### Performance issues on initialization
 
@@ -493,7 +493,7 @@ If performance is bad only on initialization of the library, then consider wrapp
 ### Performance issues while panning/zooming
 
 Most often those are caused by big SVG files. And in those cases it's browsers not being able to handle those SVGs fast enough.
-See #277 for more details.
+See [#277](https://github.com/ariutta/svg-pan-zoom/issues/277) for more details.
 
 ### How to limit zooming/panning
 
