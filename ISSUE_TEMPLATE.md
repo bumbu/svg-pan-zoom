@@ -4,7 +4,10 @@ Thanks for submitting an issue to svg-pan-zoom.
 
 To help us help you better, please do the following before submitting an issue:
 
-1. Review the available [documentation](https://github.com/ariutta/svg-pan-zoom/blob/master/README.md) and existing [examples](https://github.com/ariutta/svg-pan-zoom#demos)
+1. Review:
+  * Available documentation https://github.com/ariutta/svg-pan-zoom/blob/master/README.md
+  * Common Issues & FAQ https://github.com/ariutta/svg-pan-zoom#common-issues--faq
+  * Existing examples https://github.com/ariutta/svg-pan-zoom#demos
 1. Check if the same bug/feature request [wasn't previously reported](https://github.com/ariutta/svg-pan-zoom/issues?q=is%3Aissue%20)
 1. Make sure you are not asking a usage or debugging question. If you are, use [StackOverflow](http://stackoverflow.com/questions/tagged/svgpanzoom).
 1. Fill in the information that corresponds to your type of issue below
@@ -31,7 +34,7 @@ _your text here_
 - svg-pan-zoom version: ``
 - Browser(s): ``
 - Operating system(s): ``
-- A relevant example URL: 
+- A relevant example URL:
 
 
 Feature Request
