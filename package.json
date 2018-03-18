@@ -2,6 +2,7 @@
   "name": "svg-pan-zoom",
   "version": "3.5.3",
   "main": "dist/svg-pan-zoom.js",
+  "module": "src/svg-pan-zoom.js",
   "types": "dist/svg-pan-zoom.d.ts",
   "browser": "src/browserify.js",
   "license": "BSD-2-Clause",
