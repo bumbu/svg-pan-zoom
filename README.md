@@ -218,7 +218,7 @@ svgPanZoom('#demo-tiger', {
   viewportSelector: '.svg-pan-zoom_viewport'
 });
 // or
-var viewportGroupElement = document.getElemenById('demo-tiger').querySelector('.svg-pan-zoom_viewport');
+var viewportGroupElement = document.getElementById('demo-tiger').querySelector('.svg-pan-zoom_viewport');
 svgPanZoom('#demo-tiger', {
   viewportSelector: viewportGroupElement
 });
