@@ -32,6 +32,8 @@ var optionsDefaults = {
 , onUpdatedCTM: null
 }
 
+var passiveListenerOption = {passive: true};
+
 SvgPanZoom.prototype.init = function(svg, options) {
   var that = this
 
@@ -168,7 +170,7 @@ SvgPanZoom.prototype.setupHandlers = function() {
   for (var event in this.eventListeners) {
     // Attach event to eventsListenerElement or SVG if not available
     (this.options.eventsListenerElement || this.svg)
-      .addEventListener(event, this.eventListeners[event], false)
+      .addEventListener(event, this.eventListeners[event], !this.options.preventMouseEventsDefault ? passiveListenerOption : false)
   }
 
   // Zoom using mouse wheel
@@ -191,7 +193,8 @@ SvgPanZoom.prototype.enableMouseWheelZoom = function() {
     }
 
     // Bind wheelListener
-    Wheel.on(this.options.eventsListenerElement || this.svg, this.wheelListener, false)
+    var isPassiveListener = !this.options.preventMouseEventsDefault
+    Wheel.on(this.options.eventsListenerElement || this.svg, this.wheelListener, isPassiveListener)
 
     this.options.mouseWheelZoomEnabled = true
   }
@@ -202,7 +205,8 @@ SvgPanZoom.prototype.enableMouseWheelZoom = function() {
  */
 SvgPanZoom.prototype.disableMouseWheelZoom = function() {
   if (this.options.mouseWheelZoomEnabled) {
-    Wheel.off(this.options.eventsListenerElement || this.svg, this.wheelListener, false)
+    var isPassiveListener = !this.options.preventMouseEventsDefault
+    Wheel.off(this.options.eventsListenerElement || this.svg, this.wheelListener, isPassiveListener)
     this.options.mouseWheelZoomEnabled = false
   }
 }
@@ -612,7 +616,7 @@ SvgPanZoom.prototype.destroy = function() {
   // Unbind eventListeners
   for (var event in this.eventListeners) {
     (this.options.eventsListenerElement || this.svg)
-      .removeEventListener(event, this.eventListeners[event], false)
+      .removeEventListener(event, this.eventListeners[event], !this.options.preventMouseEventsDefault ? passiveListenerOption : false)
   }
 
   // Unbind wheelListener

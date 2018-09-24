@@ -11,7 +11,8 @@
     "start": "gulp",
     "lint": "tslint 'dist/svg-pan-zoom.d.ts'",
     "test": "tsc && gulp test",
-    "build": "gulp build"
+    "build": "gulp build",
+    "server": "node server.js"
   },
   "repository": {
     "type": "git",
