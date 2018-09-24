@@ -86,51 +86,51 @@ module.exports = (function(){
     }
   }
 
-  function _addWheelListener( elem, eventName, callback, useCapture ) {
+  function _addWheelListener( elem, eventName, callback ) {
 
     var cb;
 
     if (support === "wheel") {
       cb = callback;
     } else {
-      cb = createCallback(elem,callback,useCapture);
+      cb = createCallback(elem,callback,{passive: true});
     }
 
-    elem[ _addEventListener ]( prefix + eventName, cb, useCapture || false );
+    elem[ _addEventListener ]( prefix + eventName, cb, {passive: true});
 
   }
 
-  function _removeWheelListener( elem, eventName, callback, useCapture ) {
+  function _removeWheelListener( elem, eventName, callback ) {
 
     var cb;
 
     if (support === "wheel") {
       cb = callback;
     } else {
-      cb = getCallback(elem,useCapture);
+      cb = getCallback(elem,{passive: true});
     }
 
-    elem[ _removeEventListener ]( prefix + eventName, cb, useCapture || false );
+    elem[ _removeEventListener ]( prefix + eventName, cb, {passive: true} );
 
-    removeCallback(elem,useCapture);
+    removeCallback(elem);
 
   }
 
-  function addWheelListener( elem, callback, useCapture ) {
-    _addWheelListener( elem, support, callback, useCapture );
+  function addWheelListener( elem, callback ) {
+    _addWheelListener( elem, support, callback, {passive: true} );
 
     // handle MozMousePixelScroll in older Firefox
     if( support == "DOMMouseScroll" ) {
-        _addWheelListener( elem, "MozMousePixelScroll", callback, useCapture);
+        _addWheelListener( elem, "MozMousePixelScroll", callback, {passive: true});
     }
   }
 
-  function removeWheelListener(elem,callback,useCapture){
-    _removeWheelListener(elem,support,callback,useCapture);
+  function removeWheelListener(elem,callback){
+    _removeWheelListener(elem,support,callback,{passive: true});
 
     // handle MozMousePixelScroll in older Firefox
     if( support == "DOMMouseScroll" ) {
-        _removeWheelListener(elem, "MozMousePixelScroll", callback, useCapture);
+        _removeWheelListener(elem, "MozMousePixelScroll", callback, {passive: true});
     }
   }
 
