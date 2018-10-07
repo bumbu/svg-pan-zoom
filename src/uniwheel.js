@@ -6,7 +6,8 @@ module.exports = (function(){
 
   //Full details: https://developer.mozilla.org/en-US/docs/Web/Reference/Events/wheel
 
-  var prefix = "", _addEventListener, _removeEventListener, onwheel, support, fns = [];
+  var prefix = "", _addEventListener, _removeEventListener, support, fns = [];
+  var passiveOption = {passive: true};
 
   // detect event model
   if ( window.addEventListener ) {
@@ -24,7 +25,7 @@ module.exports = (function(){
             "DOMMouseScroll"; // let's assume that remaining browsers are older Firefox
 
 
-  function createCallback(element,callback,capture) {
+  function createCallback(element,callback) {
 
     var fn = function(originalEvent) {
 
@@ -63,74 +64,70 @@ module.exports = (function(){
     fns.push({
       element: element,
       fn: fn,
-      capture: capture
     });
 
     return fn;
   }
 
-  function getCallback(element,capture) {
+  function getCallback(element) {
     for (var i = 0; i < fns.length; i++) {
-      if (fns[i].element === element && fns[i].capture === capture) {
+      if (fns[i].element === element) {
         return fns[i].fn;
       }
     }
     return function(){};
   }
 
-  function removeCallback(element,capture) {
+  function removeCallback(element) {
     for (var i = 0; i < fns.length; i++) {
-      if (fns[i].element === element && fns[i].capture === capture) {
+      if (fns[i].element === element) {
         return fns.splice(i,1);
       }
     }
   }
 
-  function _addWheelListener( elem, eventName, callback, useCapture ) {
+  function _addWheelListener(elem, eventName, callback, isPassiveListener ) {
+    var cb;
+
+    if (support === "wheel") {
+      cb = callback;
+    } else {
+      cb = createCallback(elem, callback);
+    }
+
+    elem[_addEventListener](prefix + eventName, cb, isPassiveListener ? passiveOption : false);
+  }
+
+  function _removeWheelListener(elem, eventName, callback, isPassiveListener ) {
 
     var cb;
 
     if (support === "wheel") {
       cb = callback;
     } else {
-      cb = createCallback(elem,callback,useCapture);
+      cb = getCallback(elem);
     }
 
-    elem[ _addEventListener ]( prefix + eventName, cb, useCapture || false );
+    elem[_removeEventListener](prefix + eventName, cb, isPassiveListener ? passiveOption : false);
 
+    removeCallback(elem);
   }
 
-  function _removeWheelListener( elem, eventName, callback, useCapture ) {
-
-    var cb;
-
-    if (support === "wheel") {
-      cb = callback;
-    } else {
-      cb = getCallback(elem,useCapture);
-    }
-
-    elem[ _removeEventListener ]( prefix + eventName, cb, useCapture || false );
-
-    removeCallback(elem,useCapture);
-
-  }
-
-  function addWheelListener( elem, callback, useCapture ) {
-    _addWheelListener( elem, support, callback, useCapture );
+  function addWheelListener( elem, callback, isPassiveListener ) {
+    _addWheelListener(elem, support, callback, isPassiveListener );
 
     // handle MozMousePixelScroll in older Firefox
     if( support == "DOMMouseScroll" ) {
-        _addWheelListener( elem, "MozMousePixelScroll", callback, useCapture);
+      _addWheelListener(elem, "MozMousePixelScroll", callback, isPassiveListener );
     }
   }
 
-  function removeWheelListener(elem,callback,useCapture){
-    _removeWheelListener(elem,support,callback,useCapture);
+  function removeWheelListener(elem, callback, isPassiveListener){
+    _removeWheelListener(elem, support, callback, isPassiveListener);
 
     // handle MozMousePixelScroll in older Firefox
     if( support == "DOMMouseScroll" ) {
-        _removeWheelListener(elem, "MozMousePixelScroll", callback, useCapture);
+      _removeWheelListener(elem, "MozMousePixelScroll", callback, isPassiveListener);
     }
   }
 
