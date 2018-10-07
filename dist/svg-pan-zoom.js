@@ -1,4 +1,4 @@
-// svg-pan-zoom v3.5.2
+// svg-pan-zoom v3.6.0
 // https://github.com/ariutta/svg-pan-zoom
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var svgPanZoom = require('./svg-pan-zoom.js');
@@ -522,6 +522,8 @@ var optionsDefaults = {
 , onUpdatedCTM: null
 }
 
+var passiveListenerOption = {passive: true};
+
 SvgPanZoom.prototype.init = function(svg, options) {
   var that = this
 
@@ -658,7 +660,7 @@ SvgPanZoom.prototype.setupHandlers = function() {
   for (var event in this.eventListeners) {
     // Attach event to eventsListenerElement or SVG if not available
     (this.options.eventsListenerElement || this.svg)
-      .addEventListener(event, this.eventListeners[event], false)
+      .addEventListener(event, this.eventListeners[event], !this.options.preventMouseEventsDefault ? passiveListenerOption : false)
   }
 
   // Zoom using mouse wheel
@@ -681,7 +683,8 @@ SvgPanZoom.prototype.enableMouseWheelZoom = function() {
     }
 
     // Bind wheelListener
-    Wheel.on(this.options.eventsListenerElement || this.svg, this.wheelListener, false)
+    var isPassiveListener = !this.options.preventMouseEventsDefault
+    Wheel.on(this.options.eventsListenerElement || this.svg, this.wheelListener, isPassiveListener)
 
     this.options.mouseWheelZoomEnabled = true
   }
@@ -692,7 +695,8 @@ SvgPanZoom.prototype.enableMouseWheelZoom = function() {
  */
 SvgPanZoom.prototype.disableMouseWheelZoom = function() {
   if (this.options.mouseWheelZoomEnabled) {
-    Wheel.off(this.options.eventsListenerElement || this.svg, this.wheelListener, false)
+    var isPassiveListener = !this.options.preventMouseEventsDefault
+    Wheel.off(this.options.eventsListenerElement || this.svg, this.wheelListener, isPassiveListener)
     this.options.mouseWheelZoomEnabled = false
   }
 }
@@ -1102,7 +1106,7 @@ SvgPanZoom.prototype.destroy = function() {
   // Unbind eventListeners
   for (var event in this.eventListeners) {
     (this.options.eventsListenerElement || this.svg)
-      .removeEventListener(event, this.eventListeners[event], false)
+      .removeEventListener(event, this.eventListeners[event], !this.options.preventMouseEventsDefault ? passiveListenerOption : false)
   }
 
   // Unbind wheelListener
@@ -1397,7 +1401,7 @@ module.exports = {
       var thisDefs = allDefs[i];
       thisDefs.parentNode.insertBefore(thisDefs, thisDefs);
     }
-  }, this.internetExplorerRedisplayInterval)
+  }, this ? this.internetExplorerRedisplayInterval : null)
 
   /**
    * Sets the current transform matrix of an element
@@ -1488,7 +1492,8 @@ module.exports = (function(){
 
   //Full details: https://developer.mozilla.org/en-US/docs/Web/Reference/Events/wheel
 
-  var prefix = "", _addEventListener, _removeEventListener, onwheel, support, fns = [];
+  var prefix = "", _addEventListener, _removeEventListener, support, fns = [];
+  var passiveOption = {passive: true};
 
   // detect event model
   if ( window.addEventListener ) {
@@ -1506,7 +1511,7 @@ module.exports = (function(){
             "DOMMouseScroll"; // let's assume that remaining browsers are older Firefox
 
 
-  function createCallback(element,callback,capture) {
+  function createCallback(element,callback) {
 
     var fn = function(originalEvent) {
 
@@ -1545,74 +1550,70 @@ module.exports = (function(){
     fns.push({
       element: element,
       fn: fn,
-      capture: capture
     });
 
     return fn;
   }
 
-  function getCallback(element,capture) {
+  function getCallback(element) {
     for (var i = 0; i < fns.length; i++) {
-      if (fns[i].element === element && fns[i].capture === capture) {
+      if (fns[i].element === element) {
         return fns[i].fn;
       }
     }
     return function(){};
   }
 
-  function removeCallback(element,capture) {
+  function removeCallback(element) {
     for (var i = 0; i < fns.length; i++) {
-      if (fns[i].element === element && fns[i].capture === capture) {
+      if (fns[i].element === element) {
         return fns.splice(i,1);
       }
     }
   }
 
-  function _addWheelListener( elem, eventName, callback, useCapture ) {
+  function _addWheelListener(elem, eventName, callback, isPassiveListener ) {
+    var cb;
+
+    if (support === "wheel") {
+      cb = callback;
+    } else {
+      cb = createCallback(elem, callback);
+    }
+
+    elem[_addEventListener](prefix + eventName, cb, isPassiveListener ? passiveOption : false);
+  }
+
+  function _removeWheelListener(elem, eventName, callback, isPassiveListener ) {
 
     var cb;
 
     if (support === "wheel") {
       cb = callback;
     } else {
-      cb = createCallback(elem,callback,useCapture);
+      cb = getCallback(elem);
     }
 
-    elem[ _addEventListener ]( prefix + eventName, cb, useCapture || false );
+    elem[_removeEventListener](prefix + eventName, cb, isPassiveListener ? passiveOption : false);
 
+    removeCallback(elem);
   }
 
-  function _removeWheelListener( elem, eventName, callback, useCapture ) {
-
-    var cb;
-
-    if (support === "wheel") {
-      cb = callback;
-    } else {
-      cb = getCallback(elem,useCapture);
-    }
-
-    elem[ _removeEventListener ]( prefix + eventName, cb, useCapture || false );
-
-    removeCallback(elem,useCapture);
-
-  }
-
-  function addWheelListener( elem, callback, useCapture ) {
-    _addWheelListener( elem, support, callback, useCapture );
+  function addWheelListener( elem, callback, isPassiveListener ) {
+    _addWheelListener(elem, support, callback, isPassiveListener );
 
     // handle MozMousePixelScroll in older Firefox
     if( support == "DOMMouseScroll" ) {
-        _addWheelListener( elem, "MozMousePixelScroll", callback, useCapture);
+      _addWheelListener(elem, "MozMousePixelScroll", callback, isPassiveListener );
     }
   }
 
-  function removeWheelListener(elem,callback,useCapture){
-    _removeWheelListener(elem,support,callback,useCapture);
+  function removeWheelListener(elem, callback, isPassiveListener){
+    _removeWheelListener(elem, support, callback, isPassiveListener);
 
     // handle MozMousePixelScroll in older Firefox
     if( support == "DOMMouseScroll" ) {
-        _removeWheelListener(elem, "MozMousePixelScroll", callback, useCapture);
+      _removeWheelListener(elem, "MozMousePixelScroll", callback, isPassiveListener);
     }
   }
 

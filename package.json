@@ -1,6 +1,6 @@
 {
   "name": "svg-pan-zoom",
-  "version": "3.5.3",
+  "version": "3.6.0",
   "main": "dist/svg-pan-zoom.js",
   "module": "src/svg-pan-zoom.js",
   "types": "dist/svg-pan-zoom.d.ts",
@@ -42,7 +42,8 @@
     "César Vidril (https://github.com/Yimiprod)",
     "Androl Genhald (https://github.com/AndrolGenhald)",
     "James Newell (https://github.com/musicfuel)",
-    "KoenkookpotPlasmans (https://github.com/KoenkookpotPlasmans)"
+    "KoenkookpotPlasmans (https://github.com/KoenkookpotPlasmans)",
+    "Hassan Shaikley (http://hassanshaikley.github.io/)"
   ],
   "keywords": [
     "svg",
