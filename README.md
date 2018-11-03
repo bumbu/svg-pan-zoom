@@ -501,6 +501,10 @@ For zooming there is `minZoom` and `maxZoom` zoom config options.
 
 For panning and custom zoom experiences take a look at [limit-pan example](http://ariutta.github.io/svg-pan-zoom/demo/limit-pan.html).
 
+### How to add animations
+
+Currently there're 2 wais of doing animation: via CSS or programatically - see #101 for more details. 
+
 ### Errors for `object`/`embed` or dynamically loaded SVGs
 
 You have to ensure that the SVG is loaded and available in DOM before initializing the library.
