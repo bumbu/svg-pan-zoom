@@ -601,17 +601,12 @@ SvgPanZoom.prototype.setupHandlers = function() {
   this.eventListeners = {
     // Mouse down group
     mousedown: function(evt) {
-      if (typeof that.options.restrictPanButton !== 'undefined') {
-        if (evt.button !== that.options.restrictPanButton) {
-          return;
-        }
-      }
-      var result = that.handleMouseDown(evt, prevEvt);
+      var result = that.handleMouseDown(evt, prevEvt, 'mouse');
       prevEvt = evt
       return result;
     }
   , touchstart: function(evt) {
-      var result = that.handleMouseDown(evt, prevEvt);
+      var result = that.handleMouseDown(evt, prevEvt, 'touch');
       prevEvt = evt
       return result;
     }
@@ -930,12 +925,20 @@ SvgPanZoom.prototype.handleDblClick = function(evt) {
  *
  * @param {Event} evt
  */
-SvgPanZoom.prototype.handleMouseDown = function(evt, prevEvt) {
+SvgPanZoom.prototype.handleMouseDown = function(evt, prevEvt, source) {
   if (this.options.preventMouseEventsDefault) {
     if (evt.preventDefault) {
       evt.preventDefault()
     } else {
       evt.returnValue = false
+    }
+  }
+
+  if (source === 'mouse') {
+    if (typeof this.options.restrictPanButton !== 'undefined') {
+      if (evt.button !== this.options.restrictPanButton) {
+        return;
+      }
     }
   }
 
