@@ -166,7 +166,6 @@ SvgPanZoom.prototype.setupHandlers = function() {
       if (that.options.restrictPanWhilePointerIsDown && !that.isDown) {
         return;
       }
-      console.debug(evt);
       return that.handleMouseMove(evt);
     };
     window.addEventListener('pointermove', that.globalMoveHandler);
