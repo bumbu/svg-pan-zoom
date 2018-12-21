@@ -522,6 +522,7 @@ var optionsDefaults = {
 , onUpdatedCTM: null
 , triggerUpOnLeave: true
 , restrictPanButton: null
+, useGlobalMove: null
 }
 
 var passiveListenerOption = {passive: true};
@@ -643,6 +644,15 @@ SvgPanZoom.prototype.setupHandlers = function() {
   , touchcancel: function(evt) {
       return that.handleMouseUp(evt);
     }
+  }
+
+  if (that.options.useGlobalMove) {
+    delete that.eventListeners.mousemove;
+    delete that.eventListeners.touchmove;
+    that.globalMoveHandler = function(evt) {
+      return that.handleMouseMove(evt);
+    };
+    window.addEventListener('pointermove', that.globalMoveHandler);
   }
 
   // Init custom events handler if available
@@ -1109,6 +1119,10 @@ SvgPanZoom.prototype.destroy = function() {
   this.beforePan = null
   this.onPan = null
   this.onUpdatedCTM = null
+
+  if (this.options.globalMoveHandler) {
+    window.removeEventListener('mousemove', this.globalMoveHandler);
+  }
 
   // Destroy custom event handlers
   if (this.options.customEventsHandler != null) { // jshint ignore:line
