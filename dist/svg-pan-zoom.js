@@ -520,6 +520,8 @@ var optionsDefaults = {
 , customEventsHandler: null
 , eventsListenerElement: null
 , onUpdatedCTM: null
+, triggerUpOnLeave: true
+, restrictPanButton: null
 }
 
 var passiveListenerOption = {passive: true};
@@ -599,6 +601,11 @@ SvgPanZoom.prototype.setupHandlers = function() {
   this.eventListeners = {
     // Mouse down group
     mousedown: function(evt) {
+      if (typeof that.options.restrictPanButton !== 'undefined') {
+        if (evt.button !== that.options.restrictPanButton) {
+          return;
+        }
+      }
       var result = that.handleMouseDown(evt, prevEvt);
       prevEvt = evt
       return result;
@@ -627,9 +634,15 @@ SvgPanZoom.prototype.setupHandlers = function() {
 
     // Mouse leave group
   , mouseleave: function(evt) {
+      if (!that.options.triggerUpOnLeave) {
+        return;
+      }
       return that.handleMouseUp(evt);
     }
   , touchleave: function(evt) {
+      if (!that.options.triggerUpOnLeave) {
+        return;
+      }
       return that.handleMouseUp(evt);
     }
   , touchcancel: function(evt) {
