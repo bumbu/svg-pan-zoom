@@ -460,14 +460,6 @@ SvgPanZoom.prototype.handleMouseDown = function(evt, prevEvt, source) {
     }
   }
 
-  if (source === 'mouse') {
-    if (typeof this.options.restrictPanButton !== 'undefined') {
-      if (evt.button !== this.options.restrictPanButton) {
-        return;
-      }
-    }
-  }
-
   this.isDown = true;
 
   Utils.mouseAndTouchNormalize(evt, this.svg)
@@ -476,6 +468,13 @@ SvgPanZoom.prototype.handleMouseDown = function(evt, prevEvt, source) {
   if (this.options.dblClickZoomEnabled && Utils.isDblClick(evt, prevEvt)){
     this.handleDblClick(evt)
   } else {
+    if (source === 'mouse') {
+      if (typeof this.options.restrictPanButton !== 'undefined') {
+        if (evt.button !== this.options.restrictPanButton) {
+          return;
+        }
+      }
+    }
     // Pan mode
     this.state = 'pan'
     this.firstEventCTM = this.viewport.getCTM()
