@@ -503,7 +503,7 @@ For panning and custom zoom experiences take a look at [limit-pan example](http:
 
 ### How to add animations
 
-Currently there're 2 wais of doing animation: via CSS or programatically - see #101 for more details. 
+Currently there're 2 ways of doing animation: via CSS or programatically - see #101 for more details. 
 
 ### Errors for `object`/`embed` or dynamically loaded SVGs
 
