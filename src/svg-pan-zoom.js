@@ -32,7 +32,7 @@ var optionsDefaults = {
 , onUpdatedCTM: null
 }
 
-var passiveListenerOption = {passive: true};
+var passiveListenerOption = {passive: true}
 
 SvgPanZoom.prototype.init = function(svg, options) {
   var that = this
@@ -104,51 +104,51 @@ SvgPanZoom.prototype.init = function(svg, options) {
 SvgPanZoom.prototype.setupHandlers = function() {
   var that = this
     , prevEvt = null // use for touchstart event to detect double tap
-    ;
+    
 
   this.eventListeners = {
     // Mouse down group
     mousedown: function(evt) {
-      var result = that.handleMouseDown(evt, prevEvt);
+      var result = that.handleMouseDown(evt, prevEvt)
       prevEvt = evt
-      return result;
+      return result
     }
   , touchstart: function(evt) {
-      var result = that.handleMouseDown(evt, prevEvt);
+      var result = that.handleMouseDown(evt, prevEvt)
       prevEvt = evt
-      return result;
+      return result
     }
 
     // Mouse up group
   , mouseup: function(evt) {
-      return that.handleMouseUp(evt);
+      return that.handleMouseUp(evt)
     }
   , touchend: function(evt) {
-      return that.handleMouseUp(evt);
+      return that.handleMouseUp(evt)
     }
 
     // Mouse move group
   , mousemove: function(evt) {
-      return that.handleMouseMove(evt);
+      return that.handleMouseMove(evt)
     }
   , touchmove: function(evt) {
-      return that.handleMouseMove(evt);
+      return that.handleMouseMove(evt)
     }
 
     // Mouse leave group
   , mouseleave: function(evt) {
-      return that.handleMouseUp(evt);
+      return that.handleMouseUp(evt)
     }
   , touchleave: function(evt) {
-      return that.handleMouseUp(evt);
+      return that.handleMouseUp(evt)
     }
   , touchcancel: function(evt) {
-      return that.handleMouseUp(evt);
+      return that.handleMouseUp(evt)
     }
   }
 
   // Init custom events handler if available
-  if (this.options.customEventsHandler != null) { // jshint ignore:line
+  if (this.options.customEventsHandler != null) { // eslint-disable-line eqeqeq
     this.options.customEventsHandler.init({
       svgElement: this.svg
     , eventsListenerElement: this.options.eventsListenerElement
@@ -189,7 +189,7 @@ SvgPanZoom.prototype.enableMouseWheelZoom = function() {
 
     // Mouse wheel listener
     this.wheelListener = function(evt) {
-      return that.handleMouseWheel(evt);
+      return that.handleMouseWheel(evt)
     }
 
     // Bind wheelListener
@@ -218,14 +218,14 @@ SvgPanZoom.prototype.disableMouseWheelZoom = function() {
  */
 SvgPanZoom.prototype.handleMouseWheel = function(evt) {
   if (!this.options.zoomEnabled || this.state !== 'none') {
-    return;
+    return
   }
 
   if (this.options.preventMouseEventsDefault){
     if (evt.preventDefault) {
-      evt.preventDefault();
+      evt.preventDefault()
     } else {
-      evt.returnValue = false;
+      evt.returnValue = false
     }
   }
 
@@ -246,7 +246,7 @@ SvgPanZoom.prototype.handleMouseWheel = function(evt) {
 
   var inversedScreenCTM = this.svg.getScreenCTM().inverse()
     , relativeMousePoint = SvgUtils.getEventPoint(evt, this.svg).matrixTransform(inversedScreenCTM)
-    , zoom = Math.pow(1 + this.options.zoomScaleSensitivity, (-1) * delta); // multiplying by neg. 1 so as to make zoom in/out behavior match Google maps behavior
+    , zoom = Math.pow(1 + this.options.zoomScaleSensitivity, (-1) * delta) // multiplying by neg. 1 so as to make zoom in/out behavior match Google maps behavior
 
   this.zoomAtPoint(zoom, relativeMousePoint)
 }
@@ -369,14 +369,14 @@ SvgPanZoom.prototype.computeFromRelativeZoom = function(zoom) {
 SvgPanZoom.prototype.resetZoom = function() {
   var originalState = this.viewport.getOriginalState()
 
-  this.zoom(originalState.zoom, true);
+  this.zoom(originalState.zoom, true)
 }
 
 /**
  * Set pan to initial state
  */
 SvgPanZoom.prototype.resetPan = function() {
-  this.pan(this.viewport.getOriginalState());
+  this.pan(this.viewport.getOriginalState())
 }
 
 /**
@@ -605,7 +605,7 @@ SvgPanZoom.prototype.destroy = function() {
   this.onUpdatedCTM = null
 
   // Destroy custom event handlers
-  if (this.options.customEventsHandler != null) { // jshint ignore:line
+  if (this.options.customEventsHandler != null) { // eslint-disable-line eqeqeq
     this.options.customEventsHandler.destroy({
       svgElement: this.svg
     , eventsListenerElement: this.options.eventsListenerElement
@@ -681,7 +681,7 @@ SvgPanZoom.prototype.getPublicInstance = function() {
       }
     , disableControlIcons: function() {
         if (that.options.controlIconsEnabled) {
-          that.options.controlIconsEnabled = false;
+          that.options.controlIconsEnabled = false
           ControlIcons.disable(that)
         }
         return that.pi
@@ -771,4 +771,4 @@ var svgPanZoom = function(elementOrSelector, options){
   }
 }
 
-module.exports = svgPanZoom;
+module.exports = svgPanZoom

@@ -1,10 +1,10 @@
 var Utils = require('./utilities')
   , _browser = 'unknown'
-  ;
+  
 
 // http://stackoverflow.com/questions/9847580/how-to-detect-safari-chrome-ie-firefox-and-opera-browser
 if (/*@cc_on!@*/false || !!document.documentMode) { // internet explorer
-  _browser = 'ie';
+  _browser = 'ie'
 }
 
 module.exports = {
@@ -24,9 +24,9 @@ module.exports = {
     if (svg.clientWidth && svg.clientHeight) {
       return {width: svg.clientWidth, height: svg.clientHeight}
     } else if (!!svg.getBoundingClientRect()) {
-      return svg.getBoundingClientRect();
+      return svg.getBoundingClientRect()
     } else {
-      throw new Error('Cannot get BoundingClientRect for SVG.');
+      throw new Error('Cannot get BoundingClientRect for SVG.')
     }
   }
 
@@ -60,25 +60,25 @@ module.exports = {
 
     // If no favorable group element exists then create one
     if (!viewport) {
-      var viewportId = 'viewport-' + new Date().toISOString().replace(/\D/g, '');
-      viewport = document.createElementNS(this.svgNS, 'g');
-      viewport.setAttribute('id', viewportId);
+      var viewportId = 'viewport-' + new Date().toISOString().replace(/\D/g, '')
+      viewport = document.createElementNS(this.svgNS, 'g')
+      viewport.setAttribute('id', viewportId)
 
       // Internet Explorer (all versions?) can't use childNodes, but other browsers prefer (require?) using childNodes
-      var svgChildren = svg.childNodes || svg.children;
+      var svgChildren = svg.childNodes || svg.children
       if (!!svgChildren && svgChildren.length > 0) {
         for (var i = svgChildren.length; i > 0; i--) {
           // Move everything into viewport except defs
           if (svgChildren[svgChildren.length - i].nodeName !== 'defs') {
-            viewport.appendChild(svgChildren[svgChildren.length - i]);
+            viewport.appendChild(svgChildren[svgChildren.length - i])
           }
         }
       }
-      svg.appendChild(viewport);
+      svg.appendChild(viewport)
     }
 
     // Parse class names
-    var classNames = [];
+    var classNames = []
     if (viewport.getAttribute('class')) {
       classNames = viewport.getAttribute('class').split(' ')
     }
@@ -99,15 +99,15 @@ module.exports = {
    */
   , setupSvgAttributes: function(svg) {
     // Setting default attributes
-    svg.setAttribute('xmlns', this.svgNS);
-    svg.setAttributeNS(this.xmlnsNS, 'xmlns:xlink', this.xlinkNS);
-    svg.setAttributeNS(this.xmlnsNS, 'xmlns:ev', this.evNS);
+    svg.setAttribute('xmlns', this.svgNS)
+    svg.setAttributeNS(this.xmlnsNS, 'xmlns:xlink', this.xlinkNS)
+    svg.setAttributeNS(this.xmlnsNS, 'xmlns:ev', this.evNS)
 
     // Needed for Internet Explorer, otherwise the viewport overflows
     if (svg.parentNode !== null) {
-      var style = svg.getAttribute('style') || '';
+      var style = svg.getAttribute('style') || ''
       if (style.toLowerCase().indexOf('overflow') === -1) {
-        svg.setAttribute('style', 'overflow: hidden; ' + style);
+        svg.setAttribute('style', 'overflow: hidden; ' + style)
       }
     }
   }
@@ -129,11 +129,11 @@ module.exports = {
  * also see svg-pan-zoom issue: https://github.com/ariutta/svg-pan-zoom/issues/62
  */
 , refreshDefsGlobal: Utils.throttle(function() {
-    var allDefs = document.querySelectorAll('defs');
-    var allDefsCount = allDefs.length;
+    var allDefs = document.querySelectorAll('defs')
+    var allDefsCount = allDefs.length
     for (var i = 0; i < allDefsCount; i++) {
-      var thisDefs = allDefs[i];
-      thisDefs.parentNode.insertBefore(thisDefs, thisDefs);
+      var thisDefs = allDefs[i]
+      thisDefs.parentNode.insertBefore(thisDefs, thisDefs)
     }
   }, this ? this.internetExplorerRedisplayInterval : null)
 
@@ -146,15 +146,15 @@ module.exports = {
    */
 , setCTM: function(element, matrix, defs) {
     var that = this
-      , s = 'matrix(' + matrix.a + ',' + matrix.b + ',' + matrix.c + ',' + matrix.d + ',' + matrix.e + ',' + matrix.f + ')';
+      , s = 'matrix(' + matrix.a + ',' + matrix.b + ',' + matrix.c + ',' + matrix.d + ',' + matrix.e + ',' + matrix.f + ')'
 
-    element.setAttributeNS(null, 'transform', s);
+    element.setAttributeNS(null, 'transform', s)
     if ('transform' in element.style) {
-      element.style.transform = s;
+      element.style.transform = s
     } else if ('-ms-transform' in element.style) {
-      element.style['-ms-transform'] = s;
+      element.style['-ms-transform'] = s
     } else if ('-webkit-transform' in element.style) {
-      element.style['-webkit-transform'] = s;
+      element.style['-webkit-transform'] = s
     }
 
     // IE has a bug that makes markers disappear on zoom (when the matrix "a" and/or "d" elements change)
@@ -162,13 +162,13 @@ module.exports = {
     // and http://srndolha.wordpress.com/2013/11/25/svg-line-markers-may-disappear-in-internet-explorer-11/
     if (_browser === 'ie' && !!defs) {
       // this refresh is intended for redisplaying the SVG during zooming
-      defs.parentNode.insertBefore(defs, defs);
+      defs.parentNode.insertBefore(defs, defs)
       // this refresh is intended for redisplaying the other SVGs on a page when panning a given SVG
       // it is also needed for the given SVG itself, on zoomEnd, if the SVG contains any markers that
       // are located under any other element(s).
       window.setTimeout(function() {
-        that.refreshDefsGlobal();
-      }, that.internetExplorerRedisplayInterval);
+        that.refreshDefsGlobal()
+      }, that.internetExplorerRedisplayInterval)
     }
   }
 

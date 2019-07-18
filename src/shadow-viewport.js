@@ -1,6 +1,6 @@
 var SvgUtils = require('./svg-utilities')
   , Utils = require('./utilities')
-  ;
+  
 
 var ShadowViewport = function(viewport, options){
   this.init(viewport, options)
@@ -103,17 +103,17 @@ ShadowViewport.prototype.processCTM = function() {
   var newCTM = this.getCTM()
 
   if (this.options.fit || this.options.contain) {
-    var newScale;
+    var newScale
     if (this.options.fit) {
-      newScale = Math.min(this.options.width/this.viewBox.width, this.options.height/this.viewBox.height);
+      newScale = Math.min(this.options.width/this.viewBox.width, this.options.height/this.viewBox.height)
     } else {
-      newScale = Math.max(this.options.width/this.viewBox.width, this.options.height/this.viewBox.height);
+      newScale = Math.max(this.options.width/this.viewBox.width, this.options.height/this.viewBox.height)
     }
 
-    newCTM.a = newScale; //x-scale
-    newCTM.d = newScale; //y-scale
-    newCTM.e = -this.viewBox.x * newScale; //x-transform
-    newCTM.f = -this.viewBox.y * newScale; //y-transform
+    newCTM.a = newScale //x-scale
+    newCTM.d = newScale //y-scale
+    newCTM.e = -this.viewBox.x * newScale //x-transform
+    newCTM.f = -this.viewBox.y * newScale //y-transform
   }
 
   if (this.options.center) {
@@ -222,7 +222,7 @@ ShadowViewport.prototype.setCTM = function(newCTM) {
         newCTM.a = newCTM.d = this.activeState.zoom
         willZoom = false
       } else {
-        this.updateCache(newCTM);
+        this.updateCache(newCTM)
         this.options.onZoom(this.getRelativeZoom())
       }
     }
@@ -268,8 +268,8 @@ ShadowViewport.prototype.setCTM = function(newCTM) {
       if ((preventPanX && preventPanY) || !this.isPanDifferent(newCTM)) {
         willPan = false
       } else {
-        this.updateCache(newCTM);
-        this.options.onPan(this.getPan());
+        this.updateCache(newCTM)
+        this.options.onPan(this.getPan())
       }
     }
 

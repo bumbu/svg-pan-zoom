@@ -1,27 +1,7 @@
 // svg-pan-zoom v3.6.0
 // https://github.com/ariutta/svg-pan-zoom
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var svgPanZoom = require('./svg-pan-zoom.js');
-
-// UMD module definition
-(function(window, document){
-  // AMD
-  if (typeof define === 'function' && define.amd) {
-    define('svg-pan-zoom', function () {
-      return svgPanZoom;
-    });
-  // CMD
-  } else if (typeof module !== 'undefined' && module.exports) {
-    module.exports = svgPanZoom;
-
-    // Browser
-    // Keep exporting globally as module.exports is available because of browserify
-    window.svgPanZoom = svgPanZoom;
-  }
-})(window, document)
-
-},{"./svg-pan-zoom.js":4}],2:[function(require,module,exports){
-var SvgUtils = require('./svg-utilities');
+(function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
+var SvgUtils = require('./svg-utilities')
 
 module.exports = {
   enable: function(instance) {
@@ -33,7 +13,7 @@ module.exports = {
     }
 
     // Check for style element, and create it if it doesn't exist
-    var styleEl = defs.querySelector('style#svg-pan-zoom-controls-styles');
+    var styleEl = defs.querySelector('style#svg-pan-zoom-controls-styles')
     if (!styleEl) {
       var style = document.createElementNS(SvgUtils.svgNS, 'style')
       style.setAttribute('id', 'svg-pan-zoom-controls-styles')
@@ -43,10 +23,10 @@ module.exports = {
     }
 
     // Zoom Group
-    var zoomGroup = document.createElementNS(SvgUtils.svgNS, 'g');
-    zoomGroup.setAttribute('id', 'svg-pan-zoom-controls');
-    zoomGroup.setAttribute('transform', 'translate(' + ( instance.width - 70 ) + ' ' + ( instance.height - 76 ) + ') scale(0.75)');
-    zoomGroup.setAttribute('class', 'svg-pan-zoom-control');
+    var zoomGroup = document.createElementNS(SvgUtils.svgNS, 'g')
+    zoomGroup.setAttribute('id', 'svg-pan-zoom-controls')
+    zoomGroup.setAttribute('transform', 'translate(' + ( instance.width - 70 ) + ' ' + ( instance.height - 76 ) + ') scale(0.75)')
+    zoomGroup.setAttribute('class', 'svg-pan-zoom-control')
 
     // Control elements
     zoomGroup.appendChild(this._createZoomIn(instance))
@@ -61,80 +41,80 @@ module.exports = {
   }
 
 , _createZoomIn: function(instance) {
-    var zoomIn = document.createElementNS(SvgUtils.svgNS, 'g');
-    zoomIn.setAttribute('id', 'svg-pan-zoom-zoom-in');
-    zoomIn.setAttribute('transform', 'translate(30.5 5) scale(0.015)');
-    zoomIn.setAttribute('class', 'svg-pan-zoom-control');
+    var zoomIn = document.createElementNS(SvgUtils.svgNS, 'g')
+    zoomIn.setAttribute('id', 'svg-pan-zoom-zoom-in')
+    zoomIn.setAttribute('transform', 'translate(30.5 5) scale(0.015)')
+    zoomIn.setAttribute('class', 'svg-pan-zoom-control')
     zoomIn.addEventListener('click', function() {instance.getPublicInstance().zoomIn()}, false)
     zoomIn.addEventListener('touchstart', function() {instance.getPublicInstance().zoomIn()}, false)
 
-    var zoomInBackground = document.createElementNS(SvgUtils.svgNS, 'rect'); // TODO change these background space fillers to rounded rectangles so they look prettier
-    zoomInBackground.setAttribute('x', '0');
-    zoomInBackground.setAttribute('y', '0');
-    zoomInBackground.setAttribute('width', '1500'); // larger than expected because the whole group is transformed to scale down
-    zoomInBackground.setAttribute('height', '1400');
-    zoomInBackground.setAttribute('class', 'svg-pan-zoom-control-background');
-    zoomIn.appendChild(zoomInBackground);
+    var zoomInBackground = document.createElementNS(SvgUtils.svgNS, 'rect') // TODO change these background space fillers to rounded rectangles so they look prettier
+    zoomInBackground.setAttribute('x', '0')
+    zoomInBackground.setAttribute('y', '0')
+    zoomInBackground.setAttribute('width', '1500') // larger than expected because the whole group is transformed to scale down
+    zoomInBackground.setAttribute('height', '1400')
+    zoomInBackground.setAttribute('class', 'svg-pan-zoom-control-background')
+    zoomIn.appendChild(zoomInBackground)
 
-    var zoomInShape = document.createElementNS(SvgUtils.svgNS, 'path');
-    zoomInShape.setAttribute('d', 'M1280 576v128q0 26 -19 45t-45 19h-320v320q0 26 -19 45t-45 19h-128q-26 0 -45 -19t-19 -45v-320h-320q-26 0 -45 -19t-19 -45v-128q0 -26 19 -45t45 -19h320v-320q0 -26 19 -45t45 -19h128q26 0 45 19t19 45v320h320q26 0 45 19t19 45zM1536 1120v-960 q0 -119 -84.5 -203.5t-203.5 -84.5h-960q-119 0 -203.5 84.5t-84.5 203.5v960q0 119 84.5 203.5t203.5 84.5h960q119 0 203.5 -84.5t84.5 -203.5z');
-    zoomInShape.setAttribute('class', 'svg-pan-zoom-control-element');
-    zoomIn.appendChild(zoomInShape);
+    var zoomInShape = document.createElementNS(SvgUtils.svgNS, 'path')
+    zoomInShape.setAttribute('d', 'M1280 576v128q0 26 -19 45t-45 19h-320v320q0 26 -19 45t-45 19h-128q-26 0 -45 -19t-19 -45v-320h-320q-26 0 -45 -19t-19 -45v-128q0 -26 19 -45t45 -19h320v-320q0 -26 19 -45t45 -19h128q26 0 45 19t19 45v320h320q26 0 45 19t19 45zM1536 1120v-960 q0 -119 -84.5 -203.5t-203.5 -84.5h-960q-119 0 -203.5 84.5t-84.5 203.5v960q0 119 84.5 203.5t203.5 84.5h960q119 0 203.5 -84.5t84.5 -203.5z')
+    zoomInShape.setAttribute('class', 'svg-pan-zoom-control-element')
+    zoomIn.appendChild(zoomInShape)
 
     return zoomIn
   }
 
 , _createZoomReset: function(instance){
     // reset
-    var resetPanZoomControl = document.createElementNS(SvgUtils.svgNS, 'g');
-    resetPanZoomControl.setAttribute('id', 'svg-pan-zoom-reset-pan-zoom');
-    resetPanZoomControl.setAttribute('transform', 'translate(5 35) scale(0.4)');
-    resetPanZoomControl.setAttribute('class', 'svg-pan-zoom-control');
-    resetPanZoomControl.addEventListener('click', function() {instance.getPublicInstance().reset()}, false);
-    resetPanZoomControl.addEventListener('touchstart', function() {instance.getPublicInstance().reset()}, false);
+    var resetPanZoomControl = document.createElementNS(SvgUtils.svgNS, 'g')
+    resetPanZoomControl.setAttribute('id', 'svg-pan-zoom-reset-pan-zoom')
+    resetPanZoomControl.setAttribute('transform', 'translate(5 35) scale(0.4)')
+    resetPanZoomControl.setAttribute('class', 'svg-pan-zoom-control')
+    resetPanZoomControl.addEventListener('click', function() {instance.getPublicInstance().reset()}, false)
+    resetPanZoomControl.addEventListener('touchstart', function() {instance.getPublicInstance().reset()}, false)
 
-    var resetPanZoomControlBackground = document.createElementNS(SvgUtils.svgNS, 'rect'); // TODO change these background space fillers to rounded rectangles so they look prettier
-    resetPanZoomControlBackground.setAttribute('x', '2');
-    resetPanZoomControlBackground.setAttribute('y', '2');
-    resetPanZoomControlBackground.setAttribute('width', '182'); // larger than expected because the whole group is transformed to scale down
-    resetPanZoomControlBackground.setAttribute('height', '58');
-    resetPanZoomControlBackground.setAttribute('class', 'svg-pan-zoom-control-background');
-    resetPanZoomControl.appendChild(resetPanZoomControlBackground);
+    var resetPanZoomControlBackground = document.createElementNS(SvgUtils.svgNS, 'rect') // TODO change these background space fillers to rounded rectangles so they look prettier
+    resetPanZoomControlBackground.setAttribute('x', '2')
+    resetPanZoomControlBackground.setAttribute('y', '2')
+    resetPanZoomControlBackground.setAttribute('width', '182') // larger than expected because the whole group is transformed to scale down
+    resetPanZoomControlBackground.setAttribute('height', '58')
+    resetPanZoomControlBackground.setAttribute('class', 'svg-pan-zoom-control-background')
+    resetPanZoomControl.appendChild(resetPanZoomControlBackground)
 
-    var resetPanZoomControlShape1 = document.createElementNS(SvgUtils.svgNS, 'path');
-    resetPanZoomControlShape1.setAttribute('d', 'M33.051,20.632c-0.742-0.406-1.854-0.609-3.338-0.609h-7.969v9.281h7.769c1.543,0,2.701-0.188,3.473-0.562c1.365-0.656,2.048-1.953,2.048-3.891C35.032,22.757,34.372,21.351,33.051,20.632z');
-    resetPanZoomControlShape1.setAttribute('class', 'svg-pan-zoom-control-element');
-    resetPanZoomControl.appendChild(resetPanZoomControlShape1);
+    var resetPanZoomControlShape1 = document.createElementNS(SvgUtils.svgNS, 'path')
+    resetPanZoomControlShape1.setAttribute('d', 'M33.051,20.632c-0.742-0.406-1.854-0.609-3.338-0.609h-7.969v9.281h7.769c1.543,0,2.701-0.188,3.473-0.562c1.365-0.656,2.048-1.953,2.048-3.891C35.032,22.757,34.372,21.351,33.051,20.632z')
+    resetPanZoomControlShape1.setAttribute('class', 'svg-pan-zoom-control-element')
+    resetPanZoomControl.appendChild(resetPanZoomControlShape1)
 
-    var resetPanZoomControlShape2 = document.createElementNS(SvgUtils.svgNS, 'path');
-    resetPanZoomControlShape2.setAttribute('d', 'M170.231,0.5H15.847C7.102,0.5,0.5,5.708,0.5,11.84v38.861C0.5,56.833,7.102,61.5,15.847,61.5h154.384c8.745,0,15.269-4.667,15.269-10.798V11.84C185.5,5.708,178.976,0.5,170.231,0.5z M42.837,48.569h-7.969c-0.219-0.766-0.375-1.383-0.469-1.852c-0.188-0.969-0.289-1.961-0.305-2.977l-0.047-3.211c-0.03-2.203-0.41-3.672-1.142-4.406c-0.732-0.734-2.103-1.102-4.113-1.102h-7.05v13.547h-7.055V14.022h16.524c2.361,0.047,4.178,0.344,5.45,0.891c1.272,0.547,2.351,1.352,3.234,2.414c0.731,0.875,1.31,1.844,1.737,2.906s0.64,2.273,0.64,3.633c0,1.641-0.414,3.254-1.242,4.84s-2.195,2.707-4.102,3.363c1.594,0.641,2.723,1.551,3.387,2.73s0.996,2.98,0.996,5.402v2.32c0,1.578,0.063,2.648,0.19,3.211c0.19,0.891,0.635,1.547,1.333,1.969V48.569z M75.579,48.569h-26.18V14.022h25.336v6.117H56.454v7.336h16.781v6H56.454v8.883h19.125V48.569z M104.497,46.331c-2.44,2.086-5.887,3.129-10.34,3.129c-4.548,0-8.125-1.027-10.731-3.082s-3.909-4.879-3.909-8.473h6.891c0.224,1.578,0.662,2.758,1.316,3.539c1.196,1.422,3.246,2.133,6.15,2.133c1.739,0,3.151-0.188,4.236-0.562c2.058-0.719,3.087-2.055,3.087-4.008c0-1.141-0.504-2.023-1.512-2.648c-1.008-0.609-2.607-1.148-4.796-1.617l-3.74-0.82c-3.676-0.812-6.201-1.695-7.576-2.648c-2.328-1.594-3.492-4.086-3.492-7.477c0-3.094,1.139-5.664,3.417-7.711s5.623-3.07,10.036-3.07c3.685,0,6.829,0.965,9.431,2.895c2.602,1.93,3.966,4.73,4.093,8.402h-6.938c-0.128-2.078-1.057-3.555-2.787-4.43c-1.154-0.578-2.587-0.867-4.301-0.867c-1.907,0-3.428,0.375-4.565,1.125c-1.138,0.75-1.706,1.797-1.706,3.141c0,1.234,0.561,2.156,1.682,2.766c0.721,0.406,2.25,0.883,4.589,1.43l6.063,1.43c2.657,0.625,4.648,1.461,5.975,2.508c2.059,1.625,3.089,3.977,3.089,7.055C108.157,41.624,106.937,44.245,104.497,46.331z M139.61,48.569h-26.18V14.022h25.336v6.117h-18.281v7.336h16.781v6h-16.781v8.883h19.125V48.569z M170.337,20.14h-10.336v28.43h-7.266V20.14h-10.383v-6.117h27.984V20.14z');
-    resetPanZoomControlShape2.setAttribute('class', 'svg-pan-zoom-control-element');
-    resetPanZoomControl.appendChild(resetPanZoomControlShape2);
+    var resetPanZoomControlShape2 = document.createElementNS(SvgUtils.svgNS, 'path')
+    resetPanZoomControlShape2.setAttribute('d', 'M170.231,0.5H15.847C7.102,0.5,0.5,5.708,0.5,11.84v38.861C0.5,56.833,7.102,61.5,15.847,61.5h154.384c8.745,0,15.269-4.667,15.269-10.798V11.84C185.5,5.708,178.976,0.5,170.231,0.5z M42.837,48.569h-7.969c-0.219-0.766-0.375-1.383-0.469-1.852c-0.188-0.969-0.289-1.961-0.305-2.977l-0.047-3.211c-0.03-2.203-0.41-3.672-1.142-4.406c-0.732-0.734-2.103-1.102-4.113-1.102h-7.05v13.547h-7.055V14.022h16.524c2.361,0.047,4.178,0.344,5.45,0.891c1.272,0.547,2.351,1.352,3.234,2.414c0.731,0.875,1.31,1.844,1.737,2.906s0.64,2.273,0.64,3.633c0,1.641-0.414,3.254-1.242,4.84s-2.195,2.707-4.102,3.363c1.594,0.641,2.723,1.551,3.387,2.73s0.996,2.98,0.996,5.402v2.32c0,1.578,0.063,2.648,0.19,3.211c0.19,0.891,0.635,1.547,1.333,1.969V48.569z M75.579,48.569h-26.18V14.022h25.336v6.117H56.454v7.336h16.781v6H56.454v8.883h19.125V48.569z M104.497,46.331c-2.44,2.086-5.887,3.129-10.34,3.129c-4.548,0-8.125-1.027-10.731-3.082s-3.909-4.879-3.909-8.473h6.891c0.224,1.578,0.662,2.758,1.316,3.539c1.196,1.422,3.246,2.133,6.15,2.133c1.739,0,3.151-0.188,4.236-0.562c2.058-0.719,3.087-2.055,3.087-4.008c0-1.141-0.504-2.023-1.512-2.648c-1.008-0.609-2.607-1.148-4.796-1.617l-3.74-0.82c-3.676-0.812-6.201-1.695-7.576-2.648c-2.328-1.594-3.492-4.086-3.492-7.477c0-3.094,1.139-5.664,3.417-7.711s5.623-3.07,10.036-3.07c3.685,0,6.829,0.965,9.431,2.895c2.602,1.93,3.966,4.73,4.093,8.402h-6.938c-0.128-2.078-1.057-3.555-2.787-4.43c-1.154-0.578-2.587-0.867-4.301-0.867c-1.907,0-3.428,0.375-4.565,1.125c-1.138,0.75-1.706,1.797-1.706,3.141c0,1.234,0.561,2.156,1.682,2.766c0.721,0.406,2.25,0.883,4.589,1.43l6.063,1.43c2.657,0.625,4.648,1.461,5.975,2.508c2.059,1.625,3.089,3.977,3.089,7.055C108.157,41.624,106.937,44.245,104.497,46.331z M139.61,48.569h-26.18V14.022h25.336v6.117h-18.281v7.336h16.781v6h-16.781v8.883h19.125V48.569z M170.337,20.14h-10.336v28.43h-7.266V20.14h-10.383v-6.117h27.984V20.14z')
+    resetPanZoomControlShape2.setAttribute('class', 'svg-pan-zoom-control-element')
+    resetPanZoomControl.appendChild(resetPanZoomControlShape2)
 
     return resetPanZoomControl
   }
 
 , _createZoomOut: function(instance){
     // zoom out
-    var zoomOut = document.createElementNS(SvgUtils.svgNS, 'g');
-    zoomOut.setAttribute('id', 'svg-pan-zoom-zoom-out');
-    zoomOut.setAttribute('transform', 'translate(30.5 70) scale(0.015)');
-    zoomOut.setAttribute('class', 'svg-pan-zoom-control');
-    zoomOut.addEventListener('click', function() {instance.getPublicInstance().zoomOut()}, false);
-    zoomOut.addEventListener('touchstart', function() {instance.getPublicInstance().zoomOut()}, false);
+    var zoomOut = document.createElementNS(SvgUtils.svgNS, 'g')
+    zoomOut.setAttribute('id', 'svg-pan-zoom-zoom-out')
+    zoomOut.setAttribute('transform', 'translate(30.5 70) scale(0.015)')
+    zoomOut.setAttribute('class', 'svg-pan-zoom-control')
+    zoomOut.addEventListener('click', function() {instance.getPublicInstance().zoomOut()}, false)
+    zoomOut.addEventListener('touchstart', function() {instance.getPublicInstance().zoomOut()}, false)
 
-    var zoomOutBackground = document.createElementNS(SvgUtils.svgNS, 'rect'); // TODO change these background space fillers to rounded rectangles so they look prettier
-    zoomOutBackground.setAttribute('x', '0');
-    zoomOutBackground.setAttribute('y', '0');
-    zoomOutBackground.setAttribute('width', '1500'); // larger than expected because the whole group is transformed to scale down
-    zoomOutBackground.setAttribute('height', '1400');
-    zoomOutBackground.setAttribute('class', 'svg-pan-zoom-control-background');
-    zoomOut.appendChild(zoomOutBackground);
+    var zoomOutBackground = document.createElementNS(SvgUtils.svgNS, 'rect') // TODO change these background space fillers to rounded rectangles so they look prettier
+    zoomOutBackground.setAttribute('x', '0')
+    zoomOutBackground.setAttribute('y', '0')
+    zoomOutBackground.setAttribute('width', '1500') // larger than expected because the whole group is transformed to scale down
+    zoomOutBackground.setAttribute('height', '1400')
+    zoomOutBackground.setAttribute('class', 'svg-pan-zoom-control-background')
+    zoomOut.appendChild(zoomOutBackground)
 
-    var zoomOutShape = document.createElementNS(SvgUtils.svgNS, 'path');
-    zoomOutShape.setAttribute('d', 'M1280 576v128q0 26 -19 45t-45 19h-896q-26 0 -45 -19t-19 -45v-128q0 -26 19 -45t45 -19h896q26 0 45 19t19 45zM1536 1120v-960q0 -119 -84.5 -203.5t-203.5 -84.5h-960q-119 0 -203.5 84.5t-84.5 203.5v960q0 119 84.5 203.5t203.5 84.5h960q119 0 203.5 -84.5 t84.5 -203.5z');
-    zoomOutShape.setAttribute('class', 'svg-pan-zoom-control-element');
-    zoomOut.appendChild(zoomOutShape);
+    var zoomOutShape = document.createElementNS(SvgUtils.svgNS, 'path')
+    zoomOutShape.setAttribute('d', 'M1280 576v128q0 26 -19 45t-45 19h-896q-26 0 -45 -19t-19 -45v-128q0 -26 19 -45t45 -19h896q26 0 45 19t19 45zM1536 1120v-960q0 -119 -84.5 -203.5t-203.5 -84.5h-960q-119 0 -203.5 84.5t-84.5 203.5v960q0 119 84.5 203.5t203.5 84.5h960q119 0 203.5 -84.5 t84.5 -203.5z')
+    zoomOutShape.setAttribute('class', 'svg-pan-zoom-control-element')
+    zoomOut.appendChild(zoomOutShape)
 
     return zoomOut
   }
@@ -147,10 +127,10 @@ module.exports = {
   }
 }
 
-},{"./svg-utilities":5}],3:[function(require,module,exports){
+},{"./svg-utilities":5}],2:[function(require,module,exports){
 var SvgUtils = require('./svg-utilities')
   , Utils = require('./utilities')
-  ;
+  
 
 var ShadowViewport = function(viewport, options){
   this.init(viewport, options)
@@ -253,17 +233,17 @@ ShadowViewport.prototype.processCTM = function() {
   var newCTM = this.getCTM()
 
   if (this.options.fit || this.options.contain) {
-    var newScale;
+    var newScale
     if (this.options.fit) {
-      newScale = Math.min(this.options.width/this.viewBox.width, this.options.height/this.viewBox.height);
+      newScale = Math.min(this.options.width/this.viewBox.width, this.options.height/this.viewBox.height)
     } else {
-      newScale = Math.max(this.options.width/this.viewBox.width, this.options.height/this.viewBox.height);
+      newScale = Math.max(this.options.width/this.viewBox.width, this.options.height/this.viewBox.height)
     }
 
-    newCTM.a = newScale; //x-scale
-    newCTM.d = newScale; //y-scale
-    newCTM.e = -this.viewBox.x * newScale; //x-transform
-    newCTM.f = -this.viewBox.y * newScale; //y-transform
+    newCTM.a = newScale //x-scale
+    newCTM.d = newScale //y-scale
+    newCTM.e = -this.viewBox.x * newScale //x-transform
+    newCTM.f = -this.viewBox.y * newScale //y-transform
   }
 
   if (this.options.center) {
@@ -372,7 +352,7 @@ ShadowViewport.prototype.setCTM = function(newCTM) {
         newCTM.a = newCTM.d = this.activeState.zoom
         willZoom = false
       } else {
-        this.updateCache(newCTM);
+        this.updateCache(newCTM)
         this.options.onZoom(this.getRelativeZoom())
       }
     }
@@ -418,8 +398,8 @@ ShadowViewport.prototype.setCTM = function(newCTM) {
       if ((preventPanX && preventPanY) || !this.isPanDifferent(newCTM)) {
         willPan = false
       } else {
-        this.updateCache(newCTM);
-        this.options.onPan(this.getPan());
+        this.updateCache(newCTM)
+        this.options.onPan(this.getPan())
       }
     }
 
@@ -487,7 +467,27 @@ module.exports = function(viewport, options){
   return new ShadowViewport(viewport, options)
 }
 
-},{"./svg-utilities":5,"./utilities":7}],4:[function(require,module,exports){
+},{"./svg-utilities":5,"./utilities":7}],3:[function(require,module,exports){
+var svgPanZoom = require('./svg-pan-zoom.js');
+
+// UMD module definition
+(function(window, document){
+  // AMD
+  if (typeof define === 'function' && define.amd) {
+    define('svg-pan-zoom', function () {
+      return svgPanZoom
+    })
+  // CMD
+  } else if (typeof module !== 'undefined' && module.exports) {
+    module.exports = svgPanZoom
+
+    // Browser
+    // Keep exporting globally as module.exports is available because of browserify
+    window.svgPanZoom = svgPanZoom
+  }
+})(window, document)
+
+},{"./svg-pan-zoom.js":4}],4:[function(require,module,exports){
 var Wheel = require('./uniwheel')
 , ControlIcons = require('./control-icons')
 , Utils = require('./utilities')
@@ -522,7 +522,7 @@ var optionsDefaults = {
 , onUpdatedCTM: null
 }
 
-var passiveListenerOption = {passive: true};
+var passiveListenerOption = {passive: true}
 
 SvgPanZoom.prototype.init = function(svg, options) {
   var that = this
@@ -594,51 +594,51 @@ SvgPanZoom.prototype.init = function(svg, options) {
 SvgPanZoom.prototype.setupHandlers = function() {
   var that = this
     , prevEvt = null // use for touchstart event to detect double tap
-    ;
+    
 
   this.eventListeners = {
     // Mouse down group
     mousedown: function(evt) {
-      var result = that.handleMouseDown(evt, prevEvt);
+      var result = that.handleMouseDown(evt, prevEvt)
       prevEvt = evt
-      return result;
+      return result
     }
   , touchstart: function(evt) {
-      var result = that.handleMouseDown(evt, prevEvt);
+      var result = that.handleMouseDown(evt, prevEvt)
       prevEvt = evt
-      return result;
+      return result
     }
 
     // Mouse up group
   , mouseup: function(evt) {
-      return that.handleMouseUp(evt);
+      return that.handleMouseUp(evt)
     }
   , touchend: function(evt) {
-      return that.handleMouseUp(evt);
+      return that.handleMouseUp(evt)
     }
 
     // Mouse move group
   , mousemove: function(evt) {
-      return that.handleMouseMove(evt);
+      return that.handleMouseMove(evt)
     }
   , touchmove: function(evt) {
-      return that.handleMouseMove(evt);
+      return that.handleMouseMove(evt)
     }
 
     // Mouse leave group
   , mouseleave: function(evt) {
-      return that.handleMouseUp(evt);
+      return that.handleMouseUp(evt)
     }
   , touchleave: function(evt) {
-      return that.handleMouseUp(evt);
+      return that.handleMouseUp(evt)
     }
   , touchcancel: function(evt) {
-      return that.handleMouseUp(evt);
+      return that.handleMouseUp(evt)
     }
   }
 
   // Init custom events handler if available
-  if (this.options.customEventsHandler != null) { // jshint ignore:line
+  if (this.options.customEventsHandler != null) { // eslint-disable-line eqeqeq
     this.options.customEventsHandler.init({
       svgElement: this.svg
     , eventsListenerElement: this.options.eventsListenerElement
@@ -679,7 +679,7 @@ SvgPanZoom.prototype.enableMouseWheelZoom = function() {
 
     // Mouse wheel listener
     this.wheelListener = function(evt) {
-      return that.handleMouseWheel(evt);
+      return that.handleMouseWheel(evt)
     }
 
     // Bind wheelListener
@@ -708,14 +708,14 @@ SvgPanZoom.prototype.disableMouseWheelZoom = function() {
  */
 SvgPanZoom.prototype.handleMouseWheel = function(evt) {
   if (!this.options.zoomEnabled || this.state !== 'none') {
-    return;
+    return
   }
 
   if (this.options.preventMouseEventsDefault){
     if (evt.preventDefault) {
-      evt.preventDefault();
+      evt.preventDefault()
     } else {
-      evt.returnValue = false;
+      evt.returnValue = false
     }
   }
 
@@ -736,7 +736,7 @@ SvgPanZoom.prototype.handleMouseWheel = function(evt) {
 
   var inversedScreenCTM = this.svg.getScreenCTM().inverse()
     , relativeMousePoint = SvgUtils.getEventPoint(evt, this.svg).matrixTransform(inversedScreenCTM)
-    , zoom = Math.pow(1 + this.options.zoomScaleSensitivity, (-1) * delta); // multiplying by neg. 1 so as to make zoom in/out behavior match Google maps behavior
+    , zoom = Math.pow(1 + this.options.zoomScaleSensitivity, (-1) * delta) // multiplying by neg. 1 so as to make zoom in/out behavior match Google maps behavior
 
   this.zoomAtPoint(zoom, relativeMousePoint)
 }
@@ -859,14 +859,14 @@ SvgPanZoom.prototype.computeFromRelativeZoom = function(zoom) {
 SvgPanZoom.prototype.resetZoom = function() {
   var originalState = this.viewport.getOriginalState()
 
-  this.zoom(originalState.zoom, true);
+  this.zoom(originalState.zoom, true)
 }
 
 /**
  * Set pan to initial state
  */
 SvgPanZoom.prototype.resetPan = function() {
-  this.pan(this.viewport.getOriginalState());
+  this.pan(this.viewport.getOriginalState())
 }
 
 /**
@@ -1095,7 +1095,7 @@ SvgPanZoom.prototype.destroy = function() {
   this.onUpdatedCTM = null
 
   // Destroy custom event handlers
-  if (this.options.customEventsHandler != null) { // jshint ignore:line
+  if (this.options.customEventsHandler != null) { // eslint-disable-line eqeqeq
     this.options.customEventsHandler.destroy({
       svgElement: this.svg
     , eventsListenerElement: this.options.eventsListenerElement
@@ -1171,7 +1171,7 @@ SvgPanZoom.prototype.getPublicInstance = function() {
       }
     , disableControlIcons: function() {
         if (that.options.controlIconsEnabled) {
-          that.options.controlIconsEnabled = false;
+          that.options.controlIconsEnabled = false
           ControlIcons.disable(that)
         }
         return that.pi
@@ -1261,16 +1261,16 @@ var svgPanZoom = function(elementOrSelector, options){
   }
 }
 
-module.exports = svgPanZoom;
+module.exports = svgPanZoom
 
-},{"./control-icons":2,"./shadow-viewport":3,"./svg-utilities":5,"./uniwheel":6,"./utilities":7}],5:[function(require,module,exports){
+},{"./control-icons":1,"./shadow-viewport":2,"./svg-utilities":5,"./uniwheel":6,"./utilities":7}],5:[function(require,module,exports){
 var Utils = require('./utilities')
   , _browser = 'unknown'
-  ;
+  
 
 // http://stackoverflow.com/questions/9847580/how-to-detect-safari-chrome-ie-firefox-and-opera-browser
 if (/*@cc_on!@*/false || !!document.documentMode) { // internet explorer
-  _browser = 'ie';
+  _browser = 'ie'
 }
 
 module.exports = {
@@ -1290,9 +1290,9 @@ module.exports = {
     if (svg.clientWidth && svg.clientHeight) {
       return {width: svg.clientWidth, height: svg.clientHeight}
     } else if (!!svg.getBoundingClientRect()) {
-      return svg.getBoundingClientRect();
+      return svg.getBoundingClientRect()
     } else {
-      throw new Error('Cannot get BoundingClientRect for SVG.');
+      throw new Error('Cannot get BoundingClientRect for SVG.')
     }
   }
 
@@ -1326,25 +1326,25 @@ module.exports = {
 
     // If no favorable group element exists then create one
     if (!viewport) {
-      var viewportId = 'viewport-' + new Date().toISOString().replace(/\D/g, '');
-      viewport = document.createElementNS(this.svgNS, 'g');
-      viewport.setAttribute('id', viewportId);
+      var viewportId = 'viewport-' + new Date().toISOString().replace(/\D/g, '')
+      viewport = document.createElementNS(this.svgNS, 'g')
+      viewport.setAttribute('id', viewportId)
 
       // Internet Explorer (all versions?) can't use childNodes, but other browsers prefer (require?) using childNodes
-      var svgChildren = svg.childNodes || svg.children;
+      var svgChildren = svg.childNodes || svg.children
       if (!!svgChildren && svgChildren.length > 0) {
         for (var i = svgChildren.length; i > 0; i--) {
           // Move everything into viewport except defs
           if (svgChildren[svgChildren.length - i].nodeName !== 'defs') {
-            viewport.appendChild(svgChildren[svgChildren.length - i]);
+            viewport.appendChild(svgChildren[svgChildren.length - i])
           }
         }
       }
-      svg.appendChild(viewport);
+      svg.appendChild(viewport)
     }
 
     // Parse class names
-    var classNames = [];
+    var classNames = []
     if (viewport.getAttribute('class')) {
       classNames = viewport.getAttribute('class').split(' ')
     }
@@ -1365,15 +1365,15 @@ module.exports = {
    */
   , setupSvgAttributes: function(svg) {
     // Setting default attributes
-    svg.setAttribute('xmlns', this.svgNS);
-    svg.setAttributeNS(this.xmlnsNS, 'xmlns:xlink', this.xlinkNS);
-    svg.setAttributeNS(this.xmlnsNS, 'xmlns:ev', this.evNS);
+    svg.setAttribute('xmlns', this.svgNS)
+    svg.setAttributeNS(this.xmlnsNS, 'xmlns:xlink', this.xlinkNS)
+    svg.setAttributeNS(this.xmlnsNS, 'xmlns:ev', this.evNS)
 
     // Needed for Internet Explorer, otherwise the viewport overflows
     if (svg.parentNode !== null) {
-      var style = svg.getAttribute('style') || '';
+      var style = svg.getAttribute('style') || ''
       if (style.toLowerCase().indexOf('overflow') === -1) {
-        svg.setAttribute('style', 'overflow: hidden; ' + style);
+        svg.setAttribute('style', 'overflow: hidden; ' + style)
       }
     }
   }
@@ -1395,11 +1395,11 @@ module.exports = {
  * also see svg-pan-zoom issue: https://github.com/ariutta/svg-pan-zoom/issues/62
  */
 , refreshDefsGlobal: Utils.throttle(function() {
-    var allDefs = document.querySelectorAll('defs');
-    var allDefsCount = allDefs.length;
+    var allDefs = document.querySelectorAll('defs')
+    var allDefsCount = allDefs.length
     for (var i = 0; i < allDefsCount; i++) {
-      var thisDefs = allDefs[i];
-      thisDefs.parentNode.insertBefore(thisDefs, thisDefs);
+      var thisDefs = allDefs[i]
+      thisDefs.parentNode.insertBefore(thisDefs, thisDefs)
     }
   }, this ? this.internetExplorerRedisplayInterval : null)
 
@@ -1412,15 +1412,15 @@ module.exports = {
    */
 , setCTM: function(element, matrix, defs) {
     var that = this
-      , s = 'matrix(' + matrix.a + ',' + matrix.b + ',' + matrix.c + ',' + matrix.d + ',' + matrix.e + ',' + matrix.f + ')';
+      , s = 'matrix(' + matrix.a + ',' + matrix.b + ',' + matrix.c + ',' + matrix.d + ',' + matrix.e + ',' + matrix.f + ')'
 
-    element.setAttributeNS(null, 'transform', s);
+    element.setAttributeNS(null, 'transform', s)
     if ('transform' in element.style) {
-      element.style.transform = s;
+      element.style.transform = s
     } else if ('-ms-transform' in element.style) {
-      element.style['-ms-transform'] = s;
+      element.style['-ms-transform'] = s
     } else if ('-webkit-transform' in element.style) {
-      element.style['-webkit-transform'] = s;
+      element.style['-webkit-transform'] = s
     }
 
     // IE has a bug that makes markers disappear on zoom (when the matrix "a" and/or "d" elements change)
@@ -1428,13 +1428,13 @@ module.exports = {
     // and http://srndolha.wordpress.com/2013/11/25/svg-line-markers-may-disappear-in-internet-explorer-11/
     if (_browser === 'ie' && !!defs) {
       // this refresh is intended for redisplaying the SVG during zooming
-      defs.parentNode.insertBefore(defs, defs);
+      defs.parentNode.insertBefore(defs, defs)
       // this refresh is intended for redisplaying the other SVGs on a page when panning a given SVG
       // it is also needed for the given SVG itself, on zoomEnd, if the SVG contains any markers that
       // are located under any other element(s).
       window.setTimeout(function() {
-        that.refreshDefsGlobal();
-      }, that.internetExplorerRedisplayInterval);
+        that.refreshDefsGlobal()
+      }, that.internetExplorerRedisplayInterval)
     }
   }
 
@@ -1634,7 +1634,7 @@ module.exports = {
    * @return {Object}        extended object
    */
   extend: function(target, source) {
-    target = target || {};
+    target = target || {}
     for (var prop in source) {
       // Go recursively
       if (this.isObject(source[prop])) {
@@ -1643,7 +1643,7 @@ module.exports = {
         target[prop] = source[prop]
       }
     }
-    return target;
+    return target
   }
 
   /**
@@ -1656,7 +1656,7 @@ module.exports = {
     return (
       o instanceof HTMLElement || o instanceof SVGElement || o instanceof SVGSVGElement || //DOM2
       (o && typeof o === 'object' && o !== null && o.nodeType === 1 && typeof o.nodeName === 'string')
-    );
+    )
   }
 
   /**
@@ -1666,7 +1666,7 @@ module.exports = {
    * @return {Boolean}   returns true if object is an Object
    */
 , isObject: function(o){
-    return Object.prototype.toString.call(o) === '[object Object]';
+    return Object.prototype.toString.call(o) === '[object Object]'
   }
 
   /**
@@ -1676,7 +1676,7 @@ module.exports = {
    * @return {Boolean}   returns true if variable is Number
    */
 , isNumber: function(n) {
-    return !isNaN(parseFloat(n)) && isFinite(n);
+    return !isNaN(parseFloat(n)) && isFinite(n)
   }
 
   /**
@@ -1687,7 +1687,7 @@ module.exports = {
    */
 , getSvg: function(elementOrSelector) {
     var element
-      , svg;
+      , svg
 
     if (!this.isElement(elementOrSelector)) {
       // If selector provided
@@ -1708,18 +1708,18 @@ module.exports = {
     }
 
     if (element.tagName.toLowerCase() === 'svg') {
-      svg = element;
+      svg = element
     } else {
       if (element.tagName.toLowerCase() === 'object') {
-        svg = element.contentDocument.documentElement;
+        svg = element.contentDocument.documentElement
       } else {
         if (element.tagName.toLowerCase() === 'embed') {
-          svg = element.getSVGDocument().documentElement;
+          svg = element.getSVGDocument().documentElement
         } else {
           if (element.tagName.toLowerCase() === 'img') {
-            throw new Error('Cannot script an SVG in an "img" element. Please use an "object" element or an in-line SVG.');
+            throw new Error('Cannot script an SVG in an "img" element. Please use an "object" element or an in-line SVG.')
           } else {
-            throw new Error('Cannot get SVG.');
+            throw new Error('Cannot get SVG.')
           }
           return null
         }
@@ -1772,7 +1772,7 @@ module.exports = {
           evt.clientX = evt.touches[0].clientX
           evt.clientY = evt.touches[0].clientY
         } else if (evt.touches[0].pageX !== void 0) {
-          var rect = svg.getBoundingClientRect();
+          var rect = svg.getBoundingClientRect()
 
           evt.clientX = evt.touches[0].pageX - rect.left
           evt.clientY = evt.touches[0].pageY - rect.top
@@ -1799,7 +1799,7 @@ module.exports = {
 , isDblClick: function(evt, prevEvt) {
     // Double click detected by browser
     if (evt.detail === 2) {
-      return true;
+      return true
     }
     // Try to compare events
     else if (prevEvt !== void 0 && prevEvt !== null) {
@@ -1810,7 +1810,7 @@ module.exports = {
     }
 
     // Nothing found
-    return false;
+    return false
   }
 
   /**
@@ -1819,7 +1819,7 @@ module.exports = {
    * @return {Number}
    */
 , now: Date.now || function() {
-    return new Date().getTime();
+    return new Date().getTime()
   }
 
   // From underscore.
@@ -1831,34 +1831,34 @@ module.exports = {
 // jscs:disable
 // jshint ignore:start
 , throttle: function(func, wait, options) {
-    var that = this;
-    var context, args, result;
-    var timeout = null;
-    var previous = 0;
-    if (!options) options = {};
+    var that = this
+    var context, args, result
+    var timeout = null
+    var previous = 0
+    if (!options) {options = {}}
     var later = function() {
-      previous = options.leading === false ? 0 : that.now();
-      timeout = null;
-      result = func.apply(context, args);
-      if (!timeout) context = args = null;
-    };
+      previous = options.leading === false ? 0 : that.now()
+      timeout = null
+      result = func.apply(context, args)
+      if (!timeout) {context = args = null}
+    }
     return function() {
-      var now = that.now();
-      if (!previous && options.leading === false) previous = now;
-      var remaining = wait - (now - previous);
-      context = this;
-      args = arguments;
+      var now = that.now()
+      if (!previous && options.leading === false) {previous = now}
+      var remaining = wait - (now - previous)
+      context = this // eslint-disable-line consistent-this
+      args = arguments
       if (remaining <= 0 || remaining > wait) {
-        clearTimeout(timeout);
-        timeout = null;
-        previous = now;
-        result = func.apply(context, args);
-        if (!timeout) context = args = null;
+        clearTimeout(timeout)
+        timeout = null
+        previous = now
+        result = func.apply(context, args)
+        if (!timeout) {context = args = null}
       } else if (!timeout && options.trailing !== false) {
-        timeout = setTimeout(later, remaining);
+        timeout = setTimeout(later, remaining)
       }
-      return result;
-    };
+      return result
+    }
   }
 // jshint ignore:end
 // jscs:enable
@@ -1897,4 +1897,4 @@ function requestTimeout(timeout) {
   }
 }
 
-},{}]},{},[1]);
+},{}]},{},[3]);

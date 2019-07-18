@@ -7,7 +7,7 @@ module.exports = {
    * @return {Object}        extended object
    */
   extend: function(target, source) {
-    target = target || {};
+    target = target || {}
     for (var prop in source) {
       // Go recursively
       if (this.isObject(source[prop])) {
@@ -16,7 +16,7 @@ module.exports = {
         target[prop] = source[prop]
       }
     }
-    return target;
+    return target
   }
 
   /**
@@ -29,7 +29,7 @@ module.exports = {
     return (
       o instanceof HTMLElement || o instanceof SVGElement || o instanceof SVGSVGElement || //DOM2
       (o && typeof o === 'object' && o !== null && o.nodeType === 1 && typeof o.nodeName === 'string')
-    );
+    )
   }
 
   /**
@@ -39,7 +39,7 @@ module.exports = {
    * @return {Boolean}   returns true if object is an Object
    */
 , isObject: function(o){
-    return Object.prototype.toString.call(o) === '[object Object]';
+    return Object.prototype.toString.call(o) === '[object Object]'
   }
 
   /**
@@ -49,7 +49,7 @@ module.exports = {
    * @return {Boolean}   returns true if variable is Number
    */
 , isNumber: function(n) {
-    return !isNaN(parseFloat(n)) && isFinite(n);
+    return !isNaN(parseFloat(n)) && isFinite(n)
   }
 
   /**
@@ -60,7 +60,7 @@ module.exports = {
    */
 , getSvg: function(elementOrSelector) {
     var element
-      , svg;
+      , svg
 
     if (!this.isElement(elementOrSelector)) {
       // If selector provided
@@ -81,18 +81,18 @@ module.exports = {
     }
 
     if (element.tagName.toLowerCase() === 'svg') {
-      svg = element;
+      svg = element
     } else {
       if (element.tagName.toLowerCase() === 'object') {
-        svg = element.contentDocument.documentElement;
+        svg = element.contentDocument.documentElement
       } else {
         if (element.tagName.toLowerCase() === 'embed') {
-          svg = element.getSVGDocument().documentElement;
+          svg = element.getSVGDocument().documentElement
         } else {
           if (element.tagName.toLowerCase() === 'img') {
-            throw new Error('Cannot script an SVG in an "img" element. Please use an "object" element or an in-line SVG.');
+            throw new Error('Cannot script an SVG in an "img" element. Please use an "object" element or an in-line SVG.')
           } else {
-            throw new Error('Cannot get SVG.');
+            throw new Error('Cannot get SVG.')
           }
           return null
         }
@@ -145,7 +145,7 @@ module.exports = {
           evt.clientX = evt.touches[0].clientX
           evt.clientY = evt.touches[0].clientY
         } else if (evt.touches[0].pageX !== void 0) {
-          var rect = svg.getBoundingClientRect();
+          var rect = svg.getBoundingClientRect()
 
           evt.clientX = evt.touches[0].pageX - rect.left
           evt.clientY = evt.touches[0].pageY - rect.top
@@ -172,7 +172,7 @@ module.exports = {
 , isDblClick: function(evt, prevEvt) {
     // Double click detected by browser
     if (evt.detail === 2) {
-      return true;
+      return true
     }
     // Try to compare events
     else if (prevEvt !== void 0 && prevEvt !== null) {
@@ -183,7 +183,7 @@ module.exports = {
     }
 
     // Nothing found
-    return false;
+    return false
   }
 
   /**
@@ -192,7 +192,7 @@ module.exports = {
    * @return {Number}
    */
 , now: Date.now || function() {
-    return new Date().getTime();
+    return new Date().getTime()
   }
 
   // From underscore.
@@ -204,34 +204,34 @@ module.exports = {
 // jscs:disable
 // jshint ignore:start
 , throttle: function(func, wait, options) {
-    var that = this;
-    var context, args, result;
-    var timeout = null;
-    var previous = 0;
-    if (!options) options = {};
+    var that = this
+    var context, args, result
+    var timeout = null
+    var previous = 0
+    if (!options) {options = {}}
     var later = function() {
-      previous = options.leading === false ? 0 : that.now();
-      timeout = null;
-      result = func.apply(context, args);
-      if (!timeout) context = args = null;
-    };
+      previous = options.leading === false ? 0 : that.now()
+      timeout = null
+      result = func.apply(context, args)
+      if (!timeout) {context = args = null}
+    }
     return function() {
-      var now = that.now();
-      if (!previous && options.leading === false) previous = now;
-      var remaining = wait - (now - previous);
-      context = this;
-      args = arguments;
+      var now = that.now()
+      if (!previous && options.leading === false) {previous = now}
+      var remaining = wait - (now - previous)
+      context = this // eslint-disable-line consistent-this
+      args = arguments
       if (remaining <= 0 || remaining > wait) {
-        clearTimeout(timeout);
-        timeout = null;
-        previous = now;
-        result = func.apply(context, args);
-        if (!timeout) context = args = null;
+        clearTimeout(timeout)
+        timeout = null
+        previous = now
+        result = func.apply(context, args)
+        if (!timeout) {context = args = null}
       } else if (!timeout && options.trailing !== false) {
-        timeout = setTimeout(later, remaining);
+        timeout = setTimeout(later, remaining)
       }
-      return result;
-    };
+      return result
+    }
   }
 // jshint ignore:end
 // jscs:enable
