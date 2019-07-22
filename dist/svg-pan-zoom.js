@@ -1,26 +1,6 @@
 // svg-pan-zoom v3.6.0
 // https://github.com/ariutta/svg-pan-zoom
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var svgPanZoom = require('./svg-pan-zoom.js');
-
-// UMD module definition
-(function(window, document){
-  // AMD
-  if (typeof define === 'function' && define.amd) {
-    define('svg-pan-zoom', function () {
-      return svgPanZoom;
-    });
-  // CMD
-  } else if (typeof module !== 'undefined' && module.exports) {
-    module.exports = svgPanZoom;
-
-    // Browser
-    // Keep exporting globally as module.exports is available because of browserify
-    window.svgPanZoom = svgPanZoom;
-  }
-})(window, document)
-
-},{"./svg-pan-zoom.js":4}],2:[function(require,module,exports){
+(function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 var SvgUtils = require('./svg-utilities');
 
 module.exports = {
@@ -147,7 +127,7 @@ module.exports = {
   }
 }
 
-},{"./svg-utilities":5}],3:[function(require,module,exports){
+},{"./svg-utilities":5}],2:[function(require,module,exports){
 var SvgUtils = require('./svg-utilities')
   , Utils = require('./utilities')
   ;
@@ -487,7 +467,27 @@ module.exports = function(viewport, options){
   return new ShadowViewport(viewport, options)
 }
 
-},{"./svg-utilities":5,"./utilities":7}],4:[function(require,module,exports){
+},{"./svg-utilities":5,"./utilities":7}],3:[function(require,module,exports){
+var svgPanZoom = require('./svg-pan-zoom.js');
+
+// UMD module definition
+(function(window, document){
+  // AMD
+  if (typeof define === 'function' && define.amd) {
+    define('svg-pan-zoom', function () {
+      return svgPanZoom;
+    });
+  // CMD
+  } else if (typeof module !== 'undefined' && module.exports) {
+    module.exports = svgPanZoom;
+
+    // Browser
+    // Keep exporting globally as module.exports is available because of browserify
+    window.svgPanZoom = svgPanZoom;
+  }
+})(window, document)
+
+},{"./svg-pan-zoom.js":4}],4:[function(require,module,exports){
 var Wheel = require('./uniwheel')
 , ControlIcons = require('./control-icons')
 , Utils = require('./utilities')
@@ -638,7 +638,7 @@ SvgPanZoom.prototype.setupHandlers = function() {
   }
 
   // Init custom events handler if available
-  if (this.options.customEventsHandler != null) { // jshint ignore:line
+  if (this.options.customEventsHandler != null) { // eslint-disable-line eqeqeq
     this.options.customEventsHandler.init({
       svgElement: this.svg
     , eventsListenerElement: this.options.eventsListenerElement
@@ -1095,7 +1095,7 @@ SvgPanZoom.prototype.destroy = function() {
   this.onUpdatedCTM = null
 
   // Destroy custom event handlers
-  if (this.options.customEventsHandler != null) { // jshint ignore:line
+  if (this.options.customEventsHandler != null) { // eslint-disable-line eqeqeq
     this.options.customEventsHandler.destroy({
       svgElement: this.svg
     , eventsListenerElement: this.options.eventsListenerElement
@@ -1263,7 +1263,7 @@ var svgPanZoom = function(elementOrSelector, options){
 
 module.exports = svgPanZoom;
 
-},{"./control-icons":2,"./shadow-viewport":3,"./svg-utilities":5,"./uniwheel":6,"./utilities":7}],5:[function(require,module,exports){
+},{"./control-icons":1,"./shadow-viewport":2,"./svg-utilities":5,"./uniwheel":6,"./utilities":7}],5:[function(require,module,exports){
 var Utils = require('./utilities')
   , _browser = 'unknown'
   ;
@@ -1828,8 +1828,6 @@ module.exports = {
   // as much as it can, without ever going more than once per `wait` duration;
   // but if you'd like to disable the execution on the leading edge, pass
   // `{leading: false}`. To disable execution on the trailing edge, ditto.
-// jscs:disable
-// jshint ignore:start
 , throttle: function(func, wait, options) {
     var that = this;
     var context, args, result;
@@ -1846,7 +1844,7 @@ module.exports = {
       var now = that.now();
       if (!previous && options.leading === false) previous = now;
       var remaining = wait - (now - previous);
-      context = this;
+      context = this; // eslint-disable-line consistent-this
       args = arguments;
       if (remaining <= 0 || remaining > wait) {
         clearTimeout(timeout);
@@ -1860,8 +1858,6 @@ module.exports = {
       return result;
     };
   }
-// jshint ignore:end
-// jscs:enable
 
   /**
    * Create a requestAnimationFrame simulation
@@ -1897,4 +1893,4 @@ function requestTimeout(timeout) {
   }
 }
 
-},{}]},{},[1]);
+},{}]},{},[3]);

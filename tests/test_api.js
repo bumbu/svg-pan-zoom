@@ -26,7 +26,7 @@ var close = QUnit.assert.close = function(number, expected, error, message) {
     error = 0.0001 // default error
   }
 
-  var result = number == expected || (number < expected + error && number > expected - error) || false
+  var result = number == expected || (number < expected + error && number > expected - error) || false // eslint-disable-line eqeqeq
 
   QUnit.push(result, number, expected, message);
 }
