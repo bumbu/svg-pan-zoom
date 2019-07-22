@@ -45,16 +45,12 @@
     "KoenkookpotPlasmans (https://github.com/KoenkookpotPlasmans)",
     "Hassan Shaikley (http://hassanshaikley.github.io/)"
   ],
-  "keywords": [
-    "svg",
-    "pan",
-    "zoom"
-  ],
+  "keywords": ["svg", "pan", "zoom"],
   "devDependencies": {
     "browserify": "^8.0.3",
+    "eslint-plugin-prettier": "^3.1.0",
     "gulp": "^3.8.10",
     "gulp-concat": "^2.4.3",
-    "gulp-config-sync": "git://github.com/bumbu/gulp-config-sync",
     "gulp-header": "^1.2.2",
     "gulp-jscs": "^1.4.0",
     "gulp-jshint": "^1.9.0",
