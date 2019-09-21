@@ -20,7 +20,8 @@ var gulp = require("gulp"),
     "\n";
 
 function isFixed(file) {
-  return file.eslint !== null && file.eslint.fixed;
+  // TODO: why is file.eslint undefined?
+  return typeof file.eslint === "object" && file.eslint.fixed;
 }
 
 /**
@@ -47,7 +48,7 @@ function compile() {
  * Watch script
  */
 function watch() {
-  return gulp.watch("./src/**/*.js", [compile]);
+  return gulp.watch("./src/**/*.js", gulp.series("compile"));
 }
 
 /**
@@ -79,9 +80,9 @@ function check() {
       )
       .pipe(eslint.format())
       .pipe(gulpIf(isFixed, gulp.dest("./")))
+      // uncomment to stop on error
+      .pipe(eslint.failAfterError())
   );
-  // uncomment to stop on error
-  //.pipe(eslint.failAfterError())
 }
 
 exports.compile = compile;
@@ -92,7 +93,7 @@ exports.check = check;
 /**
  * Build
  */
-exports.build = gulp.series([test, check, compile]);
+exports.build = gulp.series([check, compile, test]);
 
 /**
  * Default task
