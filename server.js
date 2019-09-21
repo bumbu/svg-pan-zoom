@@ -86,19 +86,19 @@ StaticServlet.MimeMap = {
 };
 
 StaticServlet.prototype.handleRequest = function(req, res) {
-  var self = this;
+  var that = this;
   var path = ('./' + req.url.pathname).replace('//','/').replace(/%(..)/g, function(match, hex){
     return String.fromCharCode(parseInt(hex, 16));
   });
   var parts = path.split('/');
   if (parts[parts.length-1].charAt(0) === '.')
-    return self.sendForbidden_(req, res, path);
+    return that.sendForbidden_(req, res, path);
   fs.stat(path, function(err, stat) {
     if (err)
-      return self.sendMissing_(req, res, path);
+      return that.sendMissing_(req, res, path);
     if (stat.isDirectory())
-      return self.sendDirectory_(req, res, path);
-    return self.sendFile_(req, res, path);
+      return that.sendDirectory_(req, res, path);
+    return that.sendFile_(req, res, path);
   });
 };
 
@@ -165,7 +165,7 @@ StaticServlet.prototype.sendRedirect_ = function(req, res, redirectUrl) {
 };
 
 StaticServlet.prototype.sendFile_ = function(req, res, path) {
-  var self = this;
+  var that = this;
   var file = fs.createReadStream(path);
   res.writeHead(200, {
     'Content-Type': StaticServlet.
@@ -179,35 +179,35 @@ StaticServlet.prototype.sendFile_ = function(req, res, path) {
       res.end();
     });
     file.on('error', function(error) {
-      self.sendError_(req, res, error);
+      that.sendError_(req, res, error);
     });
   }
 };
 
 StaticServlet.prototype.sendDirectory_ = function(req, res, path) {
-  var self = this;
+  var that = this;
   if (path.match(/[^\/]$/)) {
     req.url.pathname += '/';
     var redirectUrl = url.format(url.parse(url.format(req.url)));
-    return self.sendRedirect_(req, res, redirectUrl);
+    return that.sendRedirect_(req, res, redirectUrl);
   }
   fs.readdir(path, function(err, files) {
     if (err)
-      return self.sendError_(req, res, error);
+      return that.sendError_(req, res, error);
 
     if (!files.length)
-      return self.writeDirectoryIndex_(req, res, path, []);
+      return that.writeDirectoryIndex_(req, res, path, []);
 
     var remaining = files.length;
     files.forEach(function(fileName, index) {
       fs.stat(path + '/' + fileName, function(err, stat) {
         if (err)
-          return self.sendError_(req, res, err);
+          return that.sendError_(req, res, err);
         if (stat.isDirectory()) {
           files[index] = fileName + '/';
         }
         if (!(--remaining))
-          return self.writeDirectoryIndex_(req, res, path, files);
+          return that.writeDirectoryIndex_(req, res, path, files);
       });
     });
   });

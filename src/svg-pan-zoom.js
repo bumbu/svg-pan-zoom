@@ -148,7 +148,7 @@ SvgPanZoom.prototype.setupHandlers = function() {
   }
 
   // Init custom events handler if available
-  if (this.options.customEventsHandler != null) { // jshint ignore:line
+  if (this.options.customEventsHandler != null) { // eslint-disable-line eqeqeq
     this.options.customEventsHandler.init({
       svgElement: this.svg
     , eventsListenerElement: this.options.eventsListenerElement
@@ -605,7 +605,7 @@ SvgPanZoom.prototype.destroy = function() {
   this.onUpdatedCTM = null
 
   // Destroy custom event handlers
-  if (this.options.customEventsHandler != null) { // jshint ignore:line
+  if (this.options.customEventsHandler != null) { // eslint-disable-line eqeqeq
     this.options.customEventsHandler.destroy({
       svgElement: this.svg
     , eventsListenerElement: this.options.eventsListenerElement

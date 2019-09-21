@@ -1,7 +1,0 @@
-{
-  "asi"      : true,
-  "eqeqeq"   : true,
-  "browser"  : true,
-  "laxcomma" : true,
-  "curly"    : true
-}

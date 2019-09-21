@@ -201,8 +201,6 @@ module.exports = {
   // as much as it can, without ever going more than once per `wait` duration;
   // but if you'd like to disable the execution on the leading edge, pass
   // `{leading: false}`. To disable execution on the trailing edge, ditto.
-// jscs:disable
-// jshint ignore:start
 , throttle: function(func, wait, options) {
     var that = this;
     var context, args, result;
@@ -219,7 +217,7 @@ module.exports = {
       var now = that.now();
       if (!previous && options.leading === false) previous = now;
       var remaining = wait - (now - previous);
-      context = this;
+      context = this; // eslint-disable-line consistent-this
       args = arguments;
       if (remaining <= 0 || remaining > wait) {
         clearTimeout(timeout);
@@ -233,8 +231,6 @@ module.exports = {
       return result;
     };
   }
-// jshint ignore:end
-// jscs:enable
 
   /**
    * Create a requestAnimationFrame simulation
