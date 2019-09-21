@@ -44,11 +44,11 @@ Best way to contribute is to create a pull request. In order to create a pull re
   * Run `npm install`
   * Run `npm install -g gulp` if you don't have it already installed globally
   * Running `gulp` will listen for source files changes (in `src` folder) and will automatically build distribution files
-  * Running `gulp browserify` will compile source files
-  * Running `gulp check` for some syntax errors
+  * Running `gulp compile` will compile source files
+  * Running `gulp check` will check syntax and automatically fix some errors
   * Running `gulp test` will run tests
   * Running `gulp build` will prepare the project for a new release
-* Implement the change using `gulp` or `gulp browserify`
+* Implement the change using `gulp` or `gulp compile`
 * After change is done test it with `gulp check` and `gulp test`
 * Commit only meaningful changes. **Do not commit distribution files (`dist` folder)**. Distribution files are built only before a release
 * Push your changes into your fork
