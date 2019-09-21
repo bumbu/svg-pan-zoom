@@ -1,6 +1,6 @@
 {
   "name": "svg-pan-zoom",
-  "version": "3.6.0",
+  "version": "3.6.1",
   "main": "dist/svg-pan-zoom.js",
   "module": "src/svg-pan-zoom.js",
   "types": "dist/svg-pan-zoom.d.ts",
