@@ -2,7 +2,6 @@
  *  Modules
  */
 var gulp = require("gulp"),
-  gulpWatch = require("gulp-watch"),
   uglify = require("gulp-uglify"),
   browserify = require("browserify"),
   source = require("vinyl-source-stream"),
