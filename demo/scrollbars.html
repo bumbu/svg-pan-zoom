@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <style>
+    #svg-container {
+      position: relative;
+      box-sizing: border-box;
+    }
+
+    #svg-content {
+      width: calc(100% - 17px);
+      height: calc(100% - 17px);
+      position: absolute;
+      box-sizing: border-box;
+    }
+
+    #scroll-content {
+      position: absolute;
+    }
+
+    #scroll-container {
+      overflow: scroll;
+      touch-action: none;
+      grid-area: workspace;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+  <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+  <script src="../dist/svg-pan-zoom.js"></script>
+</head>
+
+<body>
+  <div id="svg-container" style="width: 602px; height: 420px; border:1px solid black; ">
+    <div id="scroll-container">
+      <div id="scroll-content"></div>
+    </div>
+    <svg id="svg-content" xmlns="http://www.w3.org/2000/svg" version="1.1">
+      <defs>
+        <linearGradient id="linear-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" style="stop-color:rgb(56,121,217);stop-opacity:1" />
+          <stop offset="100%" style="stop-color:rgb(138,192,7);stop-opacity:1" />
+        </linearGradient>
+      </defs>
+      <g fill="none">
+        <g stroke="#000" fill="#FFF">
+          <rect x="5" y="5" width="240" height="240" fill="url(#linear-gradient)" />
+          <path d="M 5 5  L 245 245 Z" />
+        </g>
+      </g>
+    </svg>
+  </div>
+
+  <script>
+    function convertCoords(min, max, val, displayFrom, displayTo) {
+      var l = getDistance(min, max);
+
+      var ratio = l === 0 ? 0 : getDistance(min, val) / l;
+      if (min > val) {
+        ratio *= -1;
+      }
+
+      var pointOnLine = (displayFrom + ratio * getDistance(displayFrom, displayTo));
+      return pointOnLine;
+    }
+
+    function getDistance(x1, y1) {
+      return Math.abs(x1 - y1);
+    }
+
+    // Don't use window.onLoad like this in production, because it can only listen to one function.
+    window.onload = function () {
+      var scrollContent = document.getElementById("scroll-content");
+      var scrollBars = document.getElementById("scroll-container")
+      var viewPortData = null;
+      var scrollData = null;
+      var panChangedProgramatically = false;
+      var scrollChangedProgramatically = false;
+      var recalcScrollRef = null;
+      var rescaleScrollbars = function (pan) {
+        if (!window.panZoom) {
+          return;
+        }
+
+        if (!viewPortData) {
+          viewPortData = document.getElementsByClassName('svg-pan-zoom_viewport')[0];
+        }
+        
+        let viewPortRect = viewPortData.getBoundingClientRect();
+
+        let sizes = window.panZoom.getSizes();
+        scrollData = {
+          height: viewPortRect.height,
+          width: viewPortRect.width,
+          containerWidth: sizes.width,
+          containerHeight: sizes.height,
+          left: Math.min(pan.x, 0),
+          right: Math.max(pan.x + viewPortRect.width, sizes.width),
+          top: Math.min(pan.y, 0),
+          bottom: Math.max(pan.y + viewPortRect.height, sizes.height)
+        };
+
+        scrollData.boundsLeft = Math.min(
+          pan.x,
+          scrollData.containerWidth -
+          scrollData.width);
+
+        scrollData.boundsRight =
+          Math.max(pan.x,
+            scrollData.containerWidth -
+            scrollData.width);
+
+        scrollData.boundsTop = Math.min(
+          pan.y,
+          scrollData.containerHeight -
+          scrollData.height);
+
+        scrollData.boundsBottom =
+          Math.max(pan.y,
+            scrollData.containerHeight -
+            scrollData.height);
+
+
+        if (pan.y < 0) {
+          scrollData.boundsBottom = 0;
+        }
+
+        if (pan.x < 0) {
+          scrollData.boundsRight = 0;
+        }
+
+        scrollData.distanceH = getDistance(scrollData.left, scrollData.right);
+        scrollData.distanceV = getDistance(scrollData.top, scrollData.bottom);
+        scrollContent.style.height = scrollData.distanceV + "px";
+        scrollContent.style.width = scrollData.distanceH + 'px';
+        scrollChangedProgramatically = true;
+        scrollBars.scrollLeft = convertCoords(0, scrollData.distanceH, pan.x * -1, 0, scrollData.distanceH);
+        scrollChangedProgramatically = true;
+        scrollBars.scrollTop = convertCoords(0, scrollData.distanceV, pan.y * -1, 0, scrollData.distanceV);
+      }
+      // Expose to window namespace for testing purposes
+      window.panZoom = svgPanZoom('#svg-content', {
+        zoomEnabled: true
+        , controlIconsEnabled: true
+        , fit: 1
+        , center: 1
+        // CTM is used while reset cause no pan event.
+        , onUpdatedCTM: function (e) {
+          if (panChangedProgramatically) {
+            panChangedProgramatically = false;
+            return;
+          }
+
+          rescaleScrollbars(window.panZoom.getPan());
+        }
+      });
+
+      //scrollingTimeRef = null;
+      scrollBars.addEventListener('scroll', function (e) {
+        if (scrollChangedProgramatically) {
+          scrollChangedProgramatically = false;
+          return;
+        }
+
+        if (recalcScrollRef) {
+          clearTimeout(recalcScrollRef);
+          recalcScrollRef = null;
+        }
+
+        // Update scrollbars size when scrolling is finished.
+        recalcScrollRef = setTimeout(function () {
+          if (recalcScrollRef) {
+            clearTimeout(recalcScrollRef);
+            recalcScrollRef = null;
+            if (window.panZoom) {
+              rescaleScrollbars(window.panZoom.getPan());
+            }
+          }
+        }, 1000);
+
+        let maxWidth = scrollBars.scrollWidth - scrollBars.clientWidth;
+        let maxHeight = scrollBars.scrollHeight - scrollBars.clientHeight;
+
+        panChangedProgramatically = true;
+        var panData = {
+          x: convertCoords(0,
+            maxWidth,
+            maxWidth - scrollBars.scrollLeft,
+            scrollData.boundsLeft,
+            scrollData.boundsRight),
+          y: convertCoords(0,
+            maxHeight,
+            maxHeight - scrollBars.scrollTop,
+            scrollData.boundsTop,
+            scrollData.boundsBottom)
+        };
+
+        window.panZoom.pan(panData);
+      });
+
+    };
+  </script>
+
+</body>
+
+</html>
