@@ -74,21 +74,30 @@
     window.onload = function () {
       var scrollContent = document.getElementById("scroll-content");
       var scrollBars = document.getElementById("scroll-container")
-      var viewPortData = null;
+      var svgContentElement = null;
       var scrollData = null;
       var panChangedProgramatically = false;
       var scrollChangedProgramatically = false;
       var recalcScrollRef = null;
+
       var rescaleScrollbars = function (pan) {
         if (!window.panZoom) {
           return;
         }
-
-        if (!viewPortData) {
-          viewPortData = document.getElementsByClassName('svg-pan-zoom_viewport')[0];
-        }
         
-        let viewPortRect = viewPortData.getBoundingClientRect();
+        // Viewport data can be fetched only after the initialization.
+        if (!svgContentElement) {
+          var content = document.getElementsByClassName('svg-pan-zoom_viewport');
+          if (content) {
+            svgContentElement = content[0];
+          }
+        }
+
+        if (!svgContentElement) {
+          return;
+        }
+
+        let viewPortRect = svgContentElement.getBoundingClientRect();
 
         let sizes = window.panZoom.getSizes();
         scrollData = {
