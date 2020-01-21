@@ -167,7 +167,9 @@
         }
       });
 
-      //scrollingTimeRef = null;
+      // Initialize after panZoom load
+      rescaleScrollbars(window.panZoom.getPan());
+
       scrollBars.addEventListener('scroll', function (e) {
         if (scrollChangedProgramatically) {
           scrollChangedProgramatically = false;
