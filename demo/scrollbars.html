@@ -73,7 +73,15 @@
     // Don't use window.onLoad like this in production, because it can only listen to one function.
     window.onload = function () {
       var scrollContent = document.getElementById("scroll-content");
-      var scrollBars = document.getElementById("scroll-container")
+      var scrollBars = document.getElementById("scroll-container");
+      
+      // add the real scrollbar offset size
+      var svgContent = document.getElementById("svg-content");
+      var scrollBarWidth = scrollBars.offsetWidth - scrollBars.clientWidth;
+      var sizeWithoutScrollbar = "calc(100% - " + scrollBarWidth + "px)";
+      svgContent.style.width = sizeWithoutScrollbar;
+      svgContent.style.height = sizeWithoutScrollbar;
+
       var svgContentElement = null;
       var scrollData = null;
       var panChangedProgramatically = false;
@@ -151,7 +159,7 @@
         scrollBars.scrollTop = convertCoords(0, scrollData.distanceV, pan.y * -1, 0, scrollData.distanceV);
       }
       // Expose to window namespace for testing purposes
-      window.panZoom = svgPanZoom('#svg-content', {
+      window.panZoom = svgPanZoom(svgContent, {
         zoomEnabled: true
         , controlIconsEnabled: true
         , fit: 1
