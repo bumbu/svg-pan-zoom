@@ -98,17 +98,18 @@
         }
 
         let viewPortRect = svgContentElement.getBoundingClientRect();
-
         let sizes = window.panZoom.getSizes();
+        // get top and left margins:
+        let margin = { x: sizes.viewBox.x * sizes.realZoom, y: sizes.viewBox.y * sizes.realZoom };
         scrollData = {
-          height: viewPortRect.height,
-          width: viewPortRect.width,
-          containerWidth: sizes.width,
+          height: viewPortRect.height + margin.y,
+          width: viewPortRect.width + margin.x,
           containerHeight: sizes.height,
+          containerWidth: sizes.width,
           left: Math.min(pan.x, 0),
-          right: Math.max(pan.x + viewPortRect.width, sizes.width),
+          right: Math.max(pan.x + viewPortRect.width + margin.x, sizes.width),
           top: Math.min(pan.y, 0),
-          bottom: Math.max(pan.y + viewPortRect.height, sizes.height)
+          bottom: Math.max(pan.y + viewPortRect.height + margin.y, sizes.height)
         };
 
         scrollData.boundsLeft = Math.min(
