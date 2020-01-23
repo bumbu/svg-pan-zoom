@@ -5,14 +5,16 @@
   <style>
     #svg-container {
       position: relative;
-      box-sizing: border-box;
+      width: 600px; 
+      height: 420px; 
+      border:1px solid black;
+      margin: 50px;
     }
 
     #svg-content {
       width: calc(100% - 17px);
       height: calc(100% - 17px);
       position: absolute;
-      box-sizing: border-box;
     }
 
     #scroll-content {
@@ -22,7 +24,6 @@
     #scroll-container {
       overflow: scroll;
       touch-action: none;
-      grid-area: workspace;
       position: absolute;
       width: 100%;
       height: 100%;
@@ -33,7 +34,7 @@
 </head>
 
 <body>
-  <div id="svg-container" style="width: 602px; height: 420px; border:1px solid black; ">
+  <div id="svg-container">
     <div id="scroll-container">
       <div id="scroll-content"></div>
     </div>
@@ -44,27 +45,19 @@
           <stop offset="100%" style="stop-color:rgb(138,192,7);stop-opacity:1" />
         </linearGradient>
       </defs>
-      <g fill="none">
-        <g stroke="#000" fill="#FFF">
-          <rect x="5" y="5" width="240" height="240" fill="url(#linear-gradient)" />
-          <path d="M 5 5  L 245 245 Z" />
+    
+      <g transform="" fill="none">
+        <g x="0" y="0" stroke="#000" fill="#FFF">
+          <rect x="0" y="0" width="245" height="245" fill="url(#linear-gradient)" />
+        
+          <path d="M 0 0 L 245 245 Z" />
         </g>
       </g>
+    
     </svg>
   </div>
 
   <script>
-    function convertCoords(min, max, val, displayFrom, displayTo) {
-      var l = getDistance(min, max);
-
-      var ratio = l === 0 ? 0 : getDistance(min, val) / l;
-      if (min > val) {
-        ratio *= -1;
-      }
-
-      var pointOnLine = (displayFrom + ratio * getDistance(displayFrom, displayTo));
-      return pointOnLine;
-    }
 
     function getDistance(x1, y1) {
       return Math.abs(x1 - y1);
@@ -106,57 +99,39 @@
         }
 
         let viewPortRect = svgContentElement.getBoundingClientRect();
+        // This data can be cached until the browser resize:
+        var parentPos = svgContent.getBoundingClientRect();
+        childPos = viewPortRect
+        relativePos = {};
+        // Get position relative to a parent:
+        relativePos.width =viewPortRect.width;
+        relativePos.height = viewPortRect.height;
+        relativePos.top = childPos.top - parentPos.top;
+        relativePos.left = childPos.left - parentPos.left;
+        relativePos.right =  relativePos.left + relativePos.width;
+        relativePos.bottom = relativePos.top + relativePos.height;
+   
         let sizes = window.panZoom.getSizes();
+        var top = Math.min(relativePos.top, pan.y, 0);
+        var left = Math.min(relativePos.left, pan.x, 0);
         // get top and left margins:
-        let margin = { x: sizes.viewBox.x * sizes.realZoom, y: sizes.viewBox.y * sizes.realZoom };
-        scrollData = {
-          height: viewPortRect.height + margin.y,
-          width: viewPortRect.width + margin.x,
-          containerHeight: sizes.height,
-          containerWidth: sizes.width,
-          left: Math.min(pan.x, 0),
-          right: Math.max(pan.x + viewPortRect.width + margin.x, sizes.width),
-          top: Math.min(pan.y, 0),
-          bottom: Math.max(pan.y + viewPortRect.height + margin.y, sizes.height)
-        };
-
-        scrollData.boundsLeft = Math.min(
-          pan.x,
-          scrollData.containerWidth -
-          scrollData.width);
-
-        scrollData.boundsRight =
-          Math.max(pan.x,
-            scrollData.containerWidth -
-            scrollData.width);
-
-        scrollData.boundsTop = Math.min(
-          pan.y,
-          scrollData.containerHeight -
-          scrollData.height);
-
-        scrollData.boundsBottom =
-          Math.max(pan.y,
-            scrollData.containerHeight -
-            scrollData.height);
-
-
-        if (pan.y < 0) {
-          scrollData.boundsBottom = 0;
-        }
-
-        if (pan.x < 0) {
-          scrollData.boundsRight = 0;
-        }
-
-        scrollData.distanceH = getDistance(scrollData.left, scrollData.right);
-        scrollData.distanceV = getDistance(scrollData.top, scrollData.bottom);
-        scrollContent.style.height = scrollData.distanceV + "px";
-        scrollContent.style.width = scrollData.distanceH + 'px';
+        var h = getDistance(top, Math.max(relativePos.bottom, sizes.height));
+        var w = getDistance(left, Math.max(relativePos.right, sizes.width));
+        
+        scrollContent.style.height = h + "px";
+        scrollContent.style.width = w + 'px';
         scrollChangedProgramatically = true;
-        scrollBars.scrollLeft = convertCoords(0, scrollData.distanceH, pan.x * -1, 0, scrollData.distanceH);
+        scrollData = {}
+        scrollData.panY = pan.y;
+        scrollData.panX = pan.x;
+   
         scrollChangedProgramatically = true;
-        scrollBars.scrollTop = convertCoords(0, scrollData.distanceV, pan.y * -1, 0, scrollData.distanceV);
+        // Raw scroll let and top are saved to avoid rounding.
+        scrollData.scrollLeft = Math.max(0, left * -1);
+        scrollBars.scrollLeft = scrollData.scrollLeft;
+        scrollData.scrollTop = Math.max(0, top * -1);
+        scrollBars.scrollTop = scrollData.scrollTop
+
       }
       // Expose to window namespace for testing purposes
       window.panZoom = svgPanZoom(svgContent, {
@@ -200,24 +175,12 @@
           }
         }, 1000);
 
-        let maxWidth = scrollBars.scrollWidth - scrollBars.clientWidth;
-        let maxHeight = scrollBars.scrollHeight - scrollBars.clientHeight;
+        pan = {}
+        pan.y = scrollData.panY  + (scrollData.scrollTop -  scrollBars.scrollTop);
+        pan.x = scrollData.panX  + (scrollData.scrollLeft -  scrollBars.scrollLeft);
 
         panChangedProgramatically = true;
-        var panData = {
-          x: convertCoords(0,
-            maxWidth,
-            maxWidth - scrollBars.scrollLeft,
-            scrollData.boundsLeft,
-            scrollData.boundsRight),
-          y: convertCoords(0,
-            maxHeight,
-            maxHeight - scrollBars.scrollTop,
-            scrollData.boundsTop,
-            scrollData.boundsBottom)
-        };
-
-        window.panZoom.pan(panData);
+        window.panZoom.pan(pan);
       });
 
     };
