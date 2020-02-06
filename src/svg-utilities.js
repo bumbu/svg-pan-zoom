@@ -154,7 +154,7 @@ module.exports = {
    * @param {SVGMatrix} matrix  CTM
    * @param {SVGElement} defs
    */
-  setCTM: function(element, matrix, defs) {
+  setCTM: function(element, matrix, defs, rotate) {
     var that = this,
       s =
         "matrix(" +
@@ -170,6 +170,9 @@ module.exports = {
         "," +
         matrix.f +
         ")";
+      if(rotate != 0){
+        s += ' rotate(' + rotate.angle + ',' + rotate.x + ',' + rotate.y + ')';
+      }
 
     element.setAttributeNS(null, "transform", s);
     if ("transform" in element.style) {

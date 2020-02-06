@@ -17,8 +17,8 @@ ShadowViewport.prototype.init = function(viewport, options) {
   this.options = options;
 
   // State cache
-  this.originalState = { zoom: 1, x: 0, y: 0 };
-  this.activeState = { zoom: 1, x: 0, y: 0 };
+  this.originalState = { zoom: 1, x: 0, y: 0, rotate:0 };
+  this.activeState = { zoom: 1, x: 0, y: 0, rotate:0 };
 
   this.updateCTMCached = Utils.proxy(this.updateCTM, this);
 
@@ -206,6 +206,37 @@ ShadowViewport.prototype.computeRelativeZoom = function(scale) {
 ShadowViewport.prototype.getPan = function() {
   return { x: this.activeState.x, y: this.activeState.y };
 };
+/**
+ * Get rotate
+ *
+ * @return {Float} angle
+ */
+ShadowViewport.prototype.getRotate = function() {
+  return this.activeState.rotate
+}
+
+/**
+ * Get rotate transformation
+ *
+ * @return {Object} angle and point of rotation
+ */
+ShadowViewport.prototype.getRotateTransform = function() {
+  return {
+    angle: this.getRotate(),
+    x: this.getViewBox().width / 2,
+    y: this.getViewBox().height / 2
+  }
+}
+
+/**
+ * Set rotate
+ *
+ * @param {Float} angle
+ */
+ShadowViewport.prototype.rotate = function(angle) {
+  this.activeState.rotate = angle;
+  this.updateCTMOnNextFrame()
+}
 
 /**
  * Return cached viewport CTM value that can be safely modified
@@ -350,7 +381,7 @@ ShadowViewport.prototype.updateCTM = function() {
   var ctm = this.getCTM();
 
   // Updates SVG element
-  SvgUtils.setCTM(this.viewport, ctm, this.defs);
+  SvgUtils.setCTM(this.viewport, ctm, this.defs, this.getRotateTransform());
 
   // Free the lock
   this.pendingUpdate = false;
