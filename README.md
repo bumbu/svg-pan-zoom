@@ -110,6 +110,8 @@ svgPanZoom('#demo-tiger', {
 , onZoom: function(){}
 , beforePan: function(){}
 , onPan: function(){}
+, beforeRotate: function(){}
+, onRotate: function(){}
 , onUpdatedCTM: function(){}
 , customEventsHandler: {}
 , eventsListenerElement: null
@@ -135,6 +137,8 @@ If any arguments are specified, they must have the following value types:
 * 'onZoom' must be a callback function to be called when zoom changes.
 * 'beforePan' must be a callback function to be called before pan changes.
 * 'onPan' must be a callback function to be called when pan changes.
+* 'beforeRotate' must be a callback function to be called before rotation changes.
+* 'onRotate' must be a callback function to be called when rotation changes.
 * 'customEventsHandler' must be an object with `init` and `destroy` arguments as functions.
 * 'eventsListenerElement' must be an SVGElement or null.
 
@@ -384,7 +388,21 @@ panZoomTiger.zoomAtPoint(2, {x: 50, y: 50})
 // Zoom by 130% at given point
 panZoomTiger.zoomAtPointBy(1.3, {x: 50, y: 50})
 ```
+To programmatically rotate, you can use the rotate method to specify your desired angle (in degrees) value:
 
+```js
+// Get instance
+var panZoomTiger = svgPanZoom('#demo-tiger');
+
+// Rotate 45 °
+panZoomTiger.rotate(45)
+
+// If rotation is 45 ° then the resulting angle will be 90°
+panZoomTiger.rotateRelative(45)
+
+// Reset rotation back to angle 0
+panZoomTiger.resetRotate();
+```
 > Zoom is relative to initial SVG internal zoom level. If your SVG was fit at the beginning (option `fit: true`) and thus zoomed in or out to fit available space - initial scale will be 1 anyway.
 
 Or you can use the zoomIn or zoomOut methods:
