@@ -402,17 +402,8 @@ SvgPanZoom.prototype.publicZoomAtPoint = function(scale, point, absolute) {
  *
  * @param  {Float} angle
  */
-SvgPanZoom.prototype.rotate = function(angle) {
-  this.viewport.rotate(angle)
-}
-
-/**
- * Rotate relative
- *
- * @param  {Float} relative angle
- */
-SvgPanZoom.prototype.rotateRelative = function(angle) {
-  this.rotate(this.getRotate() + angle)
+SvgPanZoom.prototype.setAngle = function(angle) {
+  this.viewport.setAngle(angle)
 }
 
 /**
@@ -420,8 +411,8 @@ SvgPanZoom.prototype.rotateRelative = function(angle) {
  *
  * @return {Float} rotate
  */
-SvgPanZoom.prototype.getRotate = function() {
-  return this.viewport.getRotate()
+SvgPanZoom.prototype.getAngle = function() {
+  return this.viewport.getAngle()
 }
 
 /**
@@ -468,10 +459,10 @@ SvgPanZoom.prototype.resetPan = function() {
   this.pan(this.viewport.getOriginalState());
 };
 /**
- * Set rotate to initial state
+ * Set rotation to initial state
  */
-SvgPanZoom.prototype.resetRotate = function() {
-  this.rotate(this.viewport.getOriginalState().rotate);
+SvgPanZoom.prototype.resetRotation = function() {
+  this.setAngle(this.viewport.getOriginalState().angle);
 }
 /**
  * Set pan and zoom to initial state
@@ -927,16 +918,13 @@ SvgPanZoom.prototype.getPublicInstance = function() {
       },
       getZoom: function() {
         return that.getRelativeZoom();
-      }, 
-      rotate: function(angle) {
-        that.rotate(angle); return that.pi
-      }, 
-      rotateRelative: function(angle) {
-        that.rotateRelative(angle); return that.pi
-      }, 
-      getRotate: function() {
-        return that.getRotate()
-      },  
+      },
+      setCenterRotationAngle: function(angle) {
+        that.setAngle(angle); return that.pi
+      },
+      getCenterRotationAngle: function() {
+        return that.getAngle()
+      },
       // CTM update
       setOnUpdatedCTM: function(fn) {
         that.options.onUpdatedCTM =
@@ -952,8 +940,8 @@ SvgPanZoom.prototype.getPublicInstance = function() {
         that.resetPan();
         return that.pi;
       },
-      resetRotate: function() {
-        that.resetPan(); return that.pi
+      resetRotation: function() {
+        that.resetRotation(); return that.pi
       },
       reset: function() {
         that.reset();
@@ -986,8 +974,8 @@ SvgPanZoom.prototype.getPublicInstance = function() {
           width: that.width,
           height: that.height,
           realZoom: that.getZoom(),
-          viewBox: that.viewport.getViewBox(),
-          rotate: that.getRotate()
+          angle: that.getAngle(),
+          viewBox: that.viewport.getViewBox()
         };
       },
       // Destroy

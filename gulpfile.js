@@ -39,15 +39,19 @@ function compile() {
     .pipe(gulp.dest("./dist/"))
     .pipe(rename("svg-pan-zoom.min.js"))
     .pipe(uglify())
+    // Catch minification errors
+    .on('error', function(err) {
+      console.log(err.toString());
+      this.emit("end");
+    })
     .pipe(header(banner, { pkg: pkg }))
-    .pipe(gulp.dest("./dist/"));
 }
 
 /**
  * Watch script
  */
 function watch() {
-  return gulp.watch("./src/**/*.js", gulp.series("compile"));
+  return gulp.watch("./src/**/*.js", gulp.series([compile]));
 }
 
 /**

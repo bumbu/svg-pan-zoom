@@ -51,9 +51,7 @@
 
           intervalID = setInterval(function(){
             if (animationStep++ < animationSteps) {
-              panZoomInstance.panBy({x: stepX, y: stepY});
-              panZoomInstance.rotate(panZoomInstance.getRotate()+5);
-
+              panZoomInstance.panBy({x: stepX, y: stepY})
             } else {
               // Cancel interval
               clearInterval(intervalID)
@@ -65,7 +63,6 @@
         button.addEventListener("click", function() {
           // Pan by any values from -80 to 80
           customPanBy({x: Math.round(Math.random() * 160 - 80), y: Math.round(Math.random() * 160 - 80)})
-
         });
       };
     </script>

@@ -735,6 +735,9 @@
     </div>
     <button id="enable">enable</button>
     <button id="disable">disable</button>
+    <button id="rotate_left">rotate -10</button>
+    <button id="rotate_right">rotate +5</button>
+    <button id="rotate_reset">reset rotation</button>
 
     <script>
       // Don't use window.onLoad like this in production, because it can only listen to one function.
@@ -753,6 +756,17 @@
         })
         document.getElementById('disable').addEventListener('click', function() {
           window.zoomTiger.disableControlIcons();
+        })
+        document.getElementById('rotate_left').addEventListener('click', function() {
+          var currentAngle = window.zoomTiger.getCenterRotationAngle()
+          window.zoomTiger.setCenterRotationAngle(currentAngle - 10);
+        })
+        document.getElementById('rotate_right').addEventListener('click', function() {
+          var currentAngle = window.zoomTiger.getCenterRotationAngle()
+          window.zoomTiger.setCenterRotationAngle(currentAngle + 5);
+        })
+        document.getElementById('rotate_reset').addEventListener('click', function() {
+          window.zoomTiger.resetRotation();
         })
       };
     </script>

@@ -17,8 +17,8 @@ ShadowViewport.prototype.init = function(viewport, options) {
   this.options = options;
 
   // State cache
-  this.originalState = { zoom: 1, x: 0, y: 0, rotate:0 };
-  this.activeState = { zoom: 1, x: 0, y: 0, rotate:0 };
+  this.originalState = { zoom: 1, x: 0, y: 0, angle: 0 };
+  this.activeState = { zoom: 1, x: 0, y: 0, angle: 0 };
 
   this.updateCTMCached = Utils.proxy(this.updateCTM, this);
 
@@ -207,35 +207,41 @@ ShadowViewport.prototype.getPan = function() {
   return { x: this.activeState.x, y: this.activeState.y };
 };
 /**
- * Get rotate
+ * Get rotation angle
  *
  * @return {Float} angle
  */
-ShadowViewport.prototype.getRotate = function() {
-  return this.activeState.rotate
+ShadowViewport.prototype.getAngle = function() {
+  return this.activeState.angle
 }
 
 /**
- * Get rotate transformation
+ * Get rotation
  *
  * @return {Object} angle and point of rotation
  */
-ShadowViewport.prototype.getRotateTransform = function() {
+ShadowViewport.prototype.getRotation = function() {
+  console.log('a', this.getAngle());
+  if (this.getAngle() === 0) {
+    return null
+  }
+
   return {
-    angle: this.getRotate(),
+    angle: this.getAngle(),
     x: this.getViewBox().width / 2,
     y: this.getViewBox().height / 2
   }
 }
 
 /**
- * Set rotate
+ * Set angle
  *
  * @param {Float} angle
  */
-ShadowViewport.prototype.rotate = function(angle) {
-  this.activeState.rotate = angle;
+ShadowViewport.prototype.setAngle = function(angle) {
+  this.activeState.angle = angle
   this.updateCTMOnNextFrame()
+  console.log('new angle', angle, this.activeState);
 }
 
 /**
@@ -379,9 +385,11 @@ ShadowViewport.prototype.updateCTMOnNextFrame = function() {
  */
 ShadowViewport.prototype.updateCTM = function() {
   var ctm = this.getCTM();
+  var rotation = this.getRotation();
+  console.log('updateCTM', ctm, rotation);
 
   // Updates SVG element
-  SvgUtils.setCTM(this.viewport, ctm, this.defs, this.getRotateTransform());
+  SvgUtils.setCTM(this.viewport, ctm, this.defs, rotation);
 
   // Free the lock
   this.pendingUpdate = false;
