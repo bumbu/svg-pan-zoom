@@ -1,4 +1,6 @@
-var svgPanZoomOptions : SvgPanZoom.Options = {
+import svgPanZoom, { Options, Instance } from "dist/svg-pan-zoom";
+
+var svgPanZoomOptions : Options = {
   panEnabled: true // enable or disable panning (default enabled)
   , controlIconsEnabled: false // insert icons to give user an option in addition to mouse events to control pan/zoom (default disabled)
   , zoomEnabled: true // enable or disable zooming (default enabled)
@@ -15,7 +17,7 @@ var svgPanZoomOptions : SvgPanZoom.Options = {
   , refreshRate: 60 // in hz
 };
 
-var panZoomTiger: SvgPanZoom.Instance = svgPanZoom('#demo-tiger');
+var panZoomTiger: Instance = svgPanZoom('#demo-tiger');
 
 var svgElement = <SVGElement>document.querySelector('#demo-tiger');
 panZoomTiger = svgPanZoom(svgElement);
