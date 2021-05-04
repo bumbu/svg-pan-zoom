@@ -57,22 +57,22 @@ Best way to contribute is to create a pull request. In order to create a pull re
 Demos
 -----
 Pan and zoom the SVG tiger on github pages:
-* [Single Inline SVG](http://ariutta.github.io/svg-pan-zoom/demo/inline.html)
-* [Multiple Inline SVGs](http://ariutta.github.io/svg-pan-zoom/demo/multi-instance.html)
-* [SVG Inserted with `Embed` Element](http://ariutta.github.io/svg-pan-zoom/demo/embed.html)
-* [SVG Inserted with `Object` Element](http://ariutta.github.io/svg-pan-zoom/demo/object.html)
-* [SVG Inserted with `Img` Element](http://ariutta.github.io/svg-pan-zoom/demo/img.html) (These cannot be panned/zoomed.)
-* [SVG With custom controls](http://ariutta.github.io/svg-pan-zoom/demo/custom-controls.html)
-* [Resize SVG container on document resize](http://ariutta.github.io/svg-pan-zoom/demo/resize.html)
-* [Two SVGs with synchronized zooming and panning](http://ariutta.github.io/svg-pan-zoom/demo/sinchronized.html)
-* [Custom events: Touch events support: pan, double tap, pinch](http://ariutta.github.io/svg-pan-zoom/demo/mobile.html)
-* [Custom events: Enable zooming only on click, disable on mouse out](http://ariutta.github.io/svg-pan-zoom/demo/custom-event-handlers.html)
-* [Limit pan](http://ariutta.github.io/svg-pan-zoom/demo/limit-pan.html)
-* [Dynamic SVG load](http://ariutta.github.io/svg-pan-zoom/demo/dynamic-load.html)
-* [Using Require.js](http://ariutta.github.io/svg-pan-zoom/demo/require.html)
-* [Pan animation](http://ariutta.github.io/svg-pan-zoom/demo/simple-animation.html)
-* [Zooming just one SVG layer](http://ariutta.github.io/svg-pan-zoom/demo/layers.html)
-* [Thumbnail Viewer](http://ariutta.github.io/svg-pan-zoom/demo/thumbnailViewer.html)
+* [Single Inline SVG](http://bumbu.github.io/svg-pan-zoom/demo/inline.html)
+* [Multiple Inline SVGs](http://bumbu.github.io/svg-pan-zoom/demo/multi-instance.html)
+* [SVG Inserted with `Embed` Element](http://bumbu.github.io/svg-pan-zoom/demo/embed.html)
+* [SVG Inserted with `Object` Element](http://bumbu.github.io/svg-pan-zoom/demo/object.html)
+* [SVG Inserted with `Img` Element](http://bumbu.github.io/svg-pan-zoom/demo/img.html) (These cannot be panned/zoomed.)
+* [SVG With custom controls](http://bumbu.github.io/svg-pan-zoom/demo/custom-controls.html)
+* [Resize SVG container on document resize](http://bumbu.github.io/svg-pan-zoom/demo/resize.html)
+* [Two SVGs with synchronized zooming and panning](http://bumbu.github.io/svg-pan-zoom/demo/sinchronized.html)
+* [Custom events: Touch events support: pan, double tap, pinch](http://bumbu.github.io/svg-pan-zoom/demo/mobile.html)
+* [Custom events: Enable zooming only on click, disable on mouse out](http://bumbu.github.io/svg-pan-zoom/demo/custom-event-handlers.html)
+* [Limit pan](http://bumbu.github.io/svg-pan-zoom/demo/limit-pan.html)
+* [Dynamic SVG load](http://bumbu.github.io/svg-pan-zoom/demo/dynamic-load.html)
+* [Using Require.js](http://bumbu.github.io/svg-pan-zoom/demo/require.html)
+* [Pan animation](http://bumbu.github.io/svg-pan-zoom/demo/simple-animation.html)
+* [Zooming just one SVG layer](http://bumbu.github.io/svg-pan-zoom/demo/layers.html)
+* [Thumbnail Viewer](http://bumbu.github.io/svg-pan-zoom/demo/thumbnailViewer.html)
 
 How To Use
 ----------
