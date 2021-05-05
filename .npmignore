@@ -1,0 +1,20 @@
+# .gitignore
+./server.js
+**/*.orig
+.DS_Store
+npm-debug.log
+*.tgz
+
+# project files that don't need to be part of the published package
+tests
+demo
+.editorconfig
+index.html              
+gulpfile.js             
+server.js               
+.eslintrc.json          
+tsconfig.json           
+tslint.json             
+ISSUE_TEMPLATE.md       
+svg-pan-zoom-logo.png   
+svg-pan-zoom-logo.svg   
