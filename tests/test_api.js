@@ -622,6 +622,46 @@ test("reset (zoom and pan)", function() {
 });
 
 /**
+ * Rotate 
+ */
+test("rotate", function(){
+  expect(1);
+  instance = initSvgPanZoom();
+
+  instance.rotate(45);
+  deepEqual(instance.getRotate(), 45);
+});
+test("rotateRelative", function(){
+  expect(2);
+  instance = initSvgPanZoom();
+
+  instance.rotate(45);
+  deepEqual(instance.getRotate(), 45);
+  instance.rotateRelative(45);
+  deepEqual(instance.getRotate(), 90);
+
+});
+
+test("resetRotate", function(){
+  expect(2);
+  instance = initSvgPanZoom();
+  var initialRotate = instance.getRotate();
+  instance.rotate(45);
+  deepEqual(instance.getRotate(), 45);
+  instance.resetRotate();
+  deepEqual(instance.getRotate(), 45);//need test where resetRotate is tested before original object is adjusted... it still weird that the normal reset does work...
+});
+
+test("global reset", function(){
+  expect(1);
+  instance = initSvgPanZoom();
+  var initialRotate = instance.getRotate();
+  instance.rotate(45);
+  instance.reset();
+  deepEqual(instance.getRotate(), initialRotate);
+});
+
+/**
  * Fit and center
  */
 
