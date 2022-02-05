@@ -17,7 +17,7 @@
         window.zoomTiger = svgPanZoom('#demo-tiger', {
           zoomEnabled: true,
           controlIconsEnabled: true,
-          // Uncomment this in order to get Y asis synchronized pan
+          // Set y to true in order to get Y asis synchronized pan
           beforePan: function(oldP, newP) {return {y:false}},
         });
 
