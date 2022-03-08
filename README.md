@@ -521,11 +521,11 @@ Supported Browsers
 
 CDN
 ---
-You can use (jsdelivr)[http://www.jsdelivr.com/] as a CDN. It supports automatic pulling from NPM and GitHub.
+You can use [jsdelivr](http://www.jsdelivr.com/) as a CDN. It supports automatic pulling from NPM and GitHub.
 
 For example use `https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.5.0/dist/svg-pan-zoom.min.js` to load version `3.5.0`.
 
-For more usage examples check (jsdelivr usage)[https://github.com/jsdelivr/jsdelivr#usage].
+For more usage examples check [jsdelivr usage](https://github.com/jsdelivr/jsdelivr#usage).
 
 Related Work
 ------------
