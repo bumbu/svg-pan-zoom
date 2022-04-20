@@ -157,7 +157,7 @@ You can alter panning on X and Y axes by providing alternative values through re
 
 `onPan` callback will be called with one attribute: `newPan`.
 
-> *Caution!* Calling zoom or pan API methods form inside of `beforeZoom`, `onZoom`, `beforePan` and `onPan` callbacks may lead to infinite loop.
+> *Caution!* Calling zoom or pan API methods from inside of `beforeZoom`, `onZoom`, `beforePan` and `onPan` callbacks may lead to infinite loop.
 
 `onUpdatedCTM` will get called after the CTM will get updated. That happens asynchronously from pan and zoom events.
 
