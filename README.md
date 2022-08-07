@@ -503,7 +503,7 @@ For panning and custom zoom experiences take a look at [limit-pan example](http:
 
 ### How to add animations
 
-Currently there're 2 ways of doing animation: via CSS or programatically - see #101 for more details. 
+Currently there're 2 ways of doing animation: via CSS or programatically - see #101 for more details.
 
 ### Errors for `object`/`embed` or dynamically loaded SVGs
 
@@ -521,7 +521,7 @@ Supported Browsers
 
 CDN
 ---
-You can use (jsdelivr)[http://www.jsdelivr.com/] as a CDN. It supports automatic pulling from NPM and GitHub.
+You can use [jsdelivr](http://www.jsdelivr.com/) as a CDN. It supports automatic pulling from NPM and GitHub.
 
 For example use `https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.5.0/dist/svg-pan-zoom.min.js` to load version `3.5.0`.
 
