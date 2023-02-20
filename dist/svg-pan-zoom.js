@@ -1810,7 +1810,6 @@ module.exports = (function(){
   //Full details: https://developer.mozilla.org/en-US/docs/Web/Reference/Events/wheel
 
   var prefix = "", _addEventListener, _removeEventListener, support, fns = [];
-  var passiveOption = {passive: true};
 
   // detect event model
   if ( window.addEventListener ) {
@@ -1898,7 +1897,7 @@ module.exports = (function(){
       cb = createCallback(elem, callback);
     }
 
-    elem[_addEventListener](prefix + eventName, cb, isPassiveListener ? passiveOption : false);
+    elem[_addEventListener](prefix + eventName, cb, { passive: isPassiveListener ? true : false }, false);
   }
 
   function _removeWheelListener(elem, eventName, callback, isPassiveListener ) {
@@ -1911,7 +1910,7 @@ module.exports = (function(){
       cb = getCallback(elem);
     }
 
-    elem[_removeEventListener](prefix + eventName, cb, isPassiveListener ? passiveOption : false);
+    elem[_removeEventListener](prefix + eventName, cb, { passive: isPassiveListener ? true : false }, false);
 
     removeCallback(elem);
   }
