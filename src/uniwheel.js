@@ -94,7 +94,7 @@ module.exports = (function(){
       cb = createCallback(elem, callback);
     }
 
-    elem[_addEventListener](prefix + eventName, cb, { passive: isPassiveListener ? true : false }, false);
+    elem[_addEventListener](prefix + eventName, cb, { passive: false }, false);
   }
 
   function _removeWheelListener(elem, eventName, callback, isPassiveListener ) {
@@ -107,7 +107,7 @@ module.exports = (function(){
       cb = getCallback(elem);
     }
 
-    elem[_removeEventListener](prefix + eventName, cb, { passive: isPassiveListener ? true : false }, false);
+    elem[_removeEventListener](prefix + eventName, cb, { passive: false }, false);
 
     removeCallback(elem);
   }
