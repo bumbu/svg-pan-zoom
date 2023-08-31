@@ -77,7 +77,7 @@ Pan and zoom the SVG tiger on github pages:
 How To Use
 ----------
 
-Reference the [svg-pan-zoom.js file](http://ariutta.github.io/svg-pan-zoom/dist/svg-pan-zoom.min.js) from your HTML document. Then call the init method:
+Reference the [svg-pan-zoom.js file](https://github.com/bumbu/svg-pan-zoom/blob/master/dist/svg-pan-zoom.min.js) from your HTML document. Then call the init method:
 
 ```js
 var panZoomTiger = svgPanZoom('#demo-tiger');
