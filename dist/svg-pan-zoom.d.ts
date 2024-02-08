@@ -82,6 +82,8 @@ declare namespace SvgPanZoom {
     height: number;
     realZoom: number;
     viewBox: {
+      x: number;
+      y: number;
       width: number;
       height: number;
     };
