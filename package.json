@@ -12,7 +12,7 @@
     "lint": "tslint 'dist/svg-pan-zoom.d.ts'",
     "test": "tsc && gulp test",
     "build": "gulp build",
-    "server": "node server.js"
+    "server": "serve"
   },
   "repository": {
     "type": "git",
@@ -64,6 +64,7 @@
     "prettier": "^1.18.2",
     "qunit": "^2.9.3",
     "qunitjs": "npm:qunit@^2.9.3",
+    "serve": "^11.3.2",
     "tslint": "^4.5.1",
     "typescript": "^3.6.4",
     "vinyl-buffer": "^1.0.1",
