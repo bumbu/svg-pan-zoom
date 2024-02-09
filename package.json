@@ -48,7 +48,8 @@
   "keywords": [
     "svg",
     "pan",
-    "zoom"
+    "zoom",
+    "rotate"
   ],
   "devDependencies": {
     "browserify": "^16.5.0",
