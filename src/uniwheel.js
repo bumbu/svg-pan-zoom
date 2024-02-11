@@ -7,7 +7,8 @@ module.exports = (function(){
   //Full details: https://developer.mozilla.org/en-US/docs/Web/Reference/Events/wheel
 
   var prefix = "", _addEventListener, _removeEventListener, support, fns = [];
-  var passiveOption = {passive: true};
+  var passiveListenerOption = {passive: true};
+  var activeListenerOption = {passive: false};
 
   // detect event model
   if ( window.addEventListener ) {
@@ -95,7 +96,11 @@ module.exports = (function(){
       cb = createCallback(elem, callback);
     }
 
-    elem[_addEventListener](prefix + eventName, cb, isPassiveListener ? passiveOption : false);
+    elem[_addEventListener](
+      prefix + eventName,
+      cb,
+      isPassiveListener ? passiveListenerOption : activeListenerOption
+    );
   }
 
   function _removeWheelListener(elem, eventName, callback, isPassiveListener ) {
@@ -108,7 +113,11 @@ module.exports = (function(){
       cb = getCallback(elem);
     }
 
-    elem[_removeEventListener](prefix + eventName, cb, isPassiveListener ? passiveOption : false);
+    elem[_removeEventListener](
+      prefix + eventName,
+      cb,
+      isPassiveListener ? passiveListenerOption : activeListenerOption
+    );
 
     removeCallback(elem);
   }
