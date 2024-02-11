@@ -133,7 +133,7 @@ module.exports = {
    * This is only needed for IE. It is as a hack to make markers (and 'use' elements?)
    * visible after pan/zoom when there are multiple SVGs on the page.
    * See bug report: https://connect.microsoft.com/IE/feedback/details/781964/
-   * also see svg-pan-zoom issue: https://github.com/ariutta/svg-pan-zoom/issues/62
+   * also see svg-pan-zoom issue: https://github.com/bumbu/svg-pan-zoom/issues/62
    */
   refreshDefsGlobal: Utils.throttle(
     function() {

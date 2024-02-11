@@ -10,14 +10,14 @@ Simple pan/zoom solution for SVGs in HTML. It adds events listeners for mouse sc
 
 It works cross-browser and supports both inline SVGs and SVGs in HTML `object` or `embed` elements.
 
-> If you're looking for version 2.3.x you can find it in [v2.3.x branch](https://github.com/ariutta/svg-pan-zoom/tree/v2.3.x)
+> If you're looking for version 2.3.x you can find it in [v2.3.x branch](https://github.com/bumbu/svg-pan-zoom/tree/v2.3.x)
 
 Support
 -------
 
 ### Bugs and Issues
 
-If you found a bug or have a suggestion first check if there is a similar [open](https://github.com/ariutta/svg-pan-zoom/issues) or [closed](https://github.com/ariutta/svg-pan-zoom/issues?q=is%3Aissue+is%3Aclosed) issue. If there are none then create a new one.
+If you found a bug or have a suggestion first check if there is a similar [open](https://github.com/bumbu/svg-pan-zoom/issues) or [closed](https://github.com/bumbu/svg-pan-zoom/issues?q=is%3Aissue+is%3Aclosed) issue. If there are none then create a new one.
 
 When opening a new issue **please provide a reproducible example**:
 - Share it so we can get directly to the problem. You can use [this starter jsfiddle setup](http://jsfiddle.net/bumbu/167usffr/) to provide your example. Or upload your own [jsfiddle.net](http://jsfiddle.net) (or any other live) example.
@@ -227,20 +227,20 @@ svgPanZoom('#demo-tiger', {
 Listening for pan/zoom events on a child SVG element
 ----------------------------------------------------
 
-If you want to listen for user interaction events from a child SVG element then use `eventsListenerElement` option. An example is available in [demo/layers.html](http://ariutta.github.io/svg-pan-zoom/demo/layers.html).
+If you want to listen for user interaction events from a child SVG element then use `eventsListenerElement` option. An example is available in [demo/layers.html](http://bumbu.github.io/svg-pan-zoom/demo/layers.html).
 
 Use with browserify
 -------------------
 
 To use with browserify, follow these steps:
-* Add the package as node module `npm install --save ariutta/svg-pan-zoom`
+* Add the package as node module `npm install --save bumbu/svg-pan-zoom`
 * Require _svg-pan-zoom_ in your source file `svgPanZoom = require('svg-pan-zoom')`
 * Use in the same way as you would do with global svgPanZoom: `instance = svgPanZoom('#demo-tiger')`
 
 Use with Require.js (or other AMD libraries)
 -------------------
 
-An example of how to load library using Require.js is available in [demo/require.html](http://ariutta.github.io/svg-pan-zoom/demo/require.html)
+An example of how to load library using Require.js is available in [demo/require.html](http://bumbu.github.io/svg-pan-zoom/demo/require.html)
 
 Custom events support
 ---------------------
@@ -484,32 +484,32 @@ Because the library removes `viewBox` attribute from the SVG element - you may e
 
 ### Calling library methods throw errors when SVG is hidden
 
-This library does not support working with SVGs that are hidden as some browsers detach child documents from the DOM when those are hidden. See [#279](https://github.com/ariutta/svg-pan-zoom/issues/279) for more details.
+This library does not support working with SVGs that are hidden as some browsers detach child documents from the DOM when those are hidden. See [#279](https://github.com/bumbu/svg-pan-zoom/issues/279) for more details.
 
 ### Performance issues on initialization
 
-If performance is bad only on initialization of the library, then consider wrapping all SVG's child elements into a `<g>` beforehand. This way the library will not have to create it and move all children into it (which is the root cause of the issue). See [#146 comment](https://github.com/ariutta/svg-pan-zoom/issues/146#issuecomment-137873358).
+If performance is bad only on initialization of the library, then consider wrapping all SVG's child elements into a `<g>` beforehand. This way the library will not have to create it and move all children into it (which is the root cause of the issue). See [#146 comment](https://github.com/bumbu/svg-pan-zoom/issues/146#issuecomment-137873358).
 
 ### Performance issues while panning/zooming
 
 Most often those are caused by big SVG files. And in those cases it's browsers not being able to handle those SVGs fast enough.
-See [#277](https://github.com/ariutta/svg-pan-zoom/issues/277) for more details.
+See [#277](https://github.com/bumbu/svg-pan-zoom/issues/277) for more details.
 
 ### How to limit zooming/panning
 
 For zooming there is `minZoom` and `maxZoom` zoom config options.
 
-For panning and custom zoom experiences take a look at [limit-pan example](http://ariutta.github.io/svg-pan-zoom/demo/limit-pan.html).
+For panning and custom zoom experiences take a look at [limit-pan example](http://bumbu.github.io/svg-pan-zoom/demo/limit-pan.html).
 
 ### How to add animations
 
-Currently there're 2 ways of doing animation: via CSS or programatically - see #101 for more details. 
+Currently there're 2 ways of doing animation: via CSS or programatically - see #101 for more details.
 
 ### Errors for `object`/`embed` or dynamically loaded SVGs
 
 You have to ensure that the SVG is loaded and available in DOM before initializing the library.
 
-Check [dymanic-load demo](http://ariutta.github.io/svg-pan-zoom/demo/dynamic-load.html).
+Check [dymanic-load demo](http://bumbu.github.io/svg-pan-zoom/demo/dynamic-load.html).
 
 Supported Browsers
 ------------------

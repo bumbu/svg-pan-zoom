@@ -1,6 +1,6 @@
 {
   "name": "svg-pan-zoom",
-  "version": "3.6.1",
+  "version": "3.6.2",
   "main": "dist/svg-pan-zoom.js",
   "module": "src/svg-pan-zoom.js",
   "types": "dist/svg-pan-zoom.d.ts",
@@ -16,10 +16,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/ariutta/svg-pan-zoom"
+    "url": "https://github.com/bumbu/svg-pan-zoom"
   },
   "bugs": {
-    "url": "https://github.com/ariutta/svg-pan-zoom/issues"
+    "url": "https://github.com/bumbu/svg-pan-zoom/issues"
   },
   "contributors": [
     "Andrea Leofreddi <a.leofreddi@vleo.net>",

@@ -15,7 +15,7 @@ var gulp = require("gulp"),
   banner =
     "// svg-pan-zoom v<%= pkg.version %>" +
     "\n" +
-    "// https://github.com/ariutta/svg-pan-zoom" +
+    "// https://github.com/bumbu/svg-pan-zoom" +
     "\n";
 
 function isFixed(file) {
