@@ -730,6 +730,9 @@ SvgPanZoom.prototype.getPublicInstance = function() {
   // Create cache
   if (!this.publicInstance) {
     this.publicInstance = this.pi = {
+      // SVG Element
+      svg: that.svg,
+
       // Pan
       enablePan: function() {
         that.options.panEnabled = true;
